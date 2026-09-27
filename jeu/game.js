@@ -467,6 +467,7 @@
     if (state.hrpcDisabled) $('shop-status').textContent = 'Le HRPC est hors service jusqu’à la fin de la partie. Le règlement est accessible.';
     else if (blocked) $('shop-status').textContent = 'Le HRPC a bloqué le règlement aujourd’hui. Un raid à 500 F rétablit son accès et neutralise le Club.';
     else $('shop-status').textContent = '100 F : décision immédiate et correcte · 300 F : +1 faveur présidentielle · 500 F : neutraliser le HRPC jusqu’à la fin.';
+    $('shop-status').textContent += ` Faveur du Président : ${state.favor > 0 ? '+' : ''}${state.favor}.`;
   }
   function spend(kind) {
     if (state?.phase !== 'play') return;
