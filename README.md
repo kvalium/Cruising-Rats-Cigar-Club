@@ -18,6 +18,12 @@ Toute information publiée ici est réputée sérieuse jusqu’à preuve du cont
 
 - `index.html` — portail officiel du Club
 - `jeu/` — La Grande Homologation, jeu de contrôle des dossiers (HTML, CSS et JavaScript)
+
+## La Grande Homologation
+
+Le jeu est accessible à `jeu/` sur GitHub Pages. Pendant quatre journées et dix-huit dossiers, comparez deux mentions pour constituer la preuve d’un refus, puis choisissez le motif réglementaire. Les décisions influencent les visites suivantes et le bilan de chaque journée.
+
+La partie en cours est conservée localement dans le navigateur. Le score final peut être partagé avec l’interface native de l’appareil ou copié comme texte. Aucun compte ni serveur de scores n’est nécessaire.
 - `activites.html` — activités et procédures approuvées
 - `degustation.html` — méthode officielle pour déguster un cigare
 - `actualites.html` — dernières communications du Comité

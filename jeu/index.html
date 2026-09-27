@@ -26,16 +26,16 @@
         <div class="briefing">
           <div><b>01</b><span>Examinez la carte, la fiche et les demandes.</span></div>
           <div><b>02</b><span>Consultez le règlement du jour. Il change.</span></div>
-          <div><b>03</b><span>Validez ou refusez en indiquant le motif.</span></div>
+          <div><b>03</b><span>Pour refuser, rapprochez deux mentions et indiquez le motif.</span></div>
         </div>
-        <button class="primary-button" id="start-button" type="button">PRENDRE SON SERVICE <span>→</span></button>
-        <p class="intro-foot">Une partie · 10 dossiers · Aucune compétence réelle en cigare requise</p>
+        <div class="intro-actions"><button class="primary-button" id="start-button" type="button">PRENDRE SON SERVICE <span>→</span></button><button class="secondary-button hidden" id="resume-button" type="button">REPRENDRE LE DOSSIER EN COURS</button></div>
+        <p class="intro-foot">Une partie · 18 dossiers · 4 journées · Aucune compétence réelle en cigare requise</p>
       </section>
 
       <section class="play hidden" id="play" aria-label="Guichet des admissions">
         <div class="statusbar">
-          <div><span class="status-label">JOUR DE SERVICE</span><strong id="day-label">01 / 03</strong></div>
-          <div><span class="status-label">DOSSIER</span><strong id="case-label">01 / 10</strong></div>
+          <div><span class="status-label">JOUR DE SERVICE</span><strong id="day-label">01 / 04</strong></div>
+          <div><span class="status-label">DOSSIER</span><strong id="case-label">01 / 18</strong></div>
           <div><span class="status-label">CAISSE DU BUREAU</span><strong id="balance-label">0 F</strong></div>
           <div><span class="status-label">ERREURS</span><strong id="errors-label">0</strong></div>
         </div>
@@ -52,8 +52,9 @@
             <div class="bulletin" id="bulletin" role="status"></div>
             <div class="visitor-strip"><div class="visitor-avatar" id="visitor-avatar" aria-hidden="true">R</div><div><span>AU GUICHET</span><h2 id="visitor-name"></h2><p id="visitor-quote"></p></div><div class="queue-number" id="queue-number"></div></div>
             <div class="documents" id="documents" aria-label="Documents à examiner"></div>
+            <div class="comparison" aria-live="polite"><div><span class="comparison-label">TABLE DE COMPARAISON · SÉLECTIONNEZ DEUX MENTIONS</span><p id="comparison-text">Cliquez sur une mention du dossier ou un article du règlement, puis sur une seconde.</p></div><button id="clear-evidence" class="text-button" type="button">Effacer</button></div>
             <div class="decision-area">
-              <p class="decision-hint" id="decision-hint">Vérifiez les pièces et appliquez le règlement en vigueur.</p>
+              <p class="decision-hint" id="decision-hint">Pour refuser : comparez deux mentions, puis indiquez le motif.</p>
               <div class="actions" id="actions"><button id="approve-button" class="stamp approve" type="button"><span>✓</span> VALIDER</button><button id="refuse-button" class="stamp refuse" type="button"><span>✕</span> REFUSER</button></div>
               <div class="reason-picker hidden" id="reason-picker"><label for="reason-select">MOTIF DE REFUS À INSCRIRE AU REGISTRE</label><select id="reason-select"><option value="">Choisir le motif…</option></select><div><button id="confirm-refusal" class="stamp refuse" type="button" disabled>✕ TAMPONNER LE REFUS</button><button id="cancel-refusal" class="text-button" type="button">Annuler</button></div></div>
             </div>
@@ -65,7 +66,9 @@
         <div class="result-paper"><p class="eyebrow" id="result-kicker">AVIS DU COMITÉ</p><div class="result-stamp" id="result-stamp"></div><h2 id="result-title"></h2><p id="result-text"></p><div class="result-ledger" id="result-ledger"></div><button class="primary-button" id="next-button" type="button">DOSSIER SUIVANT <span>→</span></button></div>
       </section>
 
-      <section class="ending hidden" id="ending" aria-live="polite"><div class="ending-card"><p class="eyebrow">PROCÈS-VERBAL DE FIN DE SERVICE</p><h1 id="ending-title"></h1><p id="ending-copy"></p><div class="ending-stats" id="ending-stats"></div><button class="primary-button" id="restart-button" type="button">REPRENDRE LE SERVICE <span>↻</span></button><a href="../index.html" class="back-link">Retour au portail officiel</a></div></section>
+      <section class="daily hidden" id="daily" aria-live="polite"><div class="result-paper"><p class="eyebrow" id="daily-kicker">CLÔTURE DU JOUR</p><h2 id="daily-title"></h2><p id="daily-copy"></p><div class="daily-lines" id="daily-lines"></div><p class="committee-note" id="daily-note"></p><button class="primary-button" id="continue-button" type="button">OUVRIR LE GUICHET DEMAIN <span>→</span></button></div></section>
+
+      <section class="ending hidden" id="ending" aria-live="polite"><div class="ending-card"><p class="eyebrow">PROCÈS-VERBAL DE FIN DE SERVICE</p><h1 id="ending-title"></h1><p id="ending-copy"></p><div class="ending-stats" id="ending-stats"></div><div class="share-box"><p id="share-preview"></p><div class="share-actions"><button id="share-button" class="secondary-button" type="button">PARTAGER MON SCORE ↗</button><button id="copy-button" class="secondary-button" type="button">COPIER LE RÉSULTAT</button></div><span id="share-status" role="status"></span></div><button class="primary-button" id="restart-button" type="button">REPRENDRE LE SERVICE <span>↻</span></button><a href="../index.html" class="back-link">Retour au portail officiel</a></div></section>
     </main>
     <footer>CRCC / DIRECTION DES ADMISSIONS · TOUTE RESSEMBLANCE AVEC UNE PROCÉDURE RAISONNABLE SERAIT FORTUITE</footer>
   </div>
