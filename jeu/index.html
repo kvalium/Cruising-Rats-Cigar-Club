@@ -28,6 +28,7 @@
           <div><b>02</b><span>Consultez le règlement du jour. Il change.</span></div>
           <div><b>03</b><span>Pour refuser, rapprochez deux mentions et indiquez le motif.</span></div>
         </div>
+        <div class="game-options"><label><input id="timed-mode" type="checkbox"> Guichet sous pression <small>120 secondes par dossier · facultatif</small></label><p id="challenge-label" class="challenge-label hidden"></p></div>
         <div class="intro-actions"><button class="primary-button" id="start-button" type="button">PRENDRE SON SERVICE <span>→</span></button><button class="secondary-button hidden" id="resume-button" type="button">REPRENDRE LE DOSSIER EN COURS</button></div>
         <p class="intro-foot">Une partie · 18 dossiers · 4 journées · Aucune compétence réelle en cigare requise</p>
       </section>
@@ -38,6 +39,7 @@
           <div><span class="status-label">DOSSIER</span><strong id="case-label">01 / 18</strong></div>
           <div><span class="status-label">CAISSE DU BUREAU</span><strong id="balance-label">0 F</strong></div>
           <div><span class="status-label">ERREURS</span><strong id="errors-label">0</strong></div>
+          <div class="timer-box hidden" id="timer-box"><span class="status-label">TEMPS RESTANT</span><strong id="timer-label">2:00</strong></div>
         </div>
         <div class="workplace">
           <aside class="rules panel" aria-label="Règlement du jour">
@@ -50,6 +52,7 @@
 
           <div class="desk">
             <div class="bulletin" id="bulletin" role="status"></div>
+            <div class="president-note hidden" id="president-note"></div>
             <div class="visitor-strip"><div class="visitor-avatar" id="visitor-avatar" aria-hidden="true">R</div><div><span>AU GUICHET</span><h2 id="visitor-name"></h2><p id="visitor-quote"></p></div><div class="queue-number" id="queue-number"></div></div>
             <div class="documents" id="documents" aria-label="Documents à examiner"></div>
             <div class="comparison" aria-live="polite"><div><span class="comparison-label">TABLE DE COMPARAISON · SÉLECTIONNEZ DEUX MENTIONS</span><p id="comparison-text">Cliquez sur une mention du dossier ou un article du règlement, puis sur une seconde.</p></div><button id="clear-evidence" class="text-button" type="button">Effacer</button></div>
@@ -68,7 +71,13 @@
 
       <section class="daily hidden" id="daily" aria-live="polite"><div class="result-paper"><p class="eyebrow" id="daily-kicker">CLÔTURE DU JOUR</p><h2 id="daily-title"></h2><p id="daily-copy"></p><div class="daily-lines" id="daily-lines"></div><p class="committee-note" id="daily-note"></p><button class="primary-button" id="continue-button" type="button">OUVRIR LE GUICHET DEMAIN <span>→</span></button></div></section>
 
-      <section class="ending hidden" id="ending" aria-live="polite"><div class="ending-card"><p class="eyebrow">PROCÈS-VERBAL DE FIN DE SERVICE</p><h1 id="ending-title"></h1><p id="ending-copy"></p><div class="ending-stats" id="ending-stats"></div><div class="share-box"><p id="share-preview"></p><div class="share-actions"><button id="share-button" class="secondary-button" type="button">PARTAGER MON SCORE ↗</button><button id="copy-button" class="secondary-button" type="button">COPIER LE RÉSULTAT</button></div><span id="share-status" role="status"></span></div><button class="primary-button" id="restart-button" type="button">REPRENDRE LE SERVICE <span>↻</span></button><a href="../index.html" class="back-link">Retour au portail officiel</a></div></section>
+      <section class="event hidden" id="appeal" aria-live="polite"><div class="event-card"><p class="eyebrow">COMMISSION D’APPEL · DOSSIER N° 002</p><h2>Le retour de<br><em>Monsieur Rature</em></h2><p id="appeal-intro"></p><div class="appeal-docs"><div><span>CARTE PRÉSENTÉE LE JOUR 1</span><strong>Validation du Comité : ABSENTE</strong><p>La pièce versée au dossier au moment de votre décision.</p></div><div><span>PIÈCE NOUVELLE</span><strong>Validation apposée le jour 2</strong><p>Un tampon authentique, mais postérieur au premier passage.</p></div></div><p class="committee-note" id="appeal-question"></p><div class="event-actions"><button class="stamp approve" id="appeal-uphold" type="button">CONFIRMER LA DÉCISION</button><button class="stamp refuse" id="appeal-revise" type="button">RECTIFIER LA DÉCISION</button></div></div></section>
+
+      <section class="event hidden" id="cutter" aria-live="polite"><div class="event-card"><p class="eyebrow">EXAMEN CONTRADICTOIRE · OBJET PRÉSIDENTIEL</p><h2>Le Coupe-cigare<br><em>revient au bureau</em></h2><p>Comparez l’état des lieux avant et après l’emprunt. Une différence éventuelle doit être consignée. « Il était déjà comme ça avant » n’est pas une mesure.</p><div class="cutter-views"><div><span>AVANT</span><div id="cutter-before"></div></div><div><span>APRÈS</span><div id="cutter-after"></div></div></div><p class="comparison-label">QUELLE PARTIE A CHANGÉ ?</p><div class="cutter-options" id="cutter-options"><button type="button" data-part="blade">La lame</button><button type="button" data-part="pivot">Le pivot</button><button type="button" data-part="handle">La poignée</button><button type="button" data-part="none">Aucune</button></div></div></section>
+
+      <section class="result hidden" id="event-result" aria-live="polite"><div class="result-paper"><p class="eyebrow" id="event-result-kicker"></p><div class="result-stamp" id="event-result-stamp"></div><h2 id="event-result-title"></h2><p id="event-result-text"></p><div class="result-ledger" id="event-result-ledger"></div><button class="primary-button" id="event-next" type="button">REPRENDRE LE SERVICE <span>→</span></button></div></section>
+
+      <section class="ending hidden" id="ending" aria-live="polite"><div class="ending-card"><p class="eyebrow">PROCÈS-VERBAL DE FIN DE SERVICE</p><h1 id="ending-title"></h1><p id="ending-copy"></p><div class="ending-stats" id="ending-stats"></div><p id="ending-special" class="committee-note"></p><div class="share-box"><p id="share-preview"></p><div class="share-actions"><button id="share-button" class="secondary-button" type="button">PARTAGER MON SCORE ↗</button><button id="copy-button" class="secondary-button" type="button">COPIER LE RÉSULTAT</button></div><span id="share-status" role="status"></span></div><button class="primary-button" id="restart-button" type="button">REPRENDRE LE SERVICE <span>↻</span></button><a href="../index.html" class="back-link">Retour au portail officiel</a></div></section>
     </main>
     <footer>CRCC / DIRECTION DES ADMISSIONS · TOUTE RESSEMBLANCE AVEC UNE PROCÉDURE RAISONNABLE SERAIT FORTUITE</footer>
   </div>

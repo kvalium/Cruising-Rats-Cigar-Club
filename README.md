@@ -21,9 +21,9 @@ Toute information publiée ici est réputée sérieuse jusqu’à preuve du cont
 
 ## La Grande Homologation
 
-Le jeu est accessible à `jeu/` sur GitHub Pages. Pendant quatre journées et dix-huit dossiers, comparez deux mentions pour constituer la preuve d’un refus, puis choisissez le motif réglementaire. Les décisions influencent les visites suivantes et le bilan de chaque journée.
+Le jeu est accessible à `jeu/` sur GitHub Pages. Pendant quatre journées et dix-huit dossiers, comparez deux mentions pour constituer la preuve d’un refus, puis choisissez le motif réglementaire. Les décisions influencent les visites suivantes et le bilan de chaque journée. La Commission d’appel réexamine un ancien dossier, et un examen bonus du Coupe-cigare clôt le troisième jour. Deux notes orales du Président créent des conflits avec le règlement écrit.
 
-La partie en cours est conservée localement dans le navigateur. Le score final peut être partagé avec l’interface native de l’appareil ou copié comme texte. Aucun compte ni serveur de scores n’est nécessaire.
+La partie en cours est conservée localement dans le navigateur. Le score final peut être partagé avec l’interface native de l’appareil ou copié comme texte. Le lien contient un code de défi qui donne le même ordre de dossiers à tous les joueurs. Le mode chrono de 120 secondes par dossier est facultatif et figure aussi dans le lien partagé. Aucun compte ni serveur de scores n’est nécessaire.
 - `activites.html` — activités et procédures approuvées
 - `degustation.html` — méthode officielle pour déguster un cigare
 - `actualites.html` — dernières communications du Comité
