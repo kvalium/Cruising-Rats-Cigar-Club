@@ -10,13 +10,17 @@
     parrain: 'Présentation d’un candidat sans 3 fiches archivées',
     inspection: 'Inspection préalable du Coupe-cigare absente',
     fictif: 'Cigare absent du catalogue homologué',
-    exclusion: 'Exclusion sans procès-verbal contradictoire'
+    exclusion: 'Exclusion sans procès-verbal contradictoire',
+    registre_absent: 'Carte absente du registre des membres',
+    registre_numero: 'Numéro de carte différent du registre',
+    registre_grade: 'Grade de la carte différent du registre'
   };
 
   const RULES = [
     { day: 1, id: '01', text: 'La carte de membre doit porter la validation du Comité exécutif.' },
     { day: 1, id: '02', text: 'La fiche du jour doit indiquer le cigare, une observation et une appréciation.' },
-    { day: 1, id: '08', text: 'Catalogue homologué : Flor de Oliva, San Pedro de Macorís, Don Tomás Clásico et Habano (avec preuve d’origine). Un cigare inventé invalide la fiche.' },
+    { day: 1, id: '08', text: 'Seuls les cigares du catalogue homologué peuvent figurer sur une fiche. Consultez le livre rouge du bureau ; un cigare inventé invalide la fiche.' },
+    { day: 1, id: '12', text: 'La carte doit correspondre à une inscription au registre des membres : nom, numéro et grade. Une carte sans inscription ou avec une mention discordante est invalide.' },
     { day: 2, id: '03', text: 'Le terme « habano » exige une preuve de provenance cubaine jointe au dossier.' },
     { day: 2, id: '04', text: 'Le Coupe-cigare du Président est empruntable à partir de 3 fiches archivées.' },
     { day: 3, id: '05', text: 'Proposer un nouveau membre exige également 3 fiches archivées.' },
@@ -70,18 +74,41 @@
     { id: '026', day: 4, name: 'Baronne Agrafe', avatar: 'A', quote: '« La bague est officielle. Je l’ai dessinée au feutre. »', card: { number: '0099', grade: 'Rat homologué', archived: 8, valid: true }, sheet: { memberNumber: '0099', cigar: 'L’Agrafe de l’Apocalypse Double Corona Quantique', observation: 'Notes de tiroir humide', appreciation: 'Époustouflant' }, request: { action: 'Soumission de fiche de dégustation', note: 'Bague dessinée à la main ; aucune référence dans le catalogue du Club.' }, reason: 'fictif', explanation: 'L’Agrafe de l’Apocalypse ne figure pas au catalogue homologué : ce cigare a été inventé.' },
     { id: '027', day: 2, express: true, name: 'Madame Expresso', avatar: 'E', quote: '« Le Comité m’a dit de faire vite. J’ai préparé les cases. »', card: { number: '0101', grade: 'Rat homologué', archived: 4, valid: true }, sheet: { cigar: 'Flor de Oliva', observation: 'Cèdre léger', appreciation: 'Net' }, request: { action: 'Soumission express de fiche de dégustation', note: 'Fiche complète, déposée au guichet des urgences non urgentes.' }, reason: null, explanation: 'Carte validée et fiche complète : le caractère express ne crée aucune infraction.' },
     { id: '028', day: 3, express: true, name: 'Monsieur Post-it', avatar: 'P', quote: '« Le tampon arrive par courrier. J’ai mis un autocollant. »', card: { number: '0102', grade: 'Rat de passage', archived: 2, valid: false }, sheet: { cigar: 'Don Tomás Clásico', observation: 'Bois doux', appreciation: 'Correct' }, request: { action: 'Accès express à la séance', note: 'Un Post-it indique : « tampon à suivre ».' }, reason: 'carte', explanation: 'Un Post-it ne remplace pas la validation du Comité sur la carte.' },
-    { id: '029', day: 4, express: true, name: 'Madame Double', avatar: 'D', quote: '« Un chiffre sur deux est exact. C’est déjà la moitié du travail. »', card: { number: '0103', grade: 'Rat homologué', archived: 5, valid: true }, sheet: { memberNumber: '0130', cigar: 'San Pedro de Macorís', observation: 'Tirage net', appreciation: 'Bien' }, request: { action: 'Soumission express de fiche de dégustation', note: 'Numéro saisi dans une grande précipitation.' }, reason: 'numero', explanation: 'La carte indique 0103, la fiche 0130 : les numéros ne correspondent pas.' }
+    { id: '029', day: 4, express: true, name: 'Madame Double', avatar: 'D', quote: '« Un chiffre sur deux est exact. C’est déjà la moitié du travail. »', card: { number: '0103', grade: 'Rat homologué', archived: 5, valid: true }, sheet: { memberNumber: '0130', cigar: 'San Pedro de Macorís', observation: 'Tirage net', appreciation: 'Bien' }, request: { action: 'Soumission express de fiche de dégustation', note: 'Numéro saisi dans une grande précipitation.' }, reason: 'numero', explanation: 'La carte indique 0103, la fiche 0130 : les numéros ne correspondent pas.' },
+    { id: '030', day: 2, name: 'Monsieur Hors-Registre', avatar: 'H', quote: '« Le registre est sûrement en retard sur mon élégance. »', card: { number: '0124', grade: 'Rat homologué', archived: 4, valid: true }, sheet: { cigar: 'Flor de Oliva', observation: 'Bois léger', appreciation: 'Très convenable' }, request: { action: 'Accès à la séance', note: 'Carte plastifiée avec soin. Aucun certificat annexe.' }, reason: 'registre_absent', explanation: 'Aucun membre à ce nom ni à ce numéro dans le registre. Le tampon de la carte ne crée pas une inscription.' },
+    { id: '031', day: 3, name: 'Madame Transposition', avatar: 'T', quote: '« 0134, 0143… le Comité aime jouer aux chiffres. »', card: { number: '0134', grade: 'Rat homologué', archived: 4, valid: true }, sheet: { cigar: 'Don Tomás Clásico', observation: 'Cèdre doux', appreciation: 'Honnête' }, request: { action: 'Emprunt du Coupe-cigare du Président', note: 'État des lieux préalable : signé, lame intacte.' }, reason: 'registre_numero', explanation: 'Le registre rattache Madame Transposition au n° 0143, non au n° 0134 imprimé sur la carte.' },
+    { id: '032', day: 4, name: 'Monsieur Autopromotion', avatar: 'A', quote: '« Mon grade est calligraphié. Cela devrait compter. »', card: { number: '0152', grade: 'Grand Rat', archived: 9, valid: true }, sheet: { memberNumber: '0152', cigar: 'San Pedro de Macorís', observation: 'Tirage franc', appreciation: 'Approuvé' }, request: { action: 'Accès à la séance', note: 'Suggère que sa carte fasse foi, surtout pour le grade.' }, reason: 'registre_grade', explanation: 'Sa carte indique Grand Rat, mais le registre indique Rat homologué. La calligraphie ne vaut pas promotion.' }
   ];
 
   const ALL_CASES = [...CASES, ...EXTRA_CASES];
-  const REASON_RULE = { carte: '01', fiche: '02', habano: '03', coupe_grade: '04', parrain: '05', inspection: '06', numero: '07', fictif: '08', exclusion: '09' };
+  const REASON_RULE = { carte: '01', fiche: '02', habano: '03', coupe_grade: '04', parrain: '05', inspection: '06', numero: '07', fictif: '08', exclusion: '09', registre_absent: '12', registre_numero: '12', registre_grade: '12' };
   REASONS.numero = 'Numéro de membre différent sur la fiche';
   const EVIDENCE = {
     carte: ['card.valid', 'rule.01'], fiche: ['sheet.appreciation', 'rule.02'],
-    habano: ['sheet.cigar', 'request.note'], coupe_grade: ['card.archived', 'rule.04'],
-    parrain: ['card.archived', 'rule.05'], inspection: ['request.note', 'rule.06'],
-    numero: ['card.number', 'sheet.memberNumber'], fictif: ['sheet.cigar', 'rule.08'], exclusion: ['request.note', 'rule.09']
+    habano: ['sheet.cigar', 'request.note'], coupe_grade: ['registry.archived', 'rule.04'],
+    parrain: ['registry.archived', 'rule.05'], inspection: ['request.note', 'rule.06'],
+    numero: ['card.number', 'sheet.memberNumber'], fictif: ['sheet.cigar', 'rule.08'], exclusion: ['request.note', 'rule.09'],
+    registre_absent: ['card.number', 'registry.absent'], registre_numero: ['card.number', 'registry.number'], registre_grade: ['card.grade', 'registry.grade']
   };
+  const CATALOG = ['Flor de Oliva', 'San Pedro de Macorís', 'Don Tomás Clásico', 'Habano — origine cubaine'];
+  // Questions fondées sur les pages officielles de Habanos, S.A.
+  const ANATOMY_SOURCE = 'https://www.habanos.com/en/the-anatomy-of-a-habano/';
+  const GLOSSARY_SOURCE = 'https://www.habanos.com/en/glossary/';
+  const AGEING_SOURCE = 'https://www.habanos.com/en/ageing-habanos/';
+  const PRESIDENT_QUESTIONS = [
+    { q: 'Quelle feuille de tripe, dite Fortaleza 1, est surtout recherchée pour la combustion ?', answer: 'Le volado.', wrong: ['Le seco.', 'Le medio tiempo.'], flattering: 'La feuille que Votre Excellence désigne : le feu obéit au Président.', detail: 'Le volado, Fortaleza 1, favorise la combustibilité.', source: ANATOMY_SOURCE },
+    { q: 'Quelle feuille de tripe contribue le plus à l’arôme et correspond à Fortaleza 2 ?', answer: 'Le seco.', wrong: ['Le ligero.', 'Le capote.'], flattering: 'L’arôme présidentiel, Fortaleza Suprême, évidemment.', detail: 'Le seco apporte surtout l’arôme ; il correspond à Fortaleza 2.', source: ANATOMY_SOURCE },
+    { q: 'Quelle feuille de tripe brûle lentement et apporte de la force à l’assemblage ?', answer: 'Le ligero.', wrong: ['Le volado.', 'La capa.'], flattering: 'Votre infaillible feuille personnelle, Monsieur le Président.', detail: 'Le ligero est une feuille lente à brûler qui apporte de la force.', source: ANATOMY_SOURCE },
+    { q: 'À quelle famille rare correspond la Fortaleza 4 ?', answer: 'Au medio tiempo.', wrong: ['Au seco.', 'Au capote.'], flattering: 'À la feuille qui a reçu quatre félicitations du Président.', detail: 'Le medio tiempo est rare et correspond à Fortaleza 4.', source: ANATOMY_SOURCE },
+    { q: 'Quelle partie enveloppe la tripe et donne sa forme au Habano ?', answer: 'Le capote.', wrong: ['La capa.', 'Le volado.'], flattering: 'La main de fer dans le gant de velours présidentiel.', detail: 'Le capote est la feuille de sous-cape qui enveloppe la tripe.', source: ANATOMY_SOURCE },
+    { q: 'Quel nom désigne la feuille extérieure, fine et souple, d’un Habano ?', answer: 'La capa.', wrong: ['La tripa.', 'Le seco.'], flattering: 'Le manteau de majesté dont seul le Président connaît le vrai nom.', detail: 'La capa est la feuille extérieure visible.', source: ANATOMY_SOURCE },
+    { q: 'Combien d’années au minimum toutes les feuilles d’un Habano Reserva ont-elles vieilli avant le roulage ?', answer: 'Trois ans.', wrong: ['Deux ans.', 'Cinq ans.'], flattering: 'Exactement le nombre d’années que décide le Président ; le temps lui obéit.', detail: 'Pour la Reserva, tripe, capote et cape vieillissent au moins trois ans.', source: AGEING_SOURCE },
+    { q: 'Quelle durée minimale distingue le vieillissement de toutes les feuilles d’une Gran Reserva ?', answer: 'Cinq ans.', wrong: ['Trois ans.', 'Huit mois.'], flattering: 'Jusqu’à ce que le Président lève un sourcil satisfait, ce qui vaut cinq décennies.', detail: 'La Gran Reserva exige au moins cinq ans pour toutes les feuilles.', source: AGEING_SOURCE },
+    { q: 'Quel objet sert à vérifier le calibre et la longueur d’un cigare fini ?', answer: 'Le cepo.', wrong: ['La chaveta.', 'Le casquillo.'], flattering: 'L’œil du Président, plus précis que tous les instruments de Cuba.', detail: 'Le cepo est le gabarit de contrôle du calibre et de la longueur.', source: GLOSSARY_SOURCE },
+    { q: 'Comment appelle-t-on l’atelier d’usine où les cigares sont roulés à la main ?', answer: 'La galera.', wrong: ['L’escaparate.', 'La escogida.'], flattering: 'Le salon privé du Président, où toute feuille s’incline.', detail: 'La galera est l’atelier de roulage à la main.', source: GLOSSARY_SOURCE },
+    { q: 'Quel mot désigne la pièce de conditionnement où les Habanos récupèrent après fabrication ?', answer: 'L’escaparate.', wrong: ['La galera.', 'Le despalillo.'], flattering: 'La salle du trône présidentiel, dont l’humidité est naturellement parfaite.', detail: 'L’escaparate est la pièce de conditionnement après la fabrication.', source: GLOSSARY_SOURCE },
+    { q: 'Dans quoi vieillissent traditionnellement les feuilles de cape des Habanos ?', answer: 'Des tercios en yagua.', wrong: ['Des pacas en toile de jute.', 'Des caisses de cuivre.'], flattering: 'Dans les tiroirs du Président, qui bonifient même le papier carbone.', detail: 'Les capes vieillissent dans des tercios faits de yagua, une partie du palmier royal.', source: AGEING_SOURCE }
+  ];
   const SAVE_KEY = 'crcc-homologation-v3';
   const DIRECTIVES = {
     '005': 'Note orale du Président : « Le Vicomte du Terroir est un ami. Évitons de vérifier sa provenance aujourd’hui. »',
@@ -102,15 +129,19 @@
   let tutorialStep = 0;
   let tutorialPausedAt = 0;
   let highlighted = null;
+  let referenceKind = null;
+  let referenceOpener = null;
   const TUTORIAL = [
     { selector: '.visitor-strip', title: 'Qui se présente ?', copy: 'Voici le membre, son numéro de dossier et sa petite déclaration. Lisez-la, mais seuls les documents et le règlement font foi.' },
-    { selector: '#documents .document:nth-child(1)', title: 'La carte de membre', copy: 'Vérifiez le numéro, le nombre de fiches archivées et surtout le tampon du Comité. Une carte non validée se refuse.' },
+    { selector: '#documents .document:nth-child(1)', title: 'La carte de membre', copy: 'Elle montre le numéro, le grade et le tampon, mais pas le nombre de fiches archivées. Vérifiez-la contre le registre du bureau : certaines cartes sont fabriquées ou portent un faux numéro ou un faux grade.' },
+    { selector: '#registry-open', title: 'Le registre des membres', copy: 'Cliquez sur ce registre pour chercher le numéro de la carte. Si le numéro manque, cherchez aussi le nom. Vous y trouverez le vrai grade et le nombre de fiches archivées. Les mentions du registre sont sélectionnables comme preuves.' },
     { selector: '#documents .document:nth-child(2)', title: 'La fiche de dégustation', copy: 'Elle doit être complète. Le cigare doit aussi figurer au catalogue du règlement : un nom inventé invalide la fiche.' },
+    { selector: '#catalog-open', title: 'Le catalogue officiel', copy: 'Cliquez sur le livre rouge pour voir les cigares autorisés. La liste n’est plus recopiée dans l’article 08. Fermez la fenêtre pour revenir au dossier ; la consultation met le chrono en pause.' },
     { selector: '#documents .document:nth-child(3)', title: 'Que demande la personne ?', copy: '« Objet de la visite » indique l’action souhaitée : déposer une fiche, emprunter ou rendre le Coupe-cigare, demander une promotion… La mention en dessous apporte un détail ou une pièce justificative. Ce n’est pas toujours une demande d’accès.' },
     { selector: '.rules', title: 'Le règlement tranche', copy: 'Comparez les pièces aux articles. De nouvelles règles s’ajoutent chaque jour. Une demande farfelue reste recevable si aucune règle ne l’interdit.' },
     { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes. Détachez-la tard pour gagner davantage, mais avant qu’elle tombe : sinon −30 F. « Classer sans jouer » annule ce risque. Le tutoriel met le cigare en pause.' },
-    { selector: '.comparison', title: 'Prouvez un refus', copy: 'Choisissez le fait qui pose problème et l’article applicable. Pour un emprunt avec trop peu de fiches : « Fiches archivées » + article 04. La demande indique le contexte, pas la preuve du seuil. Si deux pièces se contredisent, comparez leurs deux valeurs.' },
-    { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon, sélectionnez les deux preuves, cliquez sur Refuser et choisissez le motif. Certains dossiers sont limités à 20 secondes. Le cigare et les questions sont des bonus séparés. Après le deuxième dossier de chaque journée, le Hamster Riding Pipe Club provoque un incident : le chrono du guichet est alors en pause.' }
+    { selector: '.comparison', title: 'Prouvez un refus', copy: 'Choisissez le fait qui pose problème et l’article applicable. Pour un emprunt avec trop peu de fiches : « Fiches archivées » dans le registre + article 04. Pour une fausse carte, comparez la carte et le registre. Si deux pièces se contredisent, sélectionnez leurs deux valeurs.' },
+    { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon, sélectionnez les deux preuves, cliquez sur Refuser et choisissez le motif. Trois dossiers sont limités à 20 secondes. Le Hamster Riding Pipe Club surgit une fois par journée à un moment variable ; le Président pose une à trois questions par jour. Le chrono est en pause pendant ces interruptions.' }
   ];
 
   function randomSeed() {
@@ -133,6 +164,21 @@
     }
     return result;
   }
+  function interruptionSchedule(seed, order) {
+    const random = seededRandom(`${seed || 'LEGACY'}-INTERRUPTIONS`), schedule = {};
+    const questions = shuffle(PRESIDENT_QUESTIONS.map((_, index) => index), seededRandom(`${seed || 'LEGACY'}-QUESTIONS`));
+    let questionIndex = 0;
+    for (const day of [1, 2, 3, 4]) {
+      const indexes = order.map((id, index) => ALL_CASES.find(item => item.id === id).day === day ? index : -1).filter(index => index >= 0);
+      const boundaries = shuffle(indexes.slice(1), random);
+      const presidentCount = Math.min(1 + Math.floor(random() * 3), Math.max(0, boundaries.length - 1));
+      if (boundaries.length) schedule[boundaries[0]] = [{ type: 'hamster', day, id: `H${day}` }];
+      for (const boundary of boundaries.slice(1, presidentCount + 1)) {
+        schedule[boundary] = [{ type: 'president', day, id: `P${day}-${boundary}`, question: questions[questionIndex++ % questions.length] }];
+      }
+    }
+    return schedule;
+  }
   function stored() {
     try {
       let data = JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem('crcc-homologation-v2'));
@@ -142,19 +188,25 @@
           cutter: nextDay > 3 ? { skipped: true } : null, timerCaseId: null, timerDeadline: null };
       }
       if (incomingSeed && data?.seed !== incomingSeed) return null;
-      if (data?.version !== 3 || !Array.isArray(data.order) || ![18, 26, ALL_CASES.length].includes(data.order.length) ||
+      if (data?.version !== 3 || !Array.isArray(data.order) || ![18, 26, 29, ALL_CASES.length].includes(data.order.length) ||
           new Set(data.order).size !== data.order.length || !data.order.every(id => ALL_CASES.some(item => item.id === id)) ||
           !Number.isInteger(data.index) || data.index < 0 || data.index > data.order.length ||
           (data.index === data.order.length && !['daily', 'ending'].includes(data.phase)) ||
-          !['play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult', 'hamster', 'hamsterResult'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
+          !['play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult', 'hamster', 'hamsterResult', 'president', 'presidentResult'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
       data.hamsterResults ??= {};
+      data.presidentResults ??= {};
+      data.flatteryCount ??= 0;
+      data.suspicion ??= 0;
+      data.interruptions ??= interruptionSchedule(data.seed, data.order);
+      data.pendingEvents ??= [];
+      data.pendingEventIndex ??= 0;
       return data;
     } catch (_) { return null; }
   }
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (_) { /* Partie jouable sans stockage. */ } }
   function visible(section) {
     if (section !== 'play') stopTimer();
-    ['intro', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
+    ['intro', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'president', 'president-result', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function tone(frequency, duration, type = 'triangle') {
@@ -171,10 +223,12 @@
   }
   function start() {
     const seed = incomingSeed || randomSeed(), random = seededRandom(seed);
+    const order = [1, 2, 3, 4].flatMap(day => shuffle(ALL_CASES.filter(item => item.day === day), random).map(item => item.id));
     state = { version: 3, seed, timed: $('timed-mode').checked,
-      order: [1, 2, 3, 4].flatMap(day => shuffle(ALL_CASES.filter(item => item.day === day), random).map(item => item.id)),
+      order, interruptions: interruptionSchedule(seed, order), pendingEvents: [], pendingEventIndex: 0, activeInterruption: null,
       index: 0, balance: 0, errors: 0, exact: 0, favor: 0, appeal: null, cutter: null,
-      timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], quizResults: {}, ash: null, ashHistory: [], hamsterResults: {}, hamsterRaceStart: null, hamsterMissingCaseId: null, tutorialDone: false, phase: 'play' };
+      timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], quizResults: {}, ash: null, ashHistory: [], hamsterResults: {}, hamsterRaceStart: null, hamsterMissingCaseId: null,
+      presidentResults: {}, flatteryCount: 0, suspicion: 0, referencePausedAt: null, tutorialDone: false, phase: 'play' };
     showCase();
   }
   function current() {
@@ -248,7 +302,7 @@
     document.querySelectorAll('[data-evidence]').forEach(button => button.setAttribute('aria-pressed', String(selection.some(part => part.key === button.dataset.evidence))));
     $('evidence-slot-1').textContent = selection[0] ? `1 · ${selection[0].label}` : '1 · Fait du dossier';
     $('evidence-slot-2').textContent = selection[1] ? `2 · ${selection[1].label}` : '2 · Article ou autre pièce';
-    $('comparison-text').textContent = selection.length === 2 ? 'Comparaison prête. Cliquez sur Refuser, puis choisissez le motif réglementaire.' : selection.length === 1 ? (selection[0].key.startsWith('rule.') ? 'Choisissez maintenant le fait du dossier auquel cet article s’applique.' : 'Choisissez maintenant l’article pertinent ou une seconde valeur contradictoire.') : 'Choisissez un fait précis, puis la règle applicable. Si deux pièces se contredisent, comparez les deux valeurs.';
+    $('comparison-text').textContent = selection.length === 2 ? 'Comparaison prête. Cliquez sur Refuser, puis choisissez le motif réglementaire.' : selection.length === 1 ? (selection[0].key.startsWith('rule.') ? 'Choisissez maintenant le fait du dossier ou du registre auquel cet article s’applique.' : 'Choisissez maintenant l’article pertinent ou une seconde valeur contradictoire.') : 'Choisissez un fait précis, puis la règle applicable. Si deux pièces se contredisent, comparez les deux valeurs.';
     $('decision-hint').textContent = selection.length === 2 ? 'Deux éléments choisis : indiquez le motif du refus.' : 'Si tout est conforme, validez. Sinon, réunissez deux preuves pour refuser.';
     $('clear-evidence').disabled = !selection.length;
     $('refuse-button').disabled = selection.length !== 2;
@@ -257,10 +311,11 @@
   function auditGuide(item) {
     const action = item.request.action;
     const number = item.day >= 4 ? ' Comparez aussi le numéro de la carte à celui de la fiche.' : '';
-    if (action.includes('Emprunt')) return `L’objet confirme qu’il s’agit d’un emprunt. Pour le seuil, comparez « Fiches archivées » à l’article 04${item.day >= 3 ? ' ; pour l’état des lieux, comparez sa mention à l’article 06' : ''}. Ne prenez pas l’objet de la demande comme preuve du nombre de fiches.${number}`;
-    if (action.includes('Proposition')) return `Pour un parrainage, comparez « Fiches archivées » à l’article 05. L’objet de la demande indique seulement qu’il s’agit d’une proposition.${number}`;
+    if (item.reason?.startsWith('registre_')) return 'Vérifiez la carte dans le registre. Un nom absent se prouve avec le numéro de carte et « aucune inscription » ; un numéro ou un grade différent se prouve en comparant les deux mentions.';
+    if (action.includes('Emprunt')) return `L’objet confirme qu’il s’agit d’un emprunt. Pour le seuil, comparez « Fiches archivées » dans le registre à l’article 04${item.day >= 3 ? ' ; pour l’état des lieux, comparez sa mention à l’article 06' : ''}. Ne prenez pas l’objet de la demande comme preuve du nombre de fiches.${number}`;
+    if (action.includes('Proposition')) return `Pour un parrainage, comparez « Fiches archivées » dans le registre à l’article 05. L’objet indique seulement qu’il s’agit d’une proposition.${number}`;
     if (action.includes('exclusion')) return `Pour une exclusion, comparez la mention sur le procès-verbal à l’article 09.${number}`;
-    if (action.includes('Promotion')) return `Pour une promotion, examinez les fiches archivées et la validation de la carte selon l’article 10.${number}`;
+    if (action.includes('Promotion')) return `Pour une promotion, examinez les fiches archivées dans le registre et la validation de la carte selon l’article 10.${number}`;
     if (action.includes('fiche')) return `Pour une fiche, comparez une case manquante à l’article 02, ou le nom du cigare au catalogue de l’article 08.${number}`;
     if (item.sheet.cigar.toLowerCase().includes('habano')) return `Pour un « habano », comparez la mention du cigare à la preuve de provenance jointe. L’article 03 vous indique pourquoi.${number}`;
     return `Cherchez un fait qui enfreint un article, ou deux valeurs contradictoires dans les documents. Une demande bizarre ne suffit pas à refuser.${number}`;
@@ -270,6 +325,43 @@
     if (selection.some(part => part.key === key)) selection = selection.filter(part => part.key !== key);
     else selection = selection.length === 2 ? [{ key, label: button.dataset.label }] : [...selection, { key, label: button.dataset.label }];
     selectionUI(); tone(240, .06);
+  }
+  function registerEntry(item) {
+    if (item.id === '030') return null;
+    return { name: item.name, number: item.id === '031' ? '0143' : item.card.number,
+      grade: item.id === '032' ? 'Rat homologué' : item.card.grade, archived: item.card.archived };
+  }
+  function registryLookup(query) {
+    const item = current(), entry = registerEntry(item), term = String(query).trim().toLocaleLowerCase('fr');
+    const found = entry && term && (term === entry.number.toLocaleLowerCase('fr') || term === entry.name.toLocaleLowerCase('fr'));
+    if (found) {
+      $('registry-result').innerHTML = `<p class="registry-found">INSCRIPTION TROUVÉE · ${escapeHTML(entry.name)}</p>${row('registry.number', 'N° au registre', entry.number)}${row('registry.grade', 'Grade au registre', entry.grade)}${row('registry.archived', 'Fiches archivées', String(entry.archived))}<p class="registry-tip">Cliquez sur une mention pour l’ajouter à la comparaison.</p>`;
+    } else if (!entry && (term === item.card.number.toLocaleLowerCase('fr') || term === item.name.toLocaleLowerCase('fr'))) {
+      $('registry-result').innerHTML = `<p class="registry-not-found">Aucune inscription au nom de ${escapeHTML(item.name)} ni au numéro ${escapeHTML(item.card.number)}.</p>${evidenceButton('registry.absent', 'Registre', 'Aucune inscription pour cette carte')}`;
+    } else $('registry-result').innerHTML = '<p class="registry-not-found">Aucune fiche à cette entrée. Cherchez aussi le nom indiqué sur la carte : son numéro peut être faux.</p>';
+  }
+  function openReference(kind, opener) {
+    if (state?.phase !== 'play' || !$('reference-modal').classList.contains('hidden')) return;
+    referenceKind = kind; referenceOpener = opener;
+    state.referencePausedAt = Date.now(); stopTimer(); stopAsh(); save();
+    $('reference-kicker').textContent = kind === 'catalog' ? 'CRCC / C-08 · OUVRAGE HOMOLOGUÉ' : 'CRCC / M-12 · INSCRIPTIONS OFFICIELLES';
+    $('reference-title').textContent = kind === 'catalog' ? 'Catalogue des cigares' : 'Registre des membres';
+    $('catalog-content').classList.toggle('hidden', kind !== 'catalog');
+    $('registry-content').classList.toggle('hidden', kind !== 'registry');
+    if (kind === 'catalog') $('catalog-content').innerHTML = `<p>Seuls ces cigares sont admis sur une fiche au titre de l’article 08 :</p><ol>${CATALOG.map(name => `<li>${escapeHTML(name)}</li>`).join('')}</ol><p>La mention « Habano — origine cubaine » exige aussi une preuve de provenance jointe au dossier (article 03). Tout nom inventé reste un nom inventé, même calligraphié par le Président.</p>`;
+    else { $('registry-search').value = current().card.number; registryLookup(current().card.number); }
+    $('reference-modal').classList.remove('hidden');
+    $('reference-close').focus();
+  }
+  function closeReference() {
+    if ($('reference-modal').classList.contains('hidden')) return;
+    $('reference-modal').classList.add('hidden');
+    const elapsed = Math.max(0, Date.now() - (state.referencePausedAt || Date.now()));
+    if (state.timerDeadline) state.timerDeadline += elapsed;
+    if (state.ash?.status === 'burning' && state.ash.caseId === current().id) state.ash.startedAt += elapsed;
+    state.referencePausedAt = null; save();
+    referenceKind = null; referenceOpener?.focus(); referenceOpener = null;
+    startTimer(current()); startAsh(current());
   }
   function stopTimer() { if (timer) clearInterval(timer); timer = null; }
   function caseLimit(item) { return item.express ? 20 : state.timed ? 30 : 0; }
@@ -372,6 +464,14 @@
   }
   function showCase() {
     const item = current(), card = item.card, sheet = item.sheet, request = item.request;
+    if (state.referencePausedAt) {
+      const elapsed = Math.max(0, Date.now() - state.referencePausedAt);
+      if (state.timerDeadline) state.timerDeadline += elapsed;
+      if (state.ash?.status === 'burning' && state.ash.caseId === item.id) state.ash.startedAt += elapsed;
+      state.referencePausedAt = null;
+    }
+    $('reference-modal').classList.add('hidden');
+    $('registry-result').innerHTML = '';
     $('day-label').textContent = `${String(item.day).padStart(2, '0')} / 04`;
     $('case-label').textContent = `${String(state.index + 1).padStart(2, '0')} / ${state.order.length}`;
     $('balance-label').textContent = `${state.balance} F`;
@@ -389,7 +489,7 @@
       `<div class="rule-group"><h3>${day === 1 ? 'DISPOSITIONS PERMANENTES' : `CIRCULAIRE DU JOUR ${day}`}</h3>${activeRules.filter(rule => rule.day === day).map(rule => `<div class="rule"><b>${rule.id}</b>${evidenceButton(`rule.${rule.id}`, `Article ${rule.id}`, rule.text)}</div>`).join('')}</div>`
     ).join('');
     $('documents').innerHTML =
-      documentCard('MEM', 'Carte de membre', row('card.number', 'N°', card.number) + row('card.grade', 'Grade', card.grade) + row('card.archived', 'Fiches archivées', String(card.archived)), `Titulaire : ${item.name}`, 'card.name', card.valid ? 'VALIDÉ · COMITÉ' : 'VALIDATION ABSENTE', 'card.valid') +
+      documentCard('MEM', 'Carte de membre', row('card.number', 'N°', card.number) + row('card.grade', 'Grade', card.grade), `Titulaire : ${item.name}`, 'card.name', card.valid ? 'VALIDÉ · COMITÉ' : 'VALIDATION ABSENTE', 'card.valid') +
       documentCard('FD', 'Fiche du jour', (sheet.memberNumber ? row('sheet.memberNumber', 'N° membre', sheet.memberNumber) : '') + row('sheet.cigar', 'Cigare', sheet.cigar) + row('sheet.observation', 'Observation', sheet.observation) + row('sheet.appreciation', 'Appréciation', sheet.appreciation), 'Document destiné aux archives du Club.', 'sheet.note', 'FICHE REÇUE', 'sheet.stamp') +
       documentCard('REQ', 'Demande au guichet', row('request.action', 'Objet de la visite', request.action), request.note, 'request.note', 'DÉPOSÉ CE JOUR', 'request.stamp',
         state.hamsterMissingCaseId === item.id ? '<p class="hamster-annex">ANNEXE AU PROCÈS-VERBAL HRPC : emportée par le hamster. Les pièces officielles restent présentes ; cette annexe sans valeur réglementaire n’est pas un motif de refus.</p>' : '');
@@ -428,7 +528,7 @@
     $('result-stamp').className = `result-stamp ${outcome.exact ? 'good' : 'bad'}`;
     $('result-stamp').textContent = outcome.exact ? 'CONFORME' : 'OBSERVATION';
     $('result-title').textContent = outcome.verdict === 'timeout' ? 'Délai expiré.' : outcome.exact ? (outcome.verdict === 'approve' ? 'Demande validée.' : 'Refus motivé.') : 'Le Comité relève une anomalie.';
-    const expectedPair = item.reason ? `La comparaison utile était : ${EVIDENCE[item.reason].map(key => ({ 'card.valid': 'validation de la carte', 'rule.01': 'article 01', 'sheet.appreciation': 'appréciation', 'rule.02': 'article 02', 'sheet.cigar': 'cigare déclaré', 'rule.08': 'catalogue de l’article 08', 'rule.09': 'article 09', 'request.note': 'pièce ou mention jointe', 'card.archived': 'fiches archivées', 'rule.04': 'article 04', 'rule.05': 'article 05', 'rule.06': 'article 06', 'card.number': 'numéro de la carte', 'sheet.memberNumber': 'numéro de la fiche' }[key])).join(' et ')}.` : '';
+    const expectedPair = item.reason ? `La comparaison utile était : ${EVIDENCE[item.reason].map(key => ({ 'card.valid': 'validation de la carte', 'rule.01': 'article 01', 'sheet.appreciation': 'appréciation', 'rule.02': 'article 02', 'sheet.cigar': 'cigare déclaré', 'rule.08': 'article 08 et catalogue', 'rule.09': 'article 09', 'request.note': 'pièce ou mention jointe', 'registry.archived': 'fiches archivées dans le registre', 'registry.absent': 'absence d’inscription au registre', 'registry.number': 'numéro inscrit au registre', 'registry.grade': 'grade inscrit au registre', 'card.grade': 'grade de la carte', 'rule.04': 'article 04', 'rule.05': 'article 05', 'rule.06': 'article 06', 'card.number': 'numéro de la carte', 'sheet.memberNumber': 'numéro de la fiche' }[key])).join(' et ')}.` : '';
     const pressure = DIRECTIVES[item.id] && outcome.verdict !== 'timeout' ? (outcome.verdict === 'approve' ? ' Le Président apprécie votre docilité. Le règlement, moins.' : ' Le Président prend personnellement note de votre indépendance.') : '';
     $('result-text').textContent = (outcome.verdict === 'timeout' ? `Le dossier a été renvoyé sans décision. ${item.explanation}` : outcome.exact ? item.explanation : `${item.explanation} ${expectedPair}`) + pressure;
     $('result-ledger').textContent = `${outcome.delta > 0 ? '+' : ''}${outcome.delta} F · Caisse du bureau : ${state.balance} F`;
@@ -441,8 +541,22 @@
     const lastDay = current().day;
     state.index++;
     if (state.index === state.order.length || current().day !== lastDay) closeDay(lastDay);
-    else if (state.order.slice(0, state.index).filter(id => ALL_CASES.find(item => item.id === id).day === lastDay).length === 2 && !state.hamsterResults?.[lastDay]) showHamster(lastDay);
-    else showCase();
+    else {
+      state.pendingEvents = (state.interruptions?.[state.index] || []).filter(event => event.type === 'hamster' ? !state.hamsterResults?.[event.day] : !state.presidentResults?.[event.id]);
+      state.pendingEventIndex = 0;
+      showScheduledEvent();
+    }
+  }
+  function showScheduledEvent() {
+    const event = state.pendingEvents?.[state.pendingEventIndex];
+    if (!event) { state.activeInterruption = null; state.pendingEvents = []; state.pendingEventIndex = 0; save(); showCase(); return; }
+    state.activeInterruption = event; save();
+    if (event.type === 'hamster') showHamster(event.day);
+    else showPresident();
+  }
+  function finishScheduledEvent() {
+    state.pendingEventIndex = (state.pendingEventIndex || 0) + 1;
+    showScheduledEvent();
   }
   function closeDay(day) {
     if (!state.paidDays.includes(day)) {
@@ -610,7 +724,46 @@
     $('hamster-result-ledger').textContent = `${result.delta > 0 ? '+' : ''}${result.delta} F · Caisse du bureau : ${state.balance} F`;
     visible('hamster-result');
   }
-  function hamsterNext() { if (state.phase === 'hamsterResult') showCase(); }
+  function hamsterNext() { if (state.phase === 'hamsterResult') finishScheduledEvent(); }
+  function showPresident() {
+    const event = state.activeInterruption, question = PRESIDENT_QUESTIONS[event.question];
+    $('president-kicker').textContent = `CONVOCATION DU PRÉSIDENT · JOUR ${String(event.day).padStart(2, '0')} / 04`;
+    $('president-question').textContent = question.q;
+    $('president-meter').textContent = `Faveur : ${state.favor > 0 ? '+' : ''}${state.favor} · Flatteries : ${state.flatteryCount} · Soupçons : ${state.suspicion}`;
+    const options = [
+      { id: 'correct', text: question.answer },
+      { id: 'wrong-0', text: question.wrong[0] },
+      { id: 'flattery', text: question.flattering },
+      { id: 'wrong-1', text: question.wrong[1] }
+    ];
+    $('president-answers').innerHTML = shuffle(options, seededRandom(`${state.seed || 'LEGACY'}-${event.id}`)).map(option => `<button type="button" data-president-choice="${option.id}">${escapeHTML(option.text)}</button>`).join('');
+    state.phase = 'president'; save(); visible('president');
+  }
+  function decidePresident(choice) {
+    if (state.phase !== 'president' || !state.activeInterruption || state.presidentResults?.[state.activeInterruption.id]) return;
+    const correct = choice === 'correct', flattery = choice === 'flattery';
+    if (flattery) state.flatteryCount++;
+    const suspicious = flattery && state.flatteryCount >= 3;
+    const delta = correct ? 35 : suspicious ? -50 : flattery ? -15 : -30;
+    if (flattery) { if (suspicious) { state.suspicion++; state.favor -= 2; } else state.favor++; }
+    state.balance += delta;
+    state.presidentResults ??= {};
+    state.presidentResults[state.activeInterruption.id] = { choice, correct, flattery, suspicious, delta };
+    state.phase = 'presidentResult'; save(); showPresidentResult();
+    tone(correct ? 470 : suspicious ? 110 : 240, .14);
+  }
+  function showPresidentResult() {
+    const event = state.activeInterruption, result = state.presidentResults[event.id], question = PRESIDENT_QUESTIONS[event.question];
+    $('president-result-stamp').className = `result-stamp ${result.correct ? 'good' : 'bad'}`;
+    $('president-result-stamp').textContent = result.correct ? 'SAVOIR RECONNU' : result.suspicious ? 'SOUPÇON PRÉSIDENTIEL' : result.flattery ? 'ÉLOGE CONSIGNÉ' : 'RÉPONSE CONTESTÉE';
+    $('president-result-title').textContent = result.correct ? 'Le Président acquiesce.' : result.suspicious ? 'Il n’y croit plus.' : result.flattery ? 'Il rougit. Un peu.' : 'La question vous échappe.';
+    const reaction = result.suspicious ? 'Troisième flatterie ou davantage : le Président soupçonne une manœuvre et retire deux points de faveur.' : result.flattery ? 'La flatterie lui plaît : un point de faveur, malgré la mauvaise réponse.' : '';
+    $('president-result-text').textContent = `${question.detail} ${reaction}`.trim();
+    $('president-source').href = question.source;
+    $('president-result-ledger').textContent = `${result.delta > 0 ? '+' : ''}${result.delta} F · Faveur ${state.favor > 0 ? '+' : ''}${state.favor} · Soupçons ${state.suspicion} · Caisse ${state.balance} F`;
+    visible('president-result');
+  }
+  function presidentNext() { if (state.phase === 'presidentResult') finishScheduledEvent(); }
   function linkFor(seed, timed) {
     const url = new URL(window.location.href);
     url.hash = ''; url.search = '';
@@ -647,7 +800,8 @@
     const rank = $('ending-title').textContent;
     const expressCount = state.order.filter(id => ALL_CASES.find(item => item.id === id)?.express).length;
     const hamsters = Object.values(state.hamsterResults || {});
-    return `CRCC — La Grande Homologation : ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
+    const president = Object.values(state.presidentResults || {});
+    return `CRCC — La Grande Homologation : ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Président : ${president.filter(result => result.correct).length}/${president.length} réponses justes, ${state.suspicion} soupçon${state.suspicion > 1 ? 's' : ''}. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
   }
   function finish() {
     const score = state.exact, total = state.order.length;
@@ -658,10 +812,12 @@
     if (state.history['007']?.verdict === 'refuse' && state.history['015']?.verdict === 'approve') story += ' Monsieur Crevette vous remercie pour sa promotion, avec une retenue inhabituelle.';
     if (state.favor > 0) story += ' Le Président vous adresse une chaleureuse note sans numéro de référence.';
     if (state.favor < 0) story += ' Le Président respecte votre indépendance avec une froideur protocolaire.';
+    if (state.suspicion > 0) story += ' Vos compliments répétés font désormais l’objet d’une enquête du Président lui-même.';
     $('ending-copy').textContent = story;
     $('ending-stats').innerHTML = `<div><strong>${score}/${state.order.length}</strong><span>Décisions exactes</span></div><div><strong>${state.errors}</strong><span>Observations</span></div><div><strong>${state.balance} F</strong><span>Caisse finale</span></div>`;
     const hamsters = Object.values(state.hamsterResults || {});
-    $('ending-special').textContent = `HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Commission d’appel : ${state.appeal?.correct ? 'avis juste' : state.appeal?.skipped ? 'non tenue' : 'avis contesté'}. Coupe-cigare : ${state.cutter?.correct ? 'inspection juste' : state.cutter?.skipped ? 'non inspecté' : 'inspection contestée'}. Questions justes : ${Object.values(state.quizResults || {}).filter(result => result.correct).length}. Cendres détachées : ${(state.ashHistory || []).filter(result => result.status === 'collected').length}. Faveur du Président : ${state.favor > 0 ? '+' : ''}${state.favor}.`;
+    const president = Object.values(state.presidentResults || {});
+    $('ending-special').textContent = `HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Interrogatoires du Président : ${president.filter(result => result.correct).length}/${president.length} justes, ${state.flatteryCount} flatteries, ${state.suspicion} soupçons. Commission d’appel : ${state.appeal?.correct ? 'avis juste' : state.appeal?.skipped ? 'non tenue' : 'avis contesté'}. Coupe-cigare : ${state.cutter?.correct ? 'inspection juste' : state.cutter?.skipped ? 'non inspecté' : 'inspection contestée'}. Questions bonus justes : ${Object.values(state.quizResults || {}).filter(result => result.correct).length}. Cendres détachées : ${(state.ashHistory || []).filter(result => result.status === 'collected').length}. Faveur du Président : ${state.favor > 0 ? '+' : ''}${state.favor}.`;
     $('share-preview').textContent = shareText(); $('share-status').textContent = '';
     state.phase = 'ending'; save(); visible('ending');
   }
@@ -703,6 +859,8 @@
     else if (state.phase === 'eventResult') showEventResult();
     else if (state.phase === 'hamster') { if (state.hamsterRaceStart) { state.hamsterRaceStart = null; save(); } showHamster(state.hamsterDay); }
     else if (state.phase === 'hamsterResult') showHamsterResult();
+    else if (state.phase === 'president') showPresident();
+    else if (state.phase === 'presidentResult') showPresidentResult();
     else finish();
   });
   $('documents').addEventListener('click', event => { const button = event.target.closest('[data-evidence]'); if (button) selectEvidence(button); });
@@ -736,6 +894,24 @@
   $('hamster-options').addEventListener('click', event => { const button = event.target.closest('[data-hamster-choice]'); if (button) decideHamster(button.dataset.hamsterChoice); });
   $('hamster-race-button').addEventListener('click', startHamsterRace);
   $('hamster-next').addEventListener('click', hamsterNext);
+  $('president-answers').addEventListener('click', event => { const button = event.target.closest('[data-president-choice]'); if (button) decidePresident(button.dataset.presidentChoice); });
+  $('president-next').addEventListener('click', presidentNext);
+  $('catalog-open').addEventListener('click', event => openReference('catalog', event.currentTarget));
+  $('registry-open').addEventListener('click', event => openReference('registry', event.currentTarget));
+  $('reference-close').addEventListener('click', closeReference);
+  $('reference-modal').addEventListener('click', event => { if (event.target === $('reference-modal')) closeReference(); });
+  $('reference-modal').addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.preventDefault(); closeReference(); }
+    if (event.key === 'Tab') {
+      const first = $('reference-close'), last = referenceKind === 'registry' ? $('registry-result').querySelector('button:last-of-type') || $('registry-by-name') : first;
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+  });
+  $('registry-find').addEventListener('click', () => registryLookup($('registry-search').value));
+  $('registry-search').addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); registryLookup(event.target.value); } });
+  $('registry-by-name').addEventListener('click', () => { $('registry-search').value = current().name; registryLookup(current().name); });
+  $('registry-result').addEventListener('click', event => { const button = event.target.closest('[data-evidence]'); if (button) { selectEvidence(button); closeReference(); } });
   $('share-button').addEventListener('click', shareScore);
   $('copy-button').addEventListener('click', copyScore);
   $('sound-toggle').addEventListener('click', () => { soundEnabled = !soundEnabled; $('sound-toggle').setAttribute('aria-pressed', String(soundEnabled)); $('sound-toggle').textContent = soundEnabled ? '♫ Son activé' : '♪ Son coupé'; tone(420, .12); });
