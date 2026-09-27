@@ -288,6 +288,7 @@
     $('balance-label').textContent = `${state.balance} F`;
     $('ash-button').disabled = true;
     $('ash-skip').disabled = true;
+    $('ash-meter').textContent = status === 'fallen' ? 'TOMBÉE' : status === 'collected' ? 'DÉTACHÉE' : 'CLASSÉ';
     $('ash-message').textContent = status === 'fallen' ? 'Patatras. La cendre est tombée : −30 F.' : status === 'collected' ? `Cendre déposée sur le registre : +${delta} F.` : 'Cigare classé sans suite. Aucun bonus ni malus.';
     save();
   }
