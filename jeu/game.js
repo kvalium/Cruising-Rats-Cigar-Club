@@ -46,6 +46,7 @@
   ];
 
   RULES.push({ day: 4, id: '07', text: 'Le numéro inscrit sur la fiche du jour doit correspondre à celui de la carte.' });
+  RULES.push({ day: 4, id: '11', text: 'Un siège au Comité ne peut être accordé qu’à un membre du CRCC dont la carte est validée et qui possède 8 fiches archivées.' });
   RULES.sort((a, b) => a.day - b.day || Number(a.id) - Number(b.id));
   BULLETINS[4] = 'Dernière circulaire : vérifiez aussi les numéros. Le Comité refuse de compter deux fois le même membre.';
 
@@ -97,6 +98,7 @@
   let soundEnabled = false;
   let timer = null;
   let ashTimer = null;
+  let hamsterTimer = null;
   let tutorialStep = 0;
   let tutorialPausedAt = 0;
   let highlighted = null;
@@ -144,14 +146,15 @@
           new Set(data.order).size !== data.order.length || !data.order.every(id => ALL_CASES.some(item => item.id === id)) ||
           !Number.isInteger(data.index) || data.index < 0 || data.index > data.order.length ||
           (data.index === data.order.length && !['daily', 'ending'].includes(data.phase)) ||
-          !['play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
+          !['play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult', 'hamster', 'hamsterResult'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
+      data.hamsterResults ??= {};
       return data;
     } catch (_) { return null; }
   }
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (_) { /* Partie jouable sans stockage. */ } }
   function visible(section) {
     if (section !== 'play') stopTimer();
-    ['intro', 'play', 'result', 'daily', 'appeal', 'cutter', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
+    ['intro', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function tone(frequency, duration, type = 'triangle') {
@@ -171,7 +174,7 @@
     state = { version: 3, seed, timed: $('timed-mode').checked,
       order: [1, 2, 3, 4].flatMap(day => shuffle(ALL_CASES.filter(item => item.day === day), random).map(item => item.id)),
       index: 0, balance: 0, errors: 0, exact: 0, favor: 0, appeal: null, cutter: null,
-      timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], quizResults: {}, ash: null, ashHistory: [], tutorialDone: false, phase: 'play' };
+      timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], quizResults: {}, ash: null, ashHistory: [], hamsterResults: {}, hamsterRaceStart: null, hamsterMissingCaseId: null, tutorialDone: false, phase: 'play' };
     showCase();
   }
   function current() {
@@ -208,8 +211,8 @@
   function row(key, label, value) {
     return `<div class="doc-row"><span>${escapeHTML(label)}</span>${evidenceButton(key, label, value)}</div>`;
   }
-  function documentCard(code, title, rows, note, noteKey, stamp, stampKey) {
-    return `<article class="document"><div class="document-head"><span>CRCC / ${escapeHTML(code)}</span><span>PIÈCE OFFICIELLE</span></div><h3>${escapeHTML(title)}</h3>${code === 'REQ' ? '<p class="request-help">L’objet indique ce que la personne vient demander au Club. La mention donne le détail ou la pièce jointe.</p>' : ''}${rows}${note ? `<div class="doc-note">${evidenceButton(noteKey, 'Mention', note)}</div>` : ''}${stamp ? evidenceButton(stampKey, 'Validation', stamp, stamp === 'VALIDATION ABSENTE' ? 'doc-stamp bad' : 'doc-stamp') : ''}</article>`;
+  function documentCard(code, title, rows, note, noteKey, stamp, stampKey, annex = '') {
+    return `<article class="document"><div class="document-head"><span>CRCC / ${escapeHTML(code)}</span><span>PIÈCE OFFICIELLE</span></div><h3>${escapeHTML(title)}</h3>${code === 'REQ' ? '<p class="request-help">L’objet indique ce que la personne vient demander au Club. La mention donne le détail ou la pièce jointe.</p>' : ''}${rows}${note ? `<div class="doc-note">${evidenceButton(noteKey, 'Mention', note)}</div>` : ''}${stamp ? evidenceButton(stampKey, 'Validation', stamp, stamp === 'VALIDATION ABSENTE' ? 'doc-stamp bad' : 'doc-stamp') : ''}${annex}</article>`;
   }
   function portrait(item) {
     const hash = seedNumber(item.name), coats = ['#735146', '#3a6159', '#745a78', '#8a5744', '#4c5878'];
@@ -388,7 +391,8 @@
     $('documents').innerHTML =
       documentCard('MEM', 'Carte de membre', row('card.number', 'N°', card.number) + row('card.grade', 'Grade', card.grade) + row('card.archived', 'Fiches archivées', String(card.archived)), `Titulaire : ${item.name}`, 'card.name', card.valid ? 'VALIDÉ · COMITÉ' : 'VALIDATION ABSENTE', 'card.valid') +
       documentCard('FD', 'Fiche du jour', (sheet.memberNumber ? row('sheet.memberNumber', 'N° membre', sheet.memberNumber) : '') + row('sheet.cigar', 'Cigare', sheet.cigar) + row('sheet.observation', 'Observation', sheet.observation) + row('sheet.appreciation', 'Appréciation', sheet.appreciation), 'Document destiné aux archives du Club.', 'sheet.note', 'FICHE REÇUE', 'sheet.stamp') +
-      documentCard('REQ', 'Demande au guichet', row('request.action', 'Objet de la visite', request.action), request.note, 'request.note', 'DÉPOSÉ CE JOUR', 'request.stamp');
+      documentCard('REQ', 'Demande au guichet', row('request.action', 'Objet de la visite', request.action), request.note, 'request.note', 'DÉPOSÉ CE JOUR', 'request.stamp',
+        state.hamsterMissingCaseId === item.id ? '<p class="hamster-annex">ANNEXE AU PROCÈS-VERBAL HRPC : emportée par le hamster. Les pièces officielles restent présentes ; cette annexe sans valeur réglementaire n’est pas un motif de refus.</p>' : '');
     $('audit-guide-text').textContent = auditGuide(item);
     $('audit-guide').open = false;
     showQuiz(item);
@@ -437,6 +441,7 @@
     const lastDay = current().day;
     state.index++;
     if (state.index === state.order.length || current().day !== lastDay) closeDay(lastDay);
+    else if (state.order.slice(0, state.index).filter(id => ALL_CASES.find(item => item.id === id).day === lastDay).length === 2 && !state.hamsterResults?.[lastDay]) showHamster(lastDay);
     else showCase();
   }
   function closeDay(day) {
@@ -523,6 +528,89 @@
     visible('event-result');
   }
   function eventNext() { if (state.phase === 'eventResult') showCase(); }
+  function hamsterEvent(day) {
+    return {
+      1: { title: 'Le faux tampon', copy: 'Le Hamster Riding Pipe Club a mélangé ses cachets à ceux du bureau. Quel cachet atteste réellement la validation du Comité exécutif ?', evidence: 'REGISTRE DES CACHETS · La carte doit porter la validation du Comité exécutif (article 01). Le dessin d’une roue ou une formule ressemblante ne suffit pas.', options: [
+        { id: 'real', label: 'VALIDÉ · COMITÉ EXÉCUTIF' }, { id: 'wheel', label: 'APPROUVÉ PAR LA ROUE · 43 TOURS' }, { id: 'almost', label: 'VALIDÉ · COMITÉ DES HAMSTERS EXÉCUTIFS' }
+      ], correct: 'real' },
+      2: { title: 'Le règlement grignoté', copy: 'Un hamster a mangé l’article 04. Trois transcriptions circulent. Laquelle correspond à la règle du CRCC ?', evidence: 'ARCHIVE DES ARTICLES · L’article 04 concerne le seuil de fiches archivées pour emprunter le Coupe-cigare du Président.', options: [
+        { id: 'real', label: 'Le Coupe-cigare du Président est empruntable à partir de 3 fiches archivées.' },
+        { id: 'one', label: 'Le Coupe-cigare du Président est empruntable à partir d’une fiche et d’un sourire.' },
+        { id: 'hamster', label: 'Le Coupe-cigare du Président est empruntable aux hamsters pour raisons de taille.' }
+      ], correct: 'real' },
+      3: { title: 'La course au procès-verbal', copy: 'Un hamster file avec une annexe au procès-verbal destinée au prochain dossier. Rattrapez-le au bon moment.', evidence: 'MAIN COURANTE · La zone verte représente le passage devant le guichet. En cas d’échec, l’annexe HRPC manque au prochain dossier ; les trois pièces officielles restent intactes.', options: [] },
+      4: { title: 'La délégation officielle', copy: 'Le Hamster Riding Pipe Club réclame un siège au Comité. Son porte-parole tient dans une tasse, mais la demande est rédigée sur papier à en-tête.', evidence: 'DEMANDE HRPC · Carte de membre CRCC : absente. Fiches de dégustation archivées : 0. Attestation de roue : 11 tours. Article 11 : siège réservé à un membre du CRCC, carte validée et 8 fiches archivées.', options: [
+        { id: 'accept', label: 'ACCEPTER · Une tasse fera office de siège' },
+        { id: 'refuse', label: 'REFUSER · Conditions de l’article 11 non remplies' }
+      ], correct: 'refuse' }
+    }[day];
+  }
+  function stopHamsterRace() { if (hamsterTimer) clearInterval(hamsterTimer); hamsterTimer = null; }
+  function hamsterRaceProgress() { return Math.min(100, Math.max(0, (Date.now() - state.hamsterRaceStart) / 60)); }
+  function tickHamsterRace() {
+    if (state?.phase !== 'hamster' || state.hamsterDay !== 3 || !state.hamsterRaceStart) return;
+    const progress = hamsterRaceProgress();
+    $('hamster-runner').style.left = `${progress}%`;
+    $('hamster-race-status').textContent = progress >= 60 && progress <= 78 ? 'ZONE VERTE · ATTRAPEZ-LE !' : 'Le hamster traverse le bureau…';
+    if (progress >= 100) decideHamster('miss');
+  }
+  function startHamsterRace() {
+    if (state.phase !== 'hamster' || state.hamsterDay !== 3) return;
+    if (!state.hamsterRaceStart) {
+      state.hamsterRaceStart = Date.now();
+      $('hamster-race-button').innerHTML = 'ATTRAPER LE HAMSTER <span>●</span>';
+      save();
+      hamsterTimer = setInterval(tickHamsterRace, 50);
+      tickHamsterRace();
+    } else decideHamster(hamsterRaceProgress() >= 60 && hamsterRaceProgress() <= 78 ? 'caught' : 'miss');
+  }
+  function showHamster(day) {
+    const event = hamsterEvent(day);
+    if (!event) return showCase();
+    state.hamsterDay = day;
+    state.phase = 'hamster'; save();
+    $('hamster-kicker').textContent = `INTERRUPTION HRPC · JOUR ${String(day).padStart(2, '0')} / 04`;
+    $('hamster-title').textContent = event.title;
+    $('hamster-copy').textContent = event.copy;
+    $('hamster-evidence').innerHTML = `<strong>PIÈCE À EXAMINER</strong>${escapeHTML(event.evidence)}`;
+    $('hamster-options').innerHTML = shuffle(event.options, seededRandom(`${state.seed || 'LEGACY'}-HRPC-${day}`)).map(option => `<button type="button" data-hamster-choice="${option.id}">${escapeHTML(option.label)}</button>`).join('');
+    $('hamster-race').classList.toggle('hidden', day !== 3);
+    $('hamster-runner').style.left = '0%';
+    $('hamster-race-button').innerHTML = state.hamsterRaceStart ? 'ATTRAPER LE HAMSTER <span>●</span>' : 'LANCER LA POURSUITE <span>→</span>';
+    $('hamster-race-status').textContent = state.hamsterRaceStart ? 'La poursuite reprend…' : 'Prêt pour la poursuite.';
+    visible('hamster');
+    stopHamsterRace();
+    if (day === 3 && state.hamsterRaceStart) { hamsterTimer = setInterval(tickHamsterRace, 50); tickHamsterRace(); }
+  }
+  function decideHamster(choice) {
+    if (state.phase !== 'hamster' || state.hamsterResults?.[state.hamsterDay]) return;
+    const day = state.hamsterDay, correct = day === 3 ? choice === 'caught' : choice === hamsterEvent(day).correct;
+    const delta = correct ? 40 : -30;
+    stopHamsterRace();
+    state.hamsterResults ??= {};
+    state.hamsterResults[day] = { choice, correct, delta };
+    state.balance += delta;
+    if (day === 3 && !correct) state.hamsterMissingCaseId = state.order[state.index];
+    state.hamsterRaceStart = null;
+    state.phase = 'hamsterResult'; save(); showHamsterResult();
+    tone(correct ? 510 : 150, .14);
+  }
+  function showHamsterResult() {
+    const day = state.hamsterDay, result = state.hamsterResults[day];
+    const descriptions = {
+      1: 'Seul « VALIDÉ · COMITÉ EXÉCUTIF » atteste la validation de la carte. Les roues, même très bien tournées, ne signent pas pour le Comité.',
+      2: 'L’article 04 exige 3 fiches archivées pour emprunter le Coupe-cigare. Le hamster a tenté de remplacer ce seuil par un sourire ou sa petite taille.',
+      3: result.correct ? 'Annexe récupérée. Le hamster demande que la poursuite soit inscrite à son palmarès.' : 'L’annexe HRPC a disparu. Son absence sera signalée sur le prochain dossier ; elle ne modifie pas les pièces officielles ni le bon motif de décision.',
+      4: 'La délégation n’a ni carte CRCC validée ni les 8 fiches requises par l’article 11. La tasse peut rester ; le siège au Comité, non.'
+    };
+    $('hamster-result-stamp').className = `result-stamp ${result.correct ? 'good' : 'bad'}`;
+    $('hamster-result-stamp').textContent = result.correct ? 'INCIDENT MAÎTRISÉ' : 'PERTURBATION';
+    $('hamster-result-title').textContent = result.correct ? 'Le guichet tient bon.' : 'Le hamster marque un point.';
+    $('hamster-result-text').textContent = descriptions[day];
+    $('hamster-result-ledger').textContent = `${result.delta > 0 ? '+' : ''}${result.delta} F · Caisse du bureau : ${state.balance} F`;
+    visible('hamster-result');
+  }
+  function hamsterNext() { if (state.phase === 'hamsterResult') showCase(); }
   function linkFor(seed, timed) {
     const url = new URL(window.location.href);
     url.hash = ''; url.search = '';
@@ -558,7 +646,8 @@
   function shareText() {
     const rank = $('ending-title').textContent;
     const expressCount = state.order.filter(id => ALL_CASES.find(item => item.id === id)?.express).length;
-    return `CRCC — La Grande Homologation : ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
+    const hamsters = Object.values(state.hamsterResults || {});
+    return `CRCC — La Grande Homologation : ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
   }
   function finish() {
     const score = state.exact, total = state.order.length;
@@ -571,7 +660,8 @@
     if (state.favor < 0) story += ' Le Président respecte votre indépendance avec une froideur protocolaire.';
     $('ending-copy').textContent = story;
     $('ending-stats').innerHTML = `<div><strong>${score}/${state.order.length}</strong><span>Décisions exactes</span></div><div><strong>${state.errors}</strong><span>Observations</span></div><div><strong>${state.balance} F</strong><span>Caisse finale</span></div>`;
-    $('ending-special').textContent = `Commission d’appel : ${state.appeal?.correct ? 'avis juste' : state.appeal?.skipped ? 'non tenue' : 'avis contesté'}. Coupe-cigare : ${state.cutter?.correct ? 'inspection juste' : state.cutter?.skipped ? 'non inspecté' : 'inspection contestée'}. Questions justes : ${Object.values(state.quizResults || {}).filter(result => result.correct).length}. Cendres détachées : ${(state.ashHistory || []).filter(result => result.status === 'collected').length}. Faveur du Président : ${state.favor > 0 ? '+' : ''}${state.favor}.`;
+    const hamsters = Object.values(state.hamsterResults || {});
+    $('ending-special').textContent = `HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Commission d’appel : ${state.appeal?.correct ? 'avis juste' : state.appeal?.skipped ? 'non tenue' : 'avis contesté'}. Coupe-cigare : ${state.cutter?.correct ? 'inspection juste' : state.cutter?.skipped ? 'non inspecté' : 'inspection contestée'}. Questions justes : ${Object.values(state.quizResults || {}).filter(result => result.correct).length}. Cendres détachées : ${(state.ashHistory || []).filter(result => result.status === 'collected').length}. Faveur du Président : ${state.favor > 0 ? '+' : ''}${state.favor}.`;
     $('share-preview').textContent = shareText(); $('share-status').textContent = '';
     state.phase = 'ending'; save(); visible('ending');
   }
@@ -611,6 +701,8 @@
     else if (state.phase === 'appeal') showAppeal();
     else if (state.phase === 'cutter') showCutter();
     else if (state.phase === 'eventResult') showEventResult();
+    else if (state.phase === 'hamster') { if (state.hamsterRaceStart) { state.hamsterRaceStart = null; save(); } showHamster(state.hamsterDay); }
+    else if (state.phase === 'hamsterResult') showHamsterResult();
     else finish();
   });
   $('documents').addEventListener('click', event => { const button = event.target.closest('[data-evidence]'); if (button) selectEvidence(button); });
@@ -641,6 +733,9 @@
   $('appeal-revise').addEventListener('click', () => decideAppeal('revise'));
   $('cutter-options').addEventListener('click', event => { const button = event.target.closest('[data-part]'); if (button) decideCutter(button.dataset.part); });
   $('event-next').addEventListener('click', eventNext);
+  $('hamster-options').addEventListener('click', event => { const button = event.target.closest('[data-hamster-choice]'); if (button) decideHamster(button.dataset.hamsterChoice); });
+  $('hamster-race-button').addEventListener('click', startHamsterRace);
+  $('hamster-next').addEventListener('click', hamsterNext);
   $('share-button').addEventListener('click', shareScore);
   $('copy-button').addEventListener('click', copyScore);
   $('sound-toggle').addEventListener('click', () => { soundEnabled = !soundEnabled; $('sound-toggle').setAttribute('aria-pressed', String(soundEnabled)); $('sound-toggle').textContent = soundEnabled ? '♫ Son activé' : '♪ Son coupé'; tone(420, .12); });
