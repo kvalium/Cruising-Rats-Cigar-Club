@@ -121,23 +121,34 @@
   let timer = null;
   let ashTimer = null;
   let hamsterTimer = null;
+  let lighterTimer = null;
+  let reggaeTimer = null;
+  let invertedReplay = false;
+  let lastPointerType = null;
   let tutorialStep = 0;
   let tutorialPausedAt = 0;
   let highlighted = null;
   let referenceKind = null;
   let referenceOpener = null;
+  const TUTORIAL_KEY = 'crcc-tutoriel-v1';
   const TUTORIAL = [
     { selector: '.visitor-strip', title: 'Qui se présente ?', copy: 'Voici la personne au guichet et sa déclaration. Les documents et le règlement font foi.' },
-    { selector: '#documents .document:nth-child(1)', title: 'La carte de membre', copy: 'Vérifiez le numéro, le grade et le tampon. Certaines cartes sont fausses ; le nombre de fiches archivées n’y apparaît pas.' },
+    { selector: '#documents', title: 'Les trois pièces du dossier', copy: 'Lisez ensemble la carte de membre, la fiche de dégustation et la demande au guichet. Vérifiez le numéro, le grade, le tampon, le cigare et ce que la personne demande. Le nombre de fiches archivées se trouve dans le registre, pas sur la carte.' },
     { selector: '#registry-open', title: 'Le registre des membres', copy: 'Cherchez le numéro de la carte, puis éventuellement le nom. Vous y trouverez le vrai grade, le numéro officiel et les fiches archivées.' },
-    { selector: '#documents .document:nth-child(2)', title: 'La fiche de dégustation', copy: 'Lisez le cigare, l’observation et l’appréciation. Un nom plausible peut être absent du catalogue.' },
-    { selector: '#catalog-open', title: 'Le catalogue officiel', copy: 'Ce livre rouge contient les seuls cigares admis sur une fiche. La consultation suspend le chrono du dossier.' },
-    { selector: '#documents .document:nth-child(3)', title: 'La demande au guichet', copy: '« Objet de la visite » est l’action demandée : déposer une fiche, emprunter le Coupe-cigare, demander une promotion… La mention dessous apporte le détail.' },
+    { selector: '#catalog-open', title: 'Le catalogue officiel', copy: 'Ce livre rouge contient les seuls cigares admis sur une fiche. Un nom très plausible peut aussi manquer au catalogue.' },
     { selector: '#rules-open', title: 'Le règlement du guichet', copy: 'Cliquez sur le livre pour lire tous les articles en vigueur. Chaque début de journée présente ses nouvelles règles. Un sabotage du HRPC peut fermer ce livre pour toute une journée.' },
-    { selector: '.bureau-shop', title: 'La caisse du bureau', copy: 'Dépensez 100 F pour décider immédiatement et correctement, 300 F pour gagner une faveur présidentielle, ou 500 F pour mettre le HRPC hors service jusqu’à la fin de la partie.' },
-    { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes. Détachez-la tard pour gagner davantage, avant qu’elle tombe : sinon −30 F.' },
-    { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon cliquez sur Refuser et choisissez le bon motif. Aucun autre élément n’est à sélectionner. Les dossiers express durent 20 secondes, et le mode chrono 30 secondes par dossier.' }
+    { selector: '.bureau-shop', title: 'La caisse du bureau', copy: 'Dépensez 100 F pour décider immédiatement et correctement, 300 F pour gagner une faveur présidentielle, ou 500 F pour mettre le HRPC hors service.' },
+    { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes à mesure que le cigare raccourcit. Détachez-la avant sa chute pour gagner un bonus.' },
+    { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon cliquez sur Refuser et choisissez le bon motif. Aucun autre élément n’est à sélectionner. Le bouton ? permet de revoir ce tutoriel à tout moment.' }
   ];
+  function tutorialSeen() {
+    try { return document.cookie.split(';').some(part => part.trim() === 'crcc_tutoriel_v1=1') || localStorage.getItem(TUTORIAL_KEY) === '1'; }
+    catch (_) { return false; }
+  }
+  function rememberTutorial() {
+    try { document.cookie = 'crcc_tutoriel_v1=1; Max-Age=31536000; Path=/; SameSite=Lax'; localStorage.setItem(TUTORIAL_KEY, '1'); }
+    catch (_) { /* Le tutoriel reste utilisable sans stockage. */ }
+  }
 
   function randomSeed() {
     const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -172,6 +183,14 @@
         schedule[boundary] = [{ type: 'president', day, id: `P${day}-${boundary}`, question: questions[questionIndex++ % questions.length] }];
       }
     }
+    const specialRandom = seededRandom(`${seed || 'LEGACY'}-SPECIAL`);
+    const eligible = order.map((id, index) => ({ id, index, day: ALL_CASES.find(item => item.id === id).day }))
+      .filter((entry, index) => entry.day >= 2 && index > 0 && ALL_CASES.find(item => item.id === order[index - 1]).day === entry.day);
+    if (eligible.length) {
+      const boundary = eligible[Math.floor(specialRandom() * eligible.length)];
+      const kind = ['pipa', 'cedric', 'blackout'][Math.floor(specialRandom() * 3)];
+      (schedule[boundary.index] ??= []).push({ type: 'special', kind, day: boundary.day, id: `S-${kind}` });
+    }
     return schedule;
   }
   function stored() {
@@ -187,7 +206,7 @@
           new Set(data.order).size !== data.order.length || !data.order.every(id => ALL_CASES.some(item => item.id === id)) ||
           !Number.isInteger(data.index) || data.index < 0 || data.index > data.order.length ||
           (data.index === data.order.length && !['daily', 'ending'].includes(data.phase)) ||
-          !['briefing', 'play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult', 'hamster', 'hamsterResult', 'president', 'presidentResult'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
+          !['briefing', 'play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult', 'hamster', 'hamsterResult', 'president', 'presidentResult', 'special'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
       data.hamsterResults ??= {};
       data.presidentResults ??= {};
       data.flatteryCount ??= 0;
@@ -197,13 +216,16 @@
       data.pendingEventIndex ??= 0;
       data.hrpcBlockDay ??= 2 + seedNumber(`${data.seed || 'LEGACY'}-BLOC`) % 3;
       data.hrpcDisabled ??= false;
+      data.specialPlayed ??= false;
+      data.specialEffect ??= null;
+      if (tutorialSeen() && !data.tutorialPausedAt) data.tutorialDone = true;
       return data;
     } catch (_) { return null; }
   }
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (_) { /* Partie jouable sans stockage. */ } }
   function visible(section) {
     if (section !== 'play') stopTimer();
-    ['intro', 'day-briefing', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'president', 'president-result', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
+    ['intro', 'day-briefing', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'president', 'president-result', 'special', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function tone(frequency, duration, type = 'triangle') {
@@ -225,7 +247,7 @@
       order, interruptions: interruptionSchedule(seed, order), pendingEvents: [], pendingEventIndex: 0, activeInterruption: null,
       index: 0, balance: 0, errors: 0, exact: 0, favor: 0, hrpcBlockDay: 2 + seedNumber(`${seed}-BLOC`) % 3, hrpcDisabled: false, appeal: null, cutter: null,
       timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], quizResults: {}, ash: null, ashHistory: [], hamsterResults: {}, hamsterRaceStart: null, hamsterMissingCaseId: null,
-      presidentResults: {}, flatteryCount: 0, suspicion: 0, referencePausedAt: null, tutorialDone: false, phase: 'play' };
+      presidentResults: {}, flatteryCount: 0, suspicion: 0, specialPlayed: false, specialEffect: null, referencePausedAt: null, tutorialDone: tutorialSeen(), phase: 'play' };
     showDayBriefing(1);
   }
   function current() {
@@ -372,16 +394,24 @@
     tickTimer();
   }
   function stopAsh() { if (ashTimer) clearInterval(ashTimer); ashTimer = null; }
+  function renderAsh(progress) {
+    const consumed = Math.round(Math.max(0, Math.min(1, progress)) * 80);
+    $('ash-body').style.width = `${216 - consumed}px`;
+    $('ash-ember').style.left = `${214 - consumed}px`;
+    $('ash-length').style.left = `${224 - consumed}px`;
+    $('ash-length').style.width = `${consumed}px`;
+  }
   function tickAsh() {
     if (state?.phase !== 'play' || state.ash?.status !== 'burning') return;
     const progress = Math.min(1, (Date.now() - state.ash.startedAt) / 14000);
-    $('ash-length').style.width = `${Math.round(progress * 44)}px`;
+    renderAsh(progress);
     $('ash-meter').textContent = progress < .25 ? 'CENDRE COURTE' : progress < .55 ? 'CENDRE MOYENNE' : progress < .8 ? 'CENDRE LONGUE' : 'CENDRE FRAGILE';
     if (progress >= 1) settleAsh('fallen', -30);
   }
   function settleAsh(status, delta) {
     if (state.ash?.status !== 'burning') return;
-    stopAsh(); state.ash.status = status; state.ash.delta = delta;
+    stopAsh(); state.ash.burnProgress = Math.min(1, (Date.now() - state.ash.startedAt) / 14000);
+    renderAsh(state.ash.burnProgress); state.ash.status = status; state.ash.delta = delta;
     state.ashHistory ??= [];
     if (status !== 'skipped') { state.balance += delta; state.ashHistory.push({ caseId: state.ash.caseId, status, delta }); }
     $('balance-label').textContent = `${state.balance} F`;
@@ -400,7 +430,7 @@
     $('ash-button').disabled = state.ash.status !== 'burning';
     $('ash-skip').disabled = state.ash.status !== 'burning';
     $('ash-message').textContent = state.ash.status === 'fallen' ? 'Patatras. La cendre est tombée : −30 F.' : state.ash.status === 'collected' ? `Cendre déposée : +${state.ash.delta} F.` : state.ash.status === 'skipped' ? 'Cigare classé sans suite. Aucun bonus ni malus.' : '';
-    $('ash-length').style.width = '0px';
+    renderAsh(state.ash.status === 'burning' ? Math.min(1, (Date.now() - state.ash.startedAt) / 14000) : state.ash.burnProgress || 0);
     $('ash-meter').textContent = state.ash.status === 'collected' ? 'DÉTACHÉE' : state.ash.status === 'fallen' ? 'TOMBÉE' : state.ash.status === 'skipped' ? 'CLASSÉ' : 'CENDRE COURTE';
     if (state.ash.status === 'burning' && !((state.index === 0 && !state.tutorialDone) || state.tutorialPausedAt)) { ashTimer = setInterval(tickAsh, 100); tickAsh(); }
     save();
@@ -411,11 +441,19 @@
     if (progress >= 1) settleAsh('fallen', -30);
     else settleAsh('collected', Math.max(5, Math.round(progress * 60)));
   }
+  function updateTutorialSpotlight() {
+    if (!highlighted || $('tutorial-overlay').classList.contains('hidden')) return;
+    const box = highlighted.getBoundingClientRect(), pad = 6, spot = $('tutorial-spotlight');
+    spot.style.left = `${Math.max(0, box.left - pad)}px`;
+    spot.style.top = `${Math.max(0, box.top - pad)}px`;
+    spot.style.width = `${Math.min(window.innerWidth, box.right + pad) - Math.max(0, box.left - pad)}px`;
+    spot.style.height = `${Math.min(window.innerHeight, box.bottom + pad) - Math.max(0, box.top - pad)}px`;
+  }
   function closeTutorial() {
     if ($('tutorial-overlay').classList.contains('hidden')) return;
-    highlighted?.classList.remove('tutorial-highlight'); highlighted = null;
+    highlighted = null;
     $('tutorial-overlay').classList.add('hidden'); document.body.classList.remove('tutorial-active');
-    state.tutorialDone = true;
+    state.tutorialDone = true; rememberTutorial();
     const paused = Date.now() - (state.tutorialPausedAt || tutorialPausedAt);
     if (caseLimit(current()) && state.timerCaseId === current().id) state.timerDeadline += paused;
     if (state.ash?.status === 'burning' && state.ash.caseId === current().id) state.ash.startedAt += paused;
@@ -423,19 +461,17 @@
     save(); startTimer(current()); startAsh(current()); $('help-button').focus();
   }
   function showTutorialStep() {
-    highlighted?.classList.remove('tutorial-highlight');
     const step = TUTORIAL[tutorialStep];
     highlighted = document.querySelector(step.selector);
     if (!highlighted) { closeTutorial(); return; }
-    highlighted.classList.add('tutorial-highlight');
     highlighted.scrollIntoView({ block: 'center', behavior: 'instant' });
     $('tutorial-progress').textContent = `MODE D’EMPLOI · ${tutorialStep + 1} / ${TUTORIAL.length}`;
     $('tutorial-title').textContent = step.title;
     $('tutorial-copy').textContent = step.copy;
     $('tutorial-next').innerHTML = tutorialStep === TUTORIAL.length - 1 ? 'COMMENCER <span>✓</span>' : 'SUIVANT <span>→</span>';
     const high = highlighted.getBoundingClientRect();
-    $('tutorial-overlay').classList.toggle('tutorial-top', high.top > window.innerHeight / 2);
-    $('tutorial-next').focus();
+    $('tutorial-overlay').classList.toggle('tutorial-top', high.bottom > window.innerHeight * .6);
+    updateTutorialSpotlight(); $('tutorial-next').focus();
   }
   function openTutorial() {
     if (state?.phase !== 'play' || !$('tutorial-overlay').classList.contains('hidden')) return;
@@ -452,7 +488,10 @@
   function showDayBriefing(day) {
     state.phase = 'briefing'; save();
     $('briefing-kicker').textContent = `CRCC / OUVERTURE DU JOUR ${String(day).padStart(2, '0')}`;
-    $('briefing-title').textContent = day === 1 ? 'Votre premier jour au guichet' : `Nouvelles règles · jour ${day}`;
+    $('briefing-title').textContent = day === 1 ? 'Votre stage au guichet commence' : `Nouvelles règles · jour ${day}`;
+    $('briefing-intro').textContent = day === 1 ? 'Le Comité exécutif vous accueille pour quatre journées de stage. À chaque passage, examinez les trois pièces, consultez les ouvrages du bureau, puis validez la demande ou refusez-la avec le bon motif. Le tampon décide ; votre intuition, nettement moins.' : 'Le Comité vous communique les dispositions qui entrent en vigueur aujourd’hui. Les règles des journées précédentes continuent de s’appliquer.';
+    $('briefing-story').classList.toggle('hidden', day !== 1);
+    $('briefing-story').textContent = day === 1 ? 'Le Hamster Riding Pipe Club (HRPC) est un club rival de rongeurs à pipe. Ses membres surgissent au guichet, falsifient des cachets, grignotent des articles et sabotent parfois le bureau. Leurs incidents sont distincts des dossiers à tamponner : gardez votre calme et vos fiches.' : ''; 
     $('briefing-rules').innerHTML = RULES.filter(rule => rule.day === day).map(rule => `<div class="rule"><b>${rule.id}</b><span>${escapeHTML(rule.text)}</span></div>`).join('');
     $('briefing-note').textContent = day === state.hrpcBlockDay && !state.hrpcDisabled ? '🐹 Sabotage du HRPC : le règlement sera indisponible pendant toute cette journée. Prenez connaissance de ces règles maintenant ; un raid peut ensuite rétablir l’accès.' : state.hrpcDisabled ? 'Le HRPC est hors service. Le règlement restera accessible.' : 'Le règlement, le catalogue et le registre sont consultables depuis le bureau.';
     visible('day-briefing');
@@ -476,9 +515,101 @@
     if (kind === 'rush') { const item = current(); decide(item.reason ? 'refuse' : 'approve', item.reason, true); return; }
     state.balance -= cost;
     if (kind === 'gift') state.favor += 1;
-    if (kind === 'raid') state.hrpcDisabled = true;
+    if (kind === 'raid') { state.hrpcDisabled = true; if (state.specialEffect?.kind === 'blackout') clearSpecialEffect(); }
     $('balance-label').textContent = `${state.balance} F`;
     save(); updateShop(); tone(kind === 'raid' ? 530 : 420, .13);
+  }
+  function showSpecial(event) {
+    if (!event) { showCase(); return; }
+    const details = {
+      pipa: { title: 'Pipa traverse le Cigar Club', copy: 'Une volute suit Pipa dans les archives. Sur le prochain dossier, certaines lignes deviennent floues. Les ouvrages du bureau restent accessibles.', warning: 'Approchez le regard des pièces brouillées ; les faits utiles restent discernables.' },
+      cedric: { title: 'L’habano très particulier de Cédric', copy: 'Cédric vous offre un « habano » dont l’odeur de ganja transforme le prochain dossier : couleurs jamaïcaines, quelques mots inconnus et un petit riddim si le son est activé.', warning: 'Sur ordinateur, les clics sur les deux tampons sont inversés. Le clavier reste normal.' },
+      blackout: { title: 'Le HRPC a rongé les fils', copy: 'Le prochain dossier sera plongé dans le noir. Cliquez sur le briquet pour éclairer le bureau pendant deux secondes, puis rallumez-le autant de fois que nécessaire.', warning: 'Le chronomètre du dossier continue de tourner dans le noir. Un raid sur le HRPC peut rétablir le courant.' }
+    }[event.kind];
+    $('special-kicker').textContent = `INCIDENT IMPRÉVU · JOUR ${event.day}`;
+    $('special-title').textContent = details.title;
+    $('special-copy').textContent = details.copy;
+    $('special-warning').textContent = details.warning;
+    state.phase = 'special'; save(); visible('special');
+  }
+  function acceptSpecial() {
+    if (state?.phase !== 'special' || state.activeInterruption?.type !== 'special') return;
+    const { kind } = state.activeInterruption;
+    state.specialPlayed = true;
+    state.specialEffect = { kind, caseId: current().id };
+    save(); finishScheduledEvent();
+  }
+  function stopReggae() { if (reggaeTimer) clearInterval(reggaeTimer); reggaeTimer = null; }
+  function startReggae() {
+    if (!soundEnabled || reggaeTimer || state?.specialEffect?.kind !== 'cedric' || state.phase !== 'play') return;
+    try {
+      audio ??= new (window.AudioContext || window.webkitAudioContext)();
+      audio.resume?.();
+      const note = (frequency, at, duration, volume, type = 'triangle') => {
+        const oscillator = audio.createOscillator(), gain = audio.createGain();
+        oscillator.type = type; oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(.0001, at);
+        gain.gain.exponentialRampToValueAtTime(volume, at + .015);
+        gain.gain.exponentialRampToValueAtTime(.0001, at + duration);
+        oscillator.connect(gain).connect(audio.destination);
+        oscillator.start(at); oscillator.stop(at + duration + .02);
+      };
+      const bar = () => {
+        const start = audio.currentTime + .04, beat = 60 / 88;
+        [0, 2, 3].forEach((step, i) => note([82.4, 110, 98][i], start + step * beat, .31, .052));
+        for (let step = 0; step < 4; step++) {
+          note(329.6, start + (step + .5) * beat, .12, .019, 'sine');
+          note(392, start + (step + .5) * beat, .12, .013, 'sine');
+          note(1100, start + step * beat, .035, .006, 'square');
+        }
+        [1, 3].forEach(step => note(145, start + step * beat, .075, .024, 'square'));
+      };
+      bar(); reggaeTimer = setInterval(bar, 4 * 60 / 88 * 1000);
+    } catch (_) { stopReggae(); }
+  }
+  function applySpecialEffect(kind) {
+    const play = $('play');
+    for (const name of ['pipa', 'cedric', 'blackout']) play.classList.toggle(`effect-${name}`, kind === name);
+    $('effect-notice').classList.toggle('hidden', !kind);
+    $('effect-notice').textContent = kind === 'pipa' ? 'PIPA · Des pièces sont embuées pour ce dossier.' : kind === 'cedric' ? 'CÉDRIC · Riddim, mots mystérieux et clics inversés sur les tampons. Activez le son pour la musique.' : kind === 'blackout' ? 'HRPC · Rallumez le briquet pour voir le dossier pendant deux secondes.' : '';
+    $('blackout-shade').classList.toggle('hidden', kind !== 'blackout');
+    $('blackout-shade').classList.remove('lit');
+    $('lighter-button').classList.toggle('hidden', kind !== 'blackout');
+    $('inverted-cursor').classList.add('hidden');
+    stopReggae(); if (kind === 'cedric') startReggae();
+  }
+  function clearSpecialEffect() {
+    if (!state?.specialEffect) return;
+    state.specialEffect = null;
+    for (const name of ['pipa', 'cedric', 'blackout']) $('play').classList.remove(`effect-${name}`);
+    $('effect-notice').classList.add('hidden'); $('blackout-shade').classList.add('hidden');
+    $('lighter-button').classList.add('hidden'); $('inverted-cursor').classList.add('hidden');
+    if (lighterTimer) clearTimeout(lighterTimer); lighterTimer = null;
+    stopReggae(); save();
+  }
+  function lightLighter() {
+    if (state?.phase !== 'play' || state.specialEffect?.kind !== 'blackout') return;
+    $('blackout-shade').classList.add('lit');
+    if (lighterTimer) clearTimeout(lighterTimer);
+    lighterTimer = setTimeout(() => { $('blackout-shade').classList.remove('lit'); lighterTimer = null; }, 2000);
+    tone(620, .09);
+  }
+  // Pendant le délire de Cédric, les deux tampons échangent leurs zones de clic à la souris.
+  function invertedPointer(event) {
+    if (state?.phase !== 'play' || state.specialEffect?.kind !== 'cedric' || event.pointerType !== 'mouse') return;
+    const bounds = $('actions').getBoundingClientRect(), cursor = $('inverted-cursor');
+    cursor.style.left = `${bounds.left + bounds.right - event.clientX}px`;
+    cursor.style.top = `${event.clientY}px`;
+    cursor.classList.remove('hidden');
+  }
+  function invertedClick(event) {
+    if (invertedReplay || state?.phase !== 'play' || state.specialEffect?.kind !== 'cedric' || event.detail === 0 || lastPointerType !== 'mouse') return;
+    event.preventDefault(); event.stopImmediatePropagation();
+    const buttons = [...$('actions').querySelectorAll('button')], target = event.target.closest('button');
+    if (!target || buttons.length !== 2) return;
+    invertedReplay = true;
+    buttons[1 - buttons.indexOf(target)]?.click();
+    invertedReplay = false;
   }
   function showCase() {
     const item = current(), card = item.card, sheet = item.sheet, request = item.request;
@@ -500,24 +631,27 @@
     $('president-note').textContent = DIRECTIVES[item.id] || '';
     $('visitor-avatar').innerHTML = portrait(item);
     $('visitor-name').textContent = item.name;
-    $('visitor-quote').textContent = item.quote;
+    const effect = state.specialEffect?.caseId === item.id ? state.specialEffect.kind : null;
+    $('visitor-quote').textContent = effect === 'cedric' ? '« Bim-bala voluta, rastavérif ! »' : item.quote;
     $('queue-number').textContent = `N° ${item.id}`;
     const activeRules = RULES.filter(rule => rule.day <= item.day);
     $('documents').innerHTML =
       documentCard('MEM', 'Carte de membre', row('card.number', 'N°', card.number) + row('card.grade', 'Grade', card.grade), `Titulaire : ${item.name}`, 'card.name', card.valid ? 'VALIDÉ · COMITÉ' : 'VALIDATION ABSENTE', 'card.valid') +
-      documentCard('FD', 'Fiche du jour', (sheet.memberNumber ? row('sheet.memberNumber', 'N° membre', sheet.memberNumber) : '') + row('sheet.cigar', 'Cigare', sheet.cigar) + row('sheet.observation', 'Observation', sheet.observation) + row('sheet.appreciation', 'Appréciation', sheet.appreciation), 'Document destiné aux archives du Club.', 'sheet.note', 'FICHE REÇUE', 'sheet.stamp') +
+      documentCard('FD', 'Fiche du jour', (sheet.memberNumber ? row('sheet.memberNumber', 'N° membre', sheet.memberNumber) : '') + row('sheet.cigar', 'Cigare', sheet.cigar) + row('sheet.observation', effect === 'cedric' ? 'Riddimologie' : 'Observation', effect === 'cedric' ? 'Zoumba-luma, papelito skank' : sheet.observation) + row('sheet.appreciation', 'Appréciation', sheet.appreciation), 'Document destiné aux archives du Club.', 'sheet.note', 'FICHE REÇUE', 'sheet.stamp') +
       documentCard('REQ', 'Demande au guichet', row('request.action', 'Objet de la visite', request.action), request.note, 'request.note', 'DÉPOSÉ CE JOUR', 'request.stamp',
         state.hamsterMissingCaseId === item.id ? '<p class="hamster-annex">ANNEXE AU PROCÈS-VERBAL HRPC : emportée par le hamster. Les pièces officielles restent présentes ; cette annexe sans valeur réglementaire n’est pas un motif de refus.</p>' : '');
-    showQuiz(item);
+    showQuiz(item); applySpecialEffect(effect);
     $('reason-select').innerHTML = '<option value="">Choisir le motif…</option>' + Object.entries(REASONS).filter(([key]) => activeRules.some(rule => rule.id === REASON_RULE[key])).map(([key, label]) => `<option value="${key}">${escapeHTML(label)}</option>`).join('');
     $('reason-select').value = '';
     $('reason-picker').classList.add('hidden'); $('actions').classList.remove('hidden');
     $('confirm-refusal').disabled = true; state.phase = 'play'; save(); visible('play'); updateShop(); startTimer(item); startAsh(item);
-    if ((state.index === 0 && !state.tutorialDone) || state.tutorialPausedAt) openTutorial();
+    if (effect === 'cedric') startReggae();
+    if ((state.index === 0 && !state.tutorialDone && !tutorialSeen()) || state.tutorialPausedAt) openTutorial();
   }
   function decide(verdict, reason = null, fast = false) {
     if (state.phase !== 'play' || (verdict === 'refuse' && !reason) || (fast && state.balance < 100)) return;
     const item = current();
+    if (state.specialEffect?.caseId === item.id) clearSpecialEffect();
     if (state.ash?.caseId === item.id && state.ash.status === 'burning') settleAsh('skipped', 0);
     stopAsh();
     const correctVerdict = verdict !== 'timeout' && (verdict === 'refuse') === Boolean(item.reason);
@@ -552,7 +686,7 @@
     state.index++;
     if (state.index === state.order.length || current().day !== lastDay) closeDay(lastDay);
     else {
-      state.pendingEvents = (state.interruptions?.[state.index] || []).filter(event => event.type === 'hamster' ? !state.hrpcDisabled && !state.hamsterResults?.[event.day] : !state.presidentResults?.[event.id]);
+      state.pendingEvents = (state.interruptions?.[state.index] || []).filter(event => event.type === 'hamster' ? !state.hrpcDisabled && !state.hamsterResults?.[event.day] : event.type === 'special' ? !state.specialPlayed && (event.kind !== 'blackout' || !state.hrpcDisabled) : !state.presidentResults?.[event.id]);
       state.pendingEventIndex = 0;
       showScheduledEvent();
     }
@@ -562,6 +696,7 @@
     if (!event) { state.activeInterruption = null; state.pendingEvents = []; state.pendingEventIndex = 0; save(); showCase(); return; }
     state.activeInterruption = event; save();
     if (event.type === 'hamster') showHamster(event.day);
+    else if (event.type === 'special') showSpecial(event);
     else showPresident();
   }
   function finishScheduledEvent() {
@@ -872,6 +1007,7 @@
     else if (state.phase === 'hamsterResult') showHamsterResult();
     else if (state.phase === 'president') showPresident();
     else if (state.phase === 'presidentResult') showPresidentResult();
+    else if (state.phase === 'special') showSpecial(state.activeInterruption);
     else finish();
   });
   $('quiz-panel').addEventListener('click', event => { const button = event.target.closest('[data-quiz-choice]'); if (button) answerQuiz(Number(button.dataset.quizChoice)); });
@@ -880,6 +1016,8 @@
   $('help-button').addEventListener('click', openTutorial);
   $('tutorial-next').addEventListener('click', () => { if (++tutorialStep >= TUTORIAL.length) closeTutorial(); else showTutorialStep(); });
   $('tutorial-skip').addEventListener('click', closeTutorial);
+  window.addEventListener?.('resize', updateTutorialSpotlight);
+  window.addEventListener?.('scroll', updateTutorialSpotlight, true);
   $('tutorial-overlay').addEventListener('keydown', event => {
     if (event.key === 'Escape') closeTutorial();
     if (event.key === 'Tab') {
@@ -902,6 +1040,12 @@
   $('hamster-options').addEventListener('click', event => { const button = event.target.closest('[data-hamster-choice]'); if (button) decideHamster(button.dataset.hamsterChoice); });
   $('hamster-race-button').addEventListener('click', startHamsterRace);
   $('hamster-next').addEventListener('click', hamsterNext);
+  $('special-next').addEventListener('click', acceptSpecial);
+  $('actions').addEventListener('pointerdown', event => { lastPointerType = event.pointerType; });
+  $('actions').addEventListener('pointermove', invertedPointer);
+  $('actions').addEventListener('pointerleave', () => $('inverted-cursor').classList.add('hidden'));
+  $('actions').addEventListener('click', invertedClick, true);
+  $('lighter-button').addEventListener('click', lightLighter);
   $('president-answers').addEventListener('click', event => { const button = event.target.closest('[data-president-choice]'); if (button) decidePresident(button.dataset.presidentChoice); });
   $('president-next').addEventListener('click', presidentNext);
   $('briefing-next').addEventListener('click', () => { if (state?.phase === 'briefing') showCase(); });
@@ -926,7 +1070,7 @@
   $('registry-by-name').addEventListener('click', () => { $('registry-search').value = current().name; registryLookup(current().name); });
   $('share-button').addEventListener('click', shareScore);
   $('copy-button').addEventListener('click', copyScore);
-  $('sound-toggle').addEventListener('click', () => { soundEnabled = !soundEnabled; $('sound-toggle').setAttribute('aria-pressed', String(soundEnabled)); $('sound-toggle').textContent = soundEnabled ? '♫ Son activé' : '♪ Son coupé'; tone(420, .12); });
+  $('sound-toggle').addEventListener('click', () => { soundEnabled = !soundEnabled; $('sound-toggle').setAttribute('aria-pressed', String(soundEnabled)); $('sound-toggle').textContent = soundEnabled ? '♫ Son activé' : '♪ Son coupé'; tone(420, .12); if (soundEnabled && state?.specialEffect?.kind === 'cedric' && state.phase === 'play') startReggae(); else if (!soundEnabled) stopReggae(); });
   $('timed-mode').checked = incomingTimed;
   if (incomingSeed) showIntroChallenge();
   $('resume-button').classList.toggle('hidden', !stored());
