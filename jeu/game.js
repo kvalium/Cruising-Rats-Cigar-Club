@@ -331,12 +331,25 @@
     return { name: item.name, number: item.id === '031' ? '0143' : item.card.number,
       grade: item.id === '032' ? 'Rat homologué' : item.card.grade, archived: item.card.archived };
   }
+  function registryEntries() {
+    const members = new Map();
+    for (const item of ALL_CASES) {
+      const entry = registerEntry(item);
+      if (entry && !members.has(entry.name)) members.set(entry.name, entry);
+    }
+    const visiting = registerEntry(current());
+    if (visiting) members.set(visiting.name, visiting);
+    return [...members.values()];
+  }
   function registryLookup(query) {
-    const item = current(), entry = registerEntry(item), term = String(query).trim().toLocaleLowerCase('fr');
-    const found = entry && term && (term === entry.number.toLocaleLowerCase('fr') || term === entry.name.toLocaleLowerCase('fr'));
+    const item = current(), term = String(query).trim().toLocaleLowerCase('fr');
+    const found = term && registryEntries().find(entry => term === entry.number.toLocaleLowerCase('fr') || term === entry.name.toLocaleLowerCase('fr'));
     if (found) {
-      $('registry-result').innerHTML = `<p class="registry-found">INSCRIPTION TROUVÉE · ${escapeHTML(entry.name)}</p>${row('registry.number', 'N° au registre', entry.number)}${row('registry.grade', 'Grade au registre', entry.grade)}${row('registry.archived', 'Fiches archivées', String(entry.archived))}<p class="registry-tip">Cliquez sur une mention pour l’ajouter à la comparaison.</p>`;
-    } else if (!entry && (term === item.card.number.toLocaleLowerCase('fr') || term === item.name.toLocaleLowerCase('fr'))) {
+      const relevant = found.name === item.name;
+      const entryRows = relevant ? row('registry.number', 'N° au registre', found.number) + row('registry.grade', 'Grade au registre', found.grade) + row('registry.archived', 'Fiches archivées', String(found.archived)) :
+        `<div class="doc-row"><span>N° au registre</span><strong>${escapeHTML(found.number)}</strong></div><div class="doc-row"><span>Grade</span><strong>${escapeHTML(found.grade)}</strong></div><div class="doc-row"><span>Fiches archivées</span><strong>${found.archived}</strong></div>`;
+      $('registry-result').innerHTML = `<p class="registry-found">INSCRIPTION TROUVÉE · ${escapeHTML(found.name)}</p>${entryRows}<p class="registry-tip">${relevant ? 'Cliquez sur une mention pour l’ajouter à la comparaison.' : 'Autre membre : ces mentions ne prouvent rien pour le dossier en cours.'}</p>`;
+    } else if (!registerEntry(item) && (term === item.card.number.toLocaleLowerCase('fr') || term === item.name.toLocaleLowerCase('fr'))) {
       $('registry-result').innerHTML = `<p class="registry-not-found">Aucune inscription au nom de ${escapeHTML(item.name)} ni au numéro ${escapeHTML(item.card.number)}.</p>${evidenceButton('registry.absent', 'Registre', 'Aucune inscription pour cette carte')}`;
     } else $('registry-result').innerHTML = '<p class="registry-not-found">Aucune fiche à cette entrée. Cherchez aussi le nom indiqué sur la carte : son numéro peut être faux.</p>';
   }
