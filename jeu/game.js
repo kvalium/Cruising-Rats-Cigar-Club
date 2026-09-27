@@ -66,7 +66,10 @@
     { id: '023', day: 3, name: 'Madame Sursis', avatar: 'S', quote: '« Je viens pour un avertissement. Enfin, pour le faire signer. »', card: { number: '0049', grade: 'Rat homologué', archived: 6, valid: true }, sheet: { cigar: 'Flor de Oliva', observation: 'Fumée douce', appreciation: 'Bien' }, request: { action: 'Mesure disciplinaire : avertissement', note: 'Décision proposée pour tamponnage intempestif de serviettes. Rapport signé joint.' }, reason: null, explanation: 'La mesure disciplinaire est documentée et aucune disposition du guichet ne l’interdit.' },
     { id: '024', day: 4, name: 'Général Bonbon', avatar: 'B', quote: '« J’ai neuf fiches et une modestie de fonction. »', card: { number: '0077', grade: 'Rat homologué', archived: 9, valid: true }, sheet: { memberNumber: '0077', cigar: 'Don Tomás Clásico', observation: 'Épices légères', appreciation: 'Approuvé' }, request: { action: 'Promotion au grade de Grand Rat', note: 'Dossier de promotion signé : 9 fiches archivées et carte validée.' }, reason: null, explanation: 'Neuf fiches archivées et une carte validée : la promotion satisfait à l’article 10.' },
     { id: '025', day: 4, name: 'Monsieur Rideau', avatar: 'R', quote: '« On m’exclut pour un soupir mal placé. Où est le procès-verbal ? »', card: { number: '0069', grade: 'Rat homologué', archived: 8, valid: true }, sheet: { memberNumber: '0069', cigar: 'Flor de Oliva', observation: 'Tirage net', appreciation: 'Honnête' }, request: { action: 'Décision d’exclusion', note: 'Motif : soupir dirigé vers le portrait du Président. Procès-verbal contradictoire absent.' }, reason: 'exclusion', explanation: 'L’exclusion ne peut être validée sans procès-verbal contradictoire signé, même pour un soupir présidentiel.' },
-    { id: '026', day: 4, name: 'Baronne Agrafe', avatar: 'A', quote: '« La bague est officielle. Je l’ai dessinée au feutre. »', card: { number: '0099', grade: 'Rat homologué', archived: 8, valid: true }, sheet: { memberNumber: '0099', cigar: 'L’Agrafe de l’Apocalypse Double Corona Quantique', observation: 'Notes de tiroir humide', appreciation: 'Époustouflant' }, request: { action: 'Soumission de fiche de dégustation', note: 'Bague dessinée à la main ; aucune référence dans le catalogue du Club.' }, reason: 'fictif', explanation: 'L’Agrafe de l’Apocalypse ne figure pas au catalogue homologué : ce cigare a été inventé.' }
+    { id: '026', day: 4, name: 'Baronne Agrafe', avatar: 'A', quote: '« La bague est officielle. Je l’ai dessinée au feutre. »', card: { number: '0099', grade: 'Rat homologué', archived: 8, valid: true }, sheet: { memberNumber: '0099', cigar: 'L’Agrafe de l’Apocalypse Double Corona Quantique', observation: 'Notes de tiroir humide', appreciation: 'Époustouflant' }, request: { action: 'Soumission de fiche de dégustation', note: 'Bague dessinée à la main ; aucune référence dans le catalogue du Club.' }, reason: 'fictif', explanation: 'L’Agrafe de l’Apocalypse ne figure pas au catalogue homologué : ce cigare a été inventé.' },
+    { id: '027', day: 2, express: true, name: 'Madame Expresso', avatar: 'E', quote: '« Le Comité m’a dit de faire vite. J’ai préparé les cases. »', card: { number: '0101', grade: 'Rat homologué', archived: 4, valid: true }, sheet: { cigar: 'Flor de Oliva', observation: 'Cèdre léger', appreciation: 'Net' }, request: { action: 'Soumission express de fiche de dégustation', note: 'Fiche complète, déposée au guichet des urgences non urgentes.' }, reason: null, explanation: 'Carte validée et fiche complète : le caractère express ne crée aucune infraction.' },
+    { id: '028', day: 3, express: true, name: 'Monsieur Post-it', avatar: 'P', quote: '« Le tampon arrive par courrier. J’ai mis un autocollant. »', card: { number: '0102', grade: 'Rat de passage', archived: 2, valid: false }, sheet: { cigar: 'Don Tomás Clásico', observation: 'Bois doux', appreciation: 'Correct' }, request: { action: 'Accès express à la séance', note: 'Un Post-it indique : « tampon à suivre ».' }, reason: 'carte', explanation: 'Un Post-it ne remplace pas la validation du Comité sur la carte.' },
+    { id: '029', day: 4, express: true, name: 'Madame Double', avatar: 'D', quote: '« Un chiffre sur deux est exact. C’est déjà la moitié du travail. »', card: { number: '0103', grade: 'Rat homologué', archived: 5, valid: true }, sheet: { memberNumber: '0130', cigar: 'San Pedro de Macorís', observation: 'Tirage net', appreciation: 'Bien' }, request: { action: 'Soumission express de fiche de dégustation', note: 'Numéro saisi dans une grande précipitation.' }, reason: 'numero', explanation: 'La carte indique 0103, la fiche 0130 : les numéros ne correspondent pas.' }
   ];
 
   const ALL_CASES = [...CASES, ...EXTRA_CASES];
@@ -105,7 +108,7 @@
     { selector: '.rules', title: 'Le règlement tranche', copy: 'Comparez les pièces aux articles. De nouvelles règles s’ajoutent chaque jour. Une demande farfelue reste recevable si aucune règle ne l’interdit.' },
     { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes. Détachez-la tard pour gagner davantage, mais avant qu’elle tombe : sinon −30 F. « Classer sans jouer » annule ce risque. Le tutoriel met le cigare en pause.' },
     { selector: '.comparison', title: 'Prouvez un refus', copy: 'Choisissez le fait qui pose problème et l’article applicable. Pour un emprunt avec trop peu de fiches : « Fiches archivées » + article 04. La demande indique le contexte, pas la preuve du seuil. Si deux pièces se contredisent, comparez leurs deux valeurs.' },
-    { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon, sélectionnez les deux preuves, cliquez sur Refuser et choisissez le motif. Le mini-jeu de cendre et les questions sont des bonus séparés de cette décision.' }
+    { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon, sélectionnez les deux preuves, cliquez sur Refuser et choisissez le motif. Certains dossiers portent un bandeau rouge : ils sont limités à 20 secondes, même sans mode chrono. Le mini-jeu de cendre et les questions sont des bonus séparés.' }
   ];
 
   function randomSeed() {
@@ -137,7 +140,7 @@
           cutter: nextDay > 3 ? { skipped: true } : null, timerCaseId: null, timerDeadline: null };
       }
       if (incomingSeed && data?.seed !== incomingSeed) return null;
-      if (data?.version !== 3 || !Array.isArray(data.order) || ![18, ALL_CASES.length].includes(data.order.length) ||
+      if (data?.version !== 3 || !Array.isArray(data.order) || ![18, 26, ALL_CASES.length].includes(data.order.length) ||
           new Set(data.order).size !== ALL_CASES.length || !data.order.every(id => ALL_CASES.some(item => item.id === id)) ||
           !Number.isInteger(data.index) || data.index < 0 || data.index > data.order.length ||
           (data.index === data.order.length && !['daily', 'ending'].includes(data.phase)) ||
@@ -266,20 +269,26 @@
     selectionUI(); tone(240, .06);
   }
   function stopTimer() { if (timer) clearInterval(timer); timer = null; }
+  function caseLimit(item) { return item.express ? 20 : state.timed ? 30 : 0; }
   function tickTimer() {
-    if (!state?.timed || state.phase !== 'play') return;
+    if (!state || state.phase !== 'play' || !caseLimit(current())) return;
     const seconds = Math.max(0, Math.ceil((state.timerDeadline - Date.now()) / 1000));
     $('timer-label').textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-    $('timer-box').classList.toggle('urgent', seconds <= 20);
+    $('timer-box').classList.toggle('urgent', seconds <= (current().express ? 5 : 10));
     if (seconds === 0) decide('timeout');
   }
   function startTimer(item) {
     stopTimer();
-    $('timer-box').classList.toggle('hidden', !state.timed);
-    if (!state.timed) return;
-    if (state.timerCaseId !== item.id || !Number.isFinite(state.timerDeadline)) {
+    const limit = caseLimit(item);
+    $('timer-box').classList.toggle('hidden', !limit);
+    $('timer-box').classList.toggle('express', Boolean(item.express));
+    $('timer-mode-label').textContent = item.express ? 'EXPRESS · 20 S' : 'TEMPS RESTANT';
+    $('timer-label').textContent = `0:${String(limit).padStart(2, '0')}`;
+    if (!limit) return;
+    if (state.timerCaseId !== item.id || state.timerLimit !== limit || !Number.isFinite(state.timerDeadline)) {
       state.timerCaseId = item.id;
-      state.timerDeadline = Date.now() + 120000;
+      state.timerLimit = limit;
+      state.timerDeadline = Date.now() + limit * 1000;
       save();
     }
     if ((state.index === 0 && !state.tutorialDone) || state.tutorialPausedAt) return;
@@ -308,7 +317,7 @@
   }
   function startAsh(item) {
     stopAsh();
-    const firstOfDay = state.index === 0 || ALL_CASES.find(entry => entry.id === state.order[state.index - 1]).day !== item.day;
+    const firstOfDay = state.order.find(id => { const entry = ALL_CASES.find(candidate => candidate.id === id); return entry.day === item.day && !entry.express; }) === item.id;
     $('ash-panel').classList.toggle('hidden', !firstOfDay);
     if (!firstOfDay) return;
     if (state.ash?.caseId !== item.id) state.ash = { caseId: item.id, startedAt: Date.now(), status: 'burning', delta: 0 };
@@ -332,7 +341,7 @@
     $('tutorial-overlay').classList.add('hidden'); document.body.classList.remove('tutorial-active');
     state.tutorialDone = true;
     const paused = Date.now() - (state.tutorialPausedAt || tutorialPausedAt);
-    if (state.timed && state.timerCaseId === current().id) state.timerDeadline += paused;
+    if (caseLimit(current()) && state.timerCaseId === current().id) state.timerDeadline += paused;
     if (state.ash?.status === 'burning' && state.ash.caseId === current().id) state.ash.startedAt += paused;
     state.tutorialPausedAt = null;
     save(); startTimer(current()); startAsh(current()); $('help-button').focus();
@@ -365,6 +374,7 @@
     $('balance-label').textContent = `${state.balance} F`;
     $('errors-label').textContent = state.errors;
     $('bulletin').innerHTML = `<b>BULLETIN N° ${item.day} —</b> ${escapeHTML(BULLETINS[item.day])}`;
+    $('express-notice').classList.toggle('hidden', !item.express);
     $('president-note').classList.toggle('hidden', !DIRECTIVES[item.id]);
     $('president-note').textContent = DIRECTIVES[item.id] || '';
     $('visitor-avatar').innerHTML = portrait(item);
@@ -403,7 +413,7 @@
     if (exact) state.exact++; else state.errors++;
     if (DIRECTIVES[item.id] && verdict !== 'timeout') state.favor += verdict === 'approve' ? 1 : -1;
     state.history[item.id] = { verdict, reason, evidence: selection.map(part => part.key), exact, delta, day: item.day };
-    stopTimer(); state.timerCaseId = null; state.timerDeadline = null;
+    stopTimer(); state.timerCaseId = null; state.timerLimit = null; state.timerDeadline = null;
     state.phase = 'result'; save(); showResult();
     tone(exact ? 330 : 130, .13, exact ? 'triangle' : 'sawtooth');
     setTimeout(() => tone(exact ? 440 : 110, .18), 110);
@@ -547,7 +557,8 @@
   }
   function shareText() {
     const rank = $('ending-title').textContent;
-    return `CRCC — La Grande Homologation : ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. Grade : ${rank}. ${state.timed ? 'Mode chrono.' : 'Mode tranquille.'} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
+    const expressCount = state.order.filter(id => ALL_CASES.find(item => item.id === id)?.express).length;
+    return `CRCC — La Grande Homologation : ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
   }
   function finish() {
     const score = state.exact, total = state.order.length;
