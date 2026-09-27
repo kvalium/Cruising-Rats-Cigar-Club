@@ -110,7 +110,7 @@
     { selector: '.rules', title: 'Le règlement tranche', copy: 'Comparez les pièces aux articles. De nouvelles règles s’ajoutent chaque jour. Une demande farfelue reste recevable si aucune règle ne l’interdit.' },
     { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes. Détachez-la tard pour gagner davantage, mais avant qu’elle tombe : sinon −30 F. « Classer sans jouer » annule ce risque. Le tutoriel met le cigare en pause.' },
     { selector: '.comparison', title: 'Prouvez un refus', copy: 'Choisissez le fait qui pose problème et l’article applicable. Pour un emprunt avec trop peu de fiches : « Fiches archivées » + article 04. La demande indique le contexte, pas la preuve du seuil. Si deux pièces se contredisent, comparez leurs deux valeurs.' },
-    { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon, sélectionnez les deux preuves, cliquez sur Refuser et choisissez le motif. Certains dossiers portent un bandeau rouge : ils sont limités à 20 secondes, même sans mode chrono. Le mini-jeu de cendre et les questions sont des bonus séparés.' }
+    { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon, sélectionnez les deux preuves, cliquez sur Refuser et choisissez le motif. Certains dossiers sont limités à 20 secondes. Le cigare et les questions sont des bonus séparés. Après le deuxième dossier de chaque journée, le Hamster Riding Pipe Club provoque un incident : le chrono du guichet est alors en pause.' }
   ];
 
   function randomSeed() {
