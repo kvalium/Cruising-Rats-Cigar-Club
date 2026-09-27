@@ -141,7 +141,7 @@
       }
       if (incomingSeed && data?.seed !== incomingSeed) return null;
       if (data?.version !== 3 || !Array.isArray(data.order) || ![18, 26, ALL_CASES.length].includes(data.order.length) ||
-          new Set(data.order).size !== ALL_CASES.length || !data.order.every(id => ALL_CASES.some(item => item.id === id)) ||
+          new Set(data.order).size !== data.order.length || !data.order.every(id => ALL_CASES.some(item => item.id === id)) ||
           !Number.isInteger(data.index) || data.index < 0 || data.index > data.order.length ||
           (data.index === data.order.length && !['daily', 'ending'].includes(data.phase)) ||
           !['play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
