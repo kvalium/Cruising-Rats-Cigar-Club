@@ -205,7 +205,7 @@
     return `<div class="doc-row"><span>${escapeHTML(label)}</span>${evidenceButton(key, label, value)}</div>`;
   }
   function documentCard(code, title, rows, note, noteKey, stamp, stampKey) {
-    return `<article class="document"><div class="document-head"><span>CRCC / ${escapeHTML(code)}</span><span>PIÈCE OFFICIELLE</span></div><h3>${escapeHTML(title)}</h3>${code === 'REQ' ? '<p class="request-help">L’objet indique ce que la personne vient demander au Club. La mention donne le détail ou la pièce jointe.</p>' : ''}${rows}${note ? `<div class="doc-note">${evidenceButton(noteKey, 'Mention', note)}</div>` : ''}${stamp ? evidenceButton(stampKey, 'Validation', stamp, 'doc-stamp') : ''}</article>`;
+    return `<article class="document"><div class="document-head"><span>CRCC / ${escapeHTML(code)}</span><span>PIÈCE OFFICIELLE</span></div><h3>${escapeHTML(title)}</h3>${code === 'REQ' ? '<p class="request-help">L’objet indique ce que la personne vient demander au Club. La mention donne le détail ou la pièce jointe.</p>' : ''}${rows}${note ? `<div class="doc-note">${evidenceButton(noteKey, 'Mention', note)}</div>` : ''}${stamp ? evidenceButton(stampKey, 'Validation', stamp, stamp === 'VALIDATION ABSENTE' ? 'doc-stamp bad' : 'doc-stamp') : ''}</article>`;
   }
   function portrait(item) {
     const hash = seedNumber(item.name), coats = ['#735146', '#3a6159', '#745a78', '#8a5744', '#4c5878'];
