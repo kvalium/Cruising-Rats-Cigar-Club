@@ -18,12 +18,6 @@ Toute information publiée ici est réputée sérieuse jusqu’à preuve du cont
 
 - `index.html` — portail officiel du Club
 - `jeu/` — La Grande Homologation, jeu de contrôle des dossiers (HTML, CSS et JavaScript)
-
-## La Grande Homologation
-
-Le jeu est accessible à `jeu/` sur GitHub Pages. Pendant quatre journées et dix-huit dossiers, comparez deux mentions pour constituer la preuve d’un refus, puis choisissez le motif réglementaire. Les décisions influencent les visites suivantes et le bilan de chaque journée. La Commission d’appel réexamine un ancien dossier, et un examen bonus du Coupe-cigare clôt le troisième jour. Deux notes orales du Président créent des conflits avec le règlement écrit.
-
-La partie en cours est conservée localement dans le navigateur. Le score final peut être partagé avec l’interface native de l’appareil ou copié comme texte. Le lien contient un code de défi qui donne le même ordre de dossiers à tous les joueurs. Le mode chrono de 120 secondes par dossier est facultatif et figure aussi dans le lien partagé. Aucun compte ni serveur de scores n’est nécessaire.
 - `activites.html` — activités et procédures approuvées
 - `degustation.html` — méthode officielle pour déguster un cigare
 - `actualites.html` — dernières communications du Comité
@@ -32,6 +26,16 @@ La partie en cours est conservée localement dans le navigateur. Le score final 
 - `contact.html` — service des correspondances
 - `reglement.html` — règlement intérieur en vigueur
 - `css/style.css` — identité graphique commune
+
+## La Grande Homologation
+
+Le jeu est accessible à `jeu/` sur GitHub Pages. Au fil de quatre journées et 26 dossiers, examinez la carte, la fiche de dégustation et l'objet de la visite. Pour refuser, comparez deux mentions puis choisissez le motif réglementaire. Les décisions influencent certaines visites suivantes. La Commission d'appel et l'inspection du Coupe-cigare ponctuent le service.
+
+Le tutoriel surligné démarre au premier dossier et se relance avec le bouton « ? Tutoriel ». Les demandes couvrent le dépôt et l'archivage de fiches, l'emprunt et la restitution du Coupe-cigare, des questions sur les feuilles du cigare, des dérogations administratives absurdes, des mesures disciplinaires, des promotions et des exclusions. Le catalogue du Club permet aussi de repérer les cigares entièrement inventés.
+
+Une fois par journée, un cigare se consume sur le bureau : détacher sa cendre rapporte davantage si elle est longue, mais sa chute coûte 30 F. On peut classer ce bonus sans jouer. Les questions techniques sont d'autres bonus, distincts de la décision sur le dossier ; leurs réponses s'appuient sur [l'anatomie du Habano publiée par Habanos, S.A.](https://www.habanos.com/en/the-anatomy-of-a-habano/).
+
+La partie en cours est conservée localement dans le navigateur. Le score final peut être partagé ou copié. Pour jouer à deux, créez un lien de défi dès l'accueil, envoyez-le à l'autre joueur et démarrez chacun sur un appareil ou navigateur distinct : l'ordre des dossiers est commun, les décisions restent individuelles. Le mode chrono de 120 secondes par dossier est facultatif et figure dans le lien. Aucun compte ni serveur de scores n'est nécessaire.
 
 ## Doctrine technique
 
