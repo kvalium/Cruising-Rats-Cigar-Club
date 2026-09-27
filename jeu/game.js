@@ -74,8 +74,8 @@
   REASONS.numero = 'Numéro de membre différent sur la fiche';
   const EVIDENCE = {
     carte: ['card.valid', 'rule.01'], fiche: ['sheet.appreciation', 'rule.02'],
-    habano: ['sheet.cigar', 'request.note'], coupe_grade: ['card.archived', 'request.action'],
-    parrain: ['card.archived', 'request.action'], inspection: ['request.note', 'rule.06'],
+    habano: ['sheet.cigar', 'request.note'], coupe_grade: ['card.archived', 'rule.04'],
+    parrain: ['card.archived', 'rule.05'], inspection: ['request.note', 'rule.06'],
     numero: ['card.number', 'sheet.memberNumber'], fictif: ['sheet.cigar', 'rule.08'], exclusion: ['request.note', 'rule.09']
   };
   const SAVE_KEY = 'crcc-homologation-v3';
@@ -104,7 +104,7 @@
     { selector: '#documents .document:nth-child(3)', title: 'Que demande la personne ?', copy: '« Objet de la visite » indique l’action souhaitée : déposer une fiche, emprunter ou rendre le Coupe-cigare, demander une promotion… La mention en dessous apporte un détail ou une pièce justificative. Ce n’est pas toujours une demande d’accès.' },
     { selector: '.rules', title: 'Le règlement tranche', copy: 'Comparez les pièces aux articles. De nouvelles règles s’ajoutent chaque jour. Une demande farfelue reste recevable si aucune règle ne l’interdit.' },
     { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes. Détachez-la tard pour gagner davantage, mais avant qu’elle tombe : sinon −30 F. « Classer sans jouer » annule ce risque. Le tutoriel met le cigare en pause.' },
-    { selector: '.comparison', title: 'Prouvez un refus', copy: 'Cliquez sur deux mentions qui montrent le problème, par exemple une carte sans tampon et l’article 01. Elles apparaîtront ici. Vous choisirez ensuite le motif exact.' },
+    { selector: '.comparison', title: 'Prouvez un refus', copy: 'Choisissez le fait qui pose problème et l’article applicable. Pour un emprunt avec trop peu de fiches : « Fiches archivées » + article 04. La demande indique le contexte, pas la preuve du seuil. Si deux pièces se contredisent, comparez leurs deux valeurs.' },
     { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon, sélectionnez les deux preuves, cliquez sur Refuser et choisissez le motif. Le mini-jeu de cendre et les questions sont des bonus séparés de cette décision.' }
   ];
 
@@ -240,10 +240,24 @@
   }
   function selectionUI() {
     document.querySelectorAll('[data-evidence]').forEach(button => button.setAttribute('aria-pressed', String(selection.some(part => part.key === button.dataset.evidence))));
-    $('comparison-text').textContent = selection.length ? selection.map(part => part.label).join('  ↔  ') : 'Cliquez sur une mention du dossier ou un article du règlement, puis sur une seconde.';
+    $('evidence-slot-1').textContent = selection[0] ? `1 · ${selection[0].label}` : '1 · Fait du dossier';
+    $('evidence-slot-2').textContent = selection[1] ? `2 · ${selection[1].label}` : '2 · Article ou autre pièce';
+    $('comparison-text').textContent = selection.length === 2 ? 'Comparaison prête. Cliquez sur Refuser, puis choisissez le motif réglementaire.' : selection.length === 1 ? (selection[0].key.startsWith('rule.') ? 'Choisissez maintenant le fait du dossier auquel cet article s’applique.' : 'Choisissez maintenant l’article pertinent ou une seconde valeur contradictoire.') : 'Choisissez un fait précis, puis la règle applicable. Si deux pièces se contredisent, comparez les deux valeurs.';
+    $('decision-hint').textContent = selection.length === 2 ? 'Deux éléments choisis : indiquez le motif du refus.' : 'Si tout est conforme, validez. Sinon, réunissez deux preuves pour refuser.';
     $('clear-evidence').disabled = !selection.length;
     $('refuse-button').disabled = selection.length !== 2;
     $('confirm-refusal').disabled = selection.length !== 2 || !$('reason-select').value;
+  }
+  function auditGuide(item) {
+    const action = item.request.action;
+    const number = item.day >= 4 ? ' Comparez aussi le numéro de la carte à celui de la fiche.' : '';
+    if (action.includes('Emprunt')) return `L’objet confirme qu’il s’agit d’un emprunt. Pour le seuil, comparez « Fiches archivées » à l’article 04${item.day >= 3 ? ' ; pour l’état des lieux, comparez sa mention à l’article 06' : ''}. Ne prenez pas l’objet de la demande comme preuve du nombre de fiches.${number}`;
+    if (action.includes('Proposition')) return `Pour un parrainage, comparez « Fiches archivées » à l’article 05. L’objet de la demande indique seulement qu’il s’agit d’une proposition.${number}`;
+    if (action.includes('exclusion')) return `Pour une exclusion, comparez la mention sur le procès-verbal à l’article 09.${number}`;
+    if (action.includes('Promotion')) return `Pour une promotion, examinez les fiches archivées et la validation de la carte selon l’article 10.${number}`;
+    if (action.includes('fiche')) return `Pour une fiche, comparez une case manquante à l’article 02, ou le nom du cigare au catalogue de l’article 08.${number}`;
+    if (item.sheet.cigar.toLowerCase().includes('habano')) return `Pour un « habano », comparez la mention du cigare à la preuve de provenance jointe. L’article 03 vous indique pourquoi.${number}`;
+    return `Cherchez un fait qui enfreint un article, ou deux valeurs contradictoires dans les documents. Une demande bizarre ne suffit pas à refuser.${number}`;
   }
   function selectEvidence(button) {
     const key = button.dataset.evidence;
@@ -365,6 +379,8 @@
       documentCard('MEM', 'Carte de membre', row('card.number', 'N°', card.number) + row('card.grade', 'Grade', card.grade) + row('card.archived', 'Fiches archivées', String(card.archived)), `Titulaire : ${item.name}`, 'card.name', card.valid ? 'VALIDÉ · COMITÉ' : 'VALIDATION ABSENTE', 'card.valid') +
       documentCard('FD', 'Fiche du jour', (sheet.memberNumber ? row('sheet.memberNumber', 'N° membre', sheet.memberNumber) : '') + row('sheet.cigar', 'Cigare', sheet.cigar) + row('sheet.observation', 'Observation', sheet.observation) + row('sheet.appreciation', 'Appréciation', sheet.appreciation), 'Document destiné aux archives du Club.', 'sheet.note', 'FICHE REÇUE', 'sheet.stamp') +
       documentCard('REQ', 'Demande au guichet', row('request.action', 'Objet de la visite', request.action), request.note, 'request.note', 'DÉPOSÉ CE JOUR', 'request.stamp');
+    $('audit-guide-text').textContent = auditGuide(item);
+    $('audit-guide').open = false;
     showQuiz(item);
     $('reason-select').innerHTML = '<option value="">Choisir le motif…</option>' + Object.entries(REASONS).filter(([key]) => activeRules.some(rule => rule.id === REASON_RULE[key])).map(([key, label]) => `<option value="${key}">${escapeHTML(label)}</option>`).join('');
     $('reason-select').value = '';
@@ -398,7 +414,7 @@
     $('result-stamp').className = `result-stamp ${outcome.exact ? 'good' : 'bad'}`;
     $('result-stamp').textContent = outcome.exact ? 'CONFORME' : 'OBSERVATION';
     $('result-title').textContent = outcome.verdict === 'timeout' ? 'Délai expiré.' : outcome.exact ? (outcome.verdict === 'approve' ? 'Demande validée.' : 'Refus motivé.') : 'Le Comité relève une anomalie.';
-    const expectedPair = item.reason ? `La comparaison utile était : ${EVIDENCE[item.reason].map(key => ({ 'card.valid': 'validation de la carte', 'rule.01': 'article 01', 'sheet.appreciation': 'appréciation', 'rule.02': 'article 02', 'sheet.cigar': 'cigare déclaré', 'rule.08': 'catalogue de l’article 08', 'rule.09': 'article 09', 'request.note': 'pièce ou mention jointe', 'card.archived': 'fiches archivées', 'request.action': 'objet de la demande', 'rule.06': 'article 06', 'card.number': 'numéro de la carte', 'sheet.memberNumber': 'numéro de la fiche' }[key])).join(' et ')}.` : '';
+    const expectedPair = item.reason ? `La comparaison utile était : ${EVIDENCE[item.reason].map(key => ({ 'card.valid': 'validation de la carte', 'rule.01': 'article 01', 'sheet.appreciation': 'appréciation', 'rule.02': 'article 02', 'sheet.cigar': 'cigare déclaré', 'rule.08': 'catalogue de l’article 08', 'rule.09': 'article 09', 'request.note': 'pièce ou mention jointe', 'card.archived': 'fiches archivées', 'rule.04': 'article 04', 'rule.05': 'article 05', 'rule.06': 'article 06', 'card.number': 'numéro de la carte', 'sheet.memberNumber': 'numéro de la fiche' }[key])).join(' et ')}.` : '';
     const pressure = DIRECTIVES[item.id] && outcome.verdict !== 'timeout' ? (outcome.verdict === 'approve' ? ' Le Président apprécie votre docilité. Le règlement, moins.' : ' Le Président prend personnellement note de votre indépendance.') : '';
     $('result-text').textContent = (outcome.verdict === 'timeout' ? `Le dossier a été renvoyé sans décision. ${item.explanation}` : outcome.exact ? item.explanation : `${item.explanation} ${expectedPair}`) + pressure;
     $('result-ledger').textContent = `${outcome.delta > 0 ? '+' : ''}${outcome.delta} F · Caisse du bureau : ${state.balance} F`;
