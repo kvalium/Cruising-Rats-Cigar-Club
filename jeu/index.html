@@ -22,15 +22,29 @@
         <div class="intro-seal">SERVICE PUBLIC<br>DE LA FUMÉE<br><span>★</span></div>
         <p class="eyebrow">CRCC · BUREAU N° 03 · SESSION 2026</p>
         <h1>La Grande<br><em>Homologation</em></h1>
-        <p class="intro-copy">Les membres défilent. Les pièces s'accumulent. Le Comité attend une décision <strong>rigoureusement justifiable</strong> pour chacun.</p>
+        <p class="intro-copy">Vous tenez le guichet du Cruising Rats Cigar Club. Les membres défilent, les pièces s'accumulent et le Comité attend une décision <strong>rigoureusement justifiable</strong> pour chacun.</p>
         <div class="briefing">
-          <div><b>01</b><span>Examinez la carte, la fiche et les demandes.</span></div>
-          <div><b>02</b><span>Consultez le règlement du jour. Il change.</span></div>
-          <div><b>03</b><span>Pour refuser, rapprochez deux mentions et indiquez le motif.</span></div>
+          <div><b>01</b><span><strong>Examinez le dossier</strong> : carte de membre, fiche de dégustation et demande au guichet. Une plaisanterie n'est pas une preuve.</span></div>
+          <div><b>02</b><span><strong>Appliquez le règlement</strong> : de nouvelles circulaires entrent en vigueur au fil des quatre journées. Les consignes orales du Président peuvent compliquer l'affaire.</span></div>
+          <div><b>03</b><span><strong>Tamponnez votre décision</strong> : validez un dossier conforme. Pour refuser, sélectionnez deux mentions qui prouvent l'écart, puis choisissez le motif.</span></div>
         </div>
-        <div class="game-options"><label><input id="timed-mode" type="checkbox"> Guichet sous pression <small>120 secondes par dossier · facultatif</small></label><p id="challenge-label" class="challenge-label hidden"></p></div>
+        <p class="intro-explainer">Vous traiterez <strong>18 dossiers</strong>, avec un avis du Comité après chaque décision. Une commission d'appel et l'inspection du Coupe-cigare ponctuent le service. À la fin, comparez vos décisions exactes, vos observations et la caisse finale.</p>
+        <div class="duo-panel" aria-labelledby="duo-title">
+          <p class="eyebrow">DEUX AGENTS · UN MÊME DÉFI</p>
+          <h2 id="duo-title">Comment jouer à deux&nbsp;?</h2>
+          <ol>
+            <li>Choisissez ensemble le mode tranquille ou le chrono, puis créez un lien de défi.</li>
+            <li>Envoyez ce lien à l'autre joueur. Ouvrez-le chacun sur votre appareil ou dans deux navigateurs distincts.</li>
+            <li>Cliquez chacun sur «&nbsp;Prendre son service&nbsp;». Les dossiers arrivent dans le même ordre ; les décisions et les scores restent individuels.</li>
+            <li>À la fin, partagez vos rapports et comparez vos résultats. Le Comité se charge de ne féliciter personne trop vite.</li>
+          </ol>
+          <p class="duo-note">Ce défi se joue chacun de son côté, sans partie en direct ni compte à créer.</p>
+          <div class="game-options"><label><input id="timed-mode" type="checkbox"> Guichet sous pression <small>120 secondes par dossier · facultatif</small></label></div>
+          <div class="challenge-actions"><button class="secondary-button" id="create-challenge" type="button">CRÉER UN LIEN DE DÉFI</button><p id="challenge-label" class="challenge-label hidden"></p></div>
+          <div class="challenge-share hidden" id="challenge-share"><label for="challenge-url">LIEN À ENVOYER À L'AUTRE JOUEUR</label><div><input id="challenge-url" type="text" readonly><button class="secondary-button" id="copy-challenge" type="button">COPIER LE LIEN</button></div><p id="challenge-status" role="status"></p></div>
+        </div>
         <div class="intro-actions"><button class="primary-button" id="start-button" type="button">PRENDRE SON SERVICE <span>→</span></button><button class="secondary-button hidden" id="resume-button" type="button">REPRENDRE LE DOSSIER EN COURS</button></div>
-        <p class="intro-foot">Une partie · 18 dossiers · 4 journées · Aucune compétence réelle en cigare requise</p>
+        <p class="intro-foot">En solo ou à deux · 18 dossiers · 4 journées · Aucune compétence réelle en cigare requise</p>
       </section>
 
       <section class="play hidden" id="play" aria-label="Guichet des admissions">
