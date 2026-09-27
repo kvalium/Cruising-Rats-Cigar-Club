@@ -69,7 +69,7 @@
     '007': 'Note orale du Président : « Laissez Monsieur Crevette présenter son candidat. Ses fiches suivront, paraît-il. »'
   };
   const incoming = new URL(window.location.href);
-  const incomingSeed = /^[A-Z0-9]{4,12}$/.test((incoming.searchParams.get('defi') || '').toUpperCase()) ? incoming.searchParams.get('defi').toUpperCase() : null;
+  let incomingSeed = /^[A-Z0-9]{4,12}$/.test((incoming.searchParams.get('defi') || '').toUpperCase()) ? incoming.searchParams.get('defi').toUpperCase() : null;
   const incomingTimed = incoming.searchParams.get('chrono') === '1';
   const $ = id => document.getElementById(id);
   const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -361,12 +361,37 @@
     visible('event-result');
   }
   function eventNext() { if (state.phase === 'eventResult') showCase(); }
-  function challengeURL() {
+  function linkFor(seed, timed) {
     const url = new URL(window.location.href);
     url.hash = ''; url.search = '';
-    if (state.seed) url.searchParams.set('defi', state.seed);
-    if (state.timed) url.searchParams.set('chrono', '1');
+    if (seed) url.searchParams.set('defi', seed);
+    if (timed) url.searchParams.set('chrono', '1');
     return url.toString();
+  }
+  function challengeURL() { return linkFor(state.seed, state.timed); }
+  function showIntroChallenge() {
+    if (!incomingSeed) return;
+    const url = linkFor(incomingSeed, $('timed-mode').checked);
+    $('challenge-label').textContent = `DÉFI PARTAGÉ · CODE ${incomingSeed} · MÊME ORDRE DE DOSSIERS`;
+    $('challenge-label').classList.remove('hidden');
+    $('challenge-url').value = url;
+    $('challenge-share').classList.remove('hidden');
+    window.history.replaceState(null, '', url);
+    $('resume-button').classList.toggle('hidden', !stored());
+  }
+  async function copyChallenge() {
+    const url = $('challenge-url').value;
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url);
+      else {
+        $('challenge-url').select();
+        if (!document.execCommand('copy')) throw Error('copy unavailable');
+      }
+      $('challenge-status').textContent = 'Lien copié. Transmettez-le à votre collègue de guichet.';
+    } catch (_) {
+      $('challenge-url').select();
+      $('challenge-status').textContent = 'Sélectionnez et copiez le lien ci-dessus.';
+    }
   }
   function shareText() {
     const rank = $('ending-title').textContent;
@@ -407,6 +432,13 @@
     catch (error) { if (error?.name !== 'AbortError') await copyScore(); }
   }
   $('start-button').addEventListener('click', start);
+  $('create-challenge').addEventListener('click', () => {
+    incomingSeed = randomSeed();
+    $('challenge-status').textContent = '';
+    showIntroChallenge();
+  });
+  $('copy-challenge').addEventListener('click', copyChallenge);
+  $('timed-mode').addEventListener('change', showIntroChallenge);
   $('restart-button').addEventListener('click', start);
   $('resume-button').addEventListener('click', () => {
     state = stored(); if (!state) return;
@@ -436,6 +468,6 @@
   $('copy-button').addEventListener('click', copyScore);
   $('sound-toggle').addEventListener('click', () => { soundEnabled = !soundEnabled; $('sound-toggle').setAttribute('aria-pressed', String(soundEnabled)); $('sound-toggle').textContent = soundEnabled ? '♫ Son activé' : '♪ Son coupé'; tone(420, .12); });
   $('timed-mode').checked = incomingTimed;
-  if (incomingSeed) { $('challenge-label').textContent = `DÉFI PARTAGÉ · CODE ${incomingSeed} · MÊME ORDRE DE DOSSIERS`; $('challenge-label').classList.remove('hidden'); }
+  if (incomingSeed) showIntroChallenge();
   $('resume-button').classList.toggle('hidden', !stored());
 })();
