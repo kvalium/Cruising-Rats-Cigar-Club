@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#241b19">
   <meta name="description" content="La Grande Homologation : examinez les dossiers du Cruising Rats Cigar Club, appliquez le règlement et tamponnez vos décisions.">
   <title>La Grande Homologation — CRCC</title>
-  <link rel="stylesheet" href="game.css?v=6">
-  <script src="game.js?v=6" defer></script>
+  <link rel="stylesheet" href="game.css?v=7">
+  <script src="game.js?v=7" defer></script>
 </head>
 <body>
   <div class="game-shell">
@@ -28,7 +28,7 @@
           <div><b>02</b><span><strong>Appliquez le règlement</strong> : de nouvelles circulaires entrent en vigueur au fil des quatre journées. Les consignes orales du Président peuvent compliquer l'affaire.</span></div>
           <div><b>03</b><span><strong>Tamponnez votre décision</strong> : validez un dossier conforme. Pour refuser, sélectionnez deux mentions qui prouvent l'écart, puis choisissez le motif.</span></div>
         </div>
-        <p class="intro-explainer">Vous traiterez <strong>26 dossiers</strong>, avec un avis du Comité après chaque décision. Une commission d'appel et l'inspection du Coupe-cigare ponctuent le service. À la fin, comparez vos décisions exactes, vos observations et la caisse finale.</p>
+        <p class="intro-explainer">Vous traiterez <strong>29 dossiers</strong>, dont trois à expédier en 20 secondes même en mode tranquille. Une commission d'appel et l'inspection du Coupe-cigare ponctuent le service. À la fin, comparez vos décisions exactes, vos observations et la caisse finale.</p>
         <div class="duo-panel" aria-labelledby="duo-title">
           <p class="eyebrow">DEUX AGENTS · UN MÊME DÉFI</p>
           <h2 id="duo-title">Comment jouer à deux&nbsp;?</h2>
@@ -39,21 +39,21 @@
             <li>À la fin, partagez vos rapports et comparez vos résultats. Le Comité se charge de ne féliciter personne trop vite.</li>
           </ol>
           <p class="duo-note">Ce défi se joue chacun de son côté, sans partie en direct ni compte à créer.</p>
-          <div class="game-options"><label><input id="timed-mode" type="checkbox"> Guichet sous pression <small>120 secondes par dossier · facultatif</small></label></div>
+          <div class="game-options"><label><input id="timed-mode" type="checkbox"> Guichet sous pression <small>30 secondes par dossier · facultatif (les express restent à 20 secondes)</small></label></div>
           <div class="challenge-actions"><button class="secondary-button" id="create-challenge" type="button">CRÉER UN LIEN DE DÉFI</button><p id="challenge-label" class="challenge-label hidden"></p></div>
           <div class="challenge-share hidden" id="challenge-share"><label for="challenge-url">LIEN À ENVOYER À L'AUTRE JOUEUR</label><div><input id="challenge-url" type="text" readonly><button class="secondary-button" id="copy-challenge" type="button">COPIER LE LIEN</button></div><p id="challenge-status" role="status"></p></div>
         </div>
         <div class="intro-actions"><button class="primary-button" id="start-button" type="button">PRENDRE SON SERVICE <span>→</span></button><button class="secondary-button hidden" id="resume-button" type="button">REPRENDRE LE DOSSIER EN COURS</button></div>
-        <p class="intro-foot">En solo ou à deux · 26 dossiers · 4 journées · Un tutoriel guidé dès le premier dossier</p>
+        <p class="intro-foot">En solo ou à deux · 29 dossiers · 4 journées · Un tutoriel guidé dès le premier dossier</p>
       </section>
 
       <section class="play hidden" id="play" aria-label="Guichet des admissions">
         <div class="statusbar">
           <div><span class="status-label">JOUR DE SERVICE</span><strong id="day-label">01 / 04</strong></div>
-          <div><span class="status-label">DOSSIER</span><strong id="case-label">01 / 18</strong></div>
+          <div><span class="status-label">DOSSIER</span><strong id="case-label">01 / 29</strong></div>
           <div><span class="status-label">CAISSE DU BUREAU</span><strong id="balance-label">0 F</strong></div>
           <div><span class="status-label">ERREURS</span><strong id="errors-label">0</strong></div>
-          <div class="timer-box hidden" id="timer-box"><span class="status-label">TEMPS RESTANT</span><strong id="timer-label">2:00</strong></div>
+          <div class="timer-box hidden" id="timer-box"><span class="status-label" id="timer-mode-label">TEMPS RESTANT</span><strong id="timer-label">0:30</strong></div>
           <button class="help-button" id="help-button" type="button" aria-label="Revoir le tutoriel">? <span>TUTORIEL</span></button>
         </div>
         <div class="workplace">
@@ -67,6 +67,7 @@
 
           <div class="desk">
             <div class="bulletin" id="bulletin" role="status"></div>
+            <div class="express-notice hidden" id="express-notice" role="status"><strong>DOSSIER EXPRESS · 20 SECONDES</strong><span>Le Comité vous laisse le temps de lire l’essentiel. À zéro, le dossier repart sans décision.</span></div>
             <div class="president-note hidden" id="president-note"></div>
             <div class="visitor-strip"><div class="visitor-avatar" id="visitor-avatar" aria-hidden="true"></div><div><span>AU GUICHET</span><h2 id="visitor-name"></h2><p id="visitor-quote"></p></div><div class="queue-number" id="queue-number"></div></div>
             <div class="documents" id="documents" aria-label="Documents à examiner"></div>
