@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#241b19">
   <meta name="description" content="La Grande Homologation : examinez les dossiers du Cruising Rats Cigar Club, appliquez le règlement et tamponnez vos décisions.">
   <title>La Grande Homologation — CRCC</title>
-  <link rel="stylesheet" href="game.css?v=9">
-  <script src="game.js?v=10" defer></script>
+  <link rel="stylesheet" href="game.css?v=10">
+  <script src="game.js?v=11" defer></script>
 </head>
 <body>
   <div class="game-shell">
@@ -28,7 +28,7 @@
           <div><b>02</b><span><strong>Appliquez le règlement</strong> : de nouvelles circulaires entrent en vigueur au fil des quatre journées. Les consignes orales du Président peuvent compliquer l'affaire.</span></div>
           <div><b>03</b><span><strong>Tamponnez votre décision</strong> : validez un dossier conforme. Pour refuser, sélectionnez deux mentions qui prouvent l'écart, puis choisissez le motif.</span></div>
         </div>
-        <p class="intro-explainer">Vous traiterez <strong>29 dossiers</strong>, dont trois à expédier en 20 secondes même en mode tranquille. Entre deux dossiers, le Hamster Riding Pipe Club perturbe une fois chaque journée le guichet : démasquez son tampon, reconstituez une règle, rattrapez une pièce et jugez sa délégation. Le chrono des dossiers est alors en pause. Une commission d'appel et l'inspection du Coupe-cigare ponctuent aussi le service. À la fin, comparez vos décisions exactes, vos observations et la caisse finale.</p>
+        <p class="intro-explainer">Vous traiterez <strong>32 dossiers</strong>, dont trois à expédier en 20 secondes. Consultez le catalogue et le registre des membres sur le bureau : la carte ne donne plus le nombre de fiches, et certains faux membres ont même fabriqué leur grade. Le Hamster Riding Pipe Club surgit à un moment différent chaque journée. Le Président peut interrompre le service plusieurs fois pour interroger votre science du cigare — ou votre goût de la flatterie. Les chronos des dossiers sont en pause pendant ces interruptions et lorsque vous consultez les deux ouvrages.</p>
         <div class="duo-panel" aria-labelledby="duo-title">
           <p class="eyebrow">DEUX AGENTS · UN MÊME DÉFI</p>
           <h2 id="duo-title">Comment jouer à deux&nbsp;?</h2>
@@ -44,13 +44,13 @@
           <div class="challenge-share hidden" id="challenge-share"><label for="challenge-url">LIEN À ENVOYER À L'AUTRE JOUEUR</label><div><input id="challenge-url" type="text" readonly><button class="secondary-button" id="copy-challenge" type="button">COPIER LE LIEN</button></div><p id="challenge-status" role="status"></p></div>
         </div>
         <div class="intro-actions"><button class="primary-button" id="start-button" type="button">PRENDRE SON SERVICE <span>→</span></button><button class="secondary-button hidden" id="resume-button" type="button">REPRENDRE LE DOSSIER EN COURS</button></div>
-        <p class="intro-foot">En solo ou à deux · 29 dossiers · 4 journées · Un tutoriel guidé dès le premier dossier</p>
+        <p class="intro-foot">En solo ou à deux · 32 dossiers · 4 journées · Un tutoriel guidé dès le premier dossier</p>
       </section>
 
       <section class="play hidden" id="play" aria-label="Guichet des admissions">
         <div class="statusbar">
           <div><span class="status-label">JOUR DE SERVICE</span><strong id="day-label">01 / 04</strong></div>
-          <div><span class="status-label">DOSSIER</span><strong id="case-label">01 / 29</strong></div>
+          <div><span class="status-label">DOSSIER</span><strong id="case-label">01 / 32</strong></div>
           <div><span class="status-label">CAISSE DU BUREAU</span><strong id="balance-label">0 F</strong></div>
           <div><span class="status-label">ERREURS</span><strong id="errors-label">0</strong></div>
           <div class="timer-box hidden" id="timer-box"><span class="status-label" id="timer-mode-label">TEMPS RESTANT</span><strong id="timer-label">0:30</strong></div>
@@ -61,6 +61,7 @@
             <div class="panel-top"><span>DOCUMENT PERMANENT</span><span>CRCC / R-01</span></div>
             <h2>Règlement<br><em>du guichet</em></h2>
             <p class="rules-note">Seuls les faits inscrits au dossier font foi. Une plaisanterie n'est pas, à elle seule, un motif de refus.</p>
+            <div class="reference-shelf"><button class="reference-object" id="catalog-open" type="button" aria-haspopup="dialog"><svg viewBox="0 0 120 96" role="img" aria-label="Livre du catalogue des cigares"><path d="M12 12q24-9 48 2 24-11 48-2v70q-24-9-48 2-24-11-48-2Z" fill="#a3493d" stroke="#57352b" stroke-width="4"/><path d="M60 14v70M20 25q15-4 30 1m-30 11q15-4 30 1m-30 11q15-4 30 1m20-24q15-4 30-1m-30 12q15-4 30-1m-30 12q15-4 30-1" fill="none" stroke="#e9d1a9" stroke-width="3"/><circle cx="60" cy="49" r="10" fill="#d8b378" stroke="#57352b" stroke-width="2"/></svg><span>CATALOGUE<br>DES CIGARES</span></button><button class="reference-object" id="registry-open" type="button" aria-haspopup="dialog"><svg viewBox="0 0 120 96" role="img" aria-label="Grand registre des membres"><path d="M20 7h83v82H20q-9 0-9-9V17q0-10 9-10Z" fill="#325a48" stroke="#263a30" stroke-width="4"/><path d="M28 7v82M41 27h48M41 39h48M41 51h48M41 63h34" stroke="#d8ca9f" stroke-width="3"/><circle cx="82" cy="70" r="12" fill="#ae7459" stroke="#e5be8d" stroke-width="3"/></svg><span>REGISTRE<br>DES MEMBRES</span></button></div>
             <div id="rules-list" class="rules-list"></div>
             <div class="rules-footer">ON PIPE RIEN, MAIS ON A DES FICHES.</div>
           </aside>
@@ -85,6 +86,8 @@
 
       <div class="tutorial-overlay hidden" id="tutorial-overlay" role="dialog" aria-modal="true" aria-labelledby="tutorial-title"><div class="tutorial-card"><span class="eyebrow" id="tutorial-progress"></span><h2 id="tutorial-title"></h2><p id="tutorial-copy"></p><div class="tutorial-controls"><button class="text-button" id="tutorial-skip" type="button">Passer le tutoriel</button><button class="primary-button" id="tutorial-next" type="button">SUIVANT <span>→</span></button></div></div></div>
 
+      <div class="reference-modal hidden" id="reference-modal" role="dialog" aria-modal="true" aria-labelledby="reference-title"><div class="reference-paper"><button class="reference-close" id="reference-close" type="button" aria-label="Fermer l’ouvrage">×</button><p class="eyebrow" id="reference-kicker"></p><h2 id="reference-title"></h2><div id="catalog-content" class="hidden"></div><div id="registry-content" class="hidden"><label for="registry-search">Chercher par numéro ou par nom</label><div class="registry-search-row"><input id="registry-search" type="search" autocomplete="off"><button id="registry-find" type="button">CONSULTER</button></div><button id="registry-by-name" class="text-button" type="button">Chercher le nom de la carte</button><div id="registry-result" aria-live="polite"></div></div><p class="reference-foot">Les mentions du registre peuvent servir de preuves. Le chrono du dossier est en pause pendant la consultation.</p></div></div>
+
       <section class="result hidden" id="result" aria-live="polite">
         <div class="result-paper"><p class="eyebrow" id="result-kicker">AVIS DU COMITÉ</p><div class="result-stamp" id="result-stamp"></div><h2 id="result-title"></h2><p id="result-text"></p><div class="result-ledger" id="result-ledger"></div><button class="primary-button" id="next-button" type="button">DOSSIER SUIVANT <span>→</span></button></div>
       </section>
@@ -98,6 +101,10 @@
       <section class="event hidden" id="hamster" aria-live="polite"><div class="event-card hamster-card"><p class="eyebrow" id="hamster-kicker"></p><div class="hamster-header"><div><h2 id="hamster-title"></h2><p id="hamster-copy"></p></div><div class="hamster-avatar" aria-hidden="true">🐹</div></div><div class="hamster-evidence" id="hamster-evidence"></div><div class="hamster-options" id="hamster-options"></div><div class="hamster-race hidden" id="hamster-race"><p>La pièce est dans ses pattes. Lancez la poursuite, puis cliquez quand le hamster traverse la zone verte. Trop tôt ou trop tard : l’annexe disparaît.</p><div class="hamster-track" role="img" aria-label="Piste avec zone verte de capture"><div class="hamster-target"></div><div class="hamster-runner" id="hamster-runner">🐹</div></div><p id="hamster-race-status" role="status">Prêt pour la poursuite.</p><button class="primary-button" id="hamster-race-button" type="button">LANCER LA POURSUITE <span>→</span></button></div><p class="hamster-note">Incident séparé de la décision sur le dossier. Le chrono du guichet est en pause.</p></div></section>
 
       <section class="result hidden" id="hamster-result" aria-live="polite"><div class="result-paper"><p class="eyebrow">PROCÈS-VERBAL · HAMSTER RIDING PIPE CLUB</p><div class="result-stamp" id="hamster-result-stamp"></div><h2 id="hamster-result-title"></h2><p id="hamster-result-text"></p><div class="result-ledger" id="hamster-result-ledger"></div><button class="primary-button" id="hamster-next" type="button">REPRENDRE LE GUICHET <span>→</span></button></div></section>
+
+      <section class="event hidden" id="president" aria-live="polite"><div class="event-card president-card"><p class="eyebrow" id="president-kicker">CONVOCATION DU PRÉSIDENT</p><h2>Une question<br><em>présidentielle</em></h2><p id="president-question"></p><div class="president-meter" id="president-meter"></div><div class="president-answers" id="president-answers"></div><p class="hamster-note">Une réponse flatteuse mais fausse plaît d’abord au Président. À partir de la troisième flatterie, il devient soupçonneux. Le chrono du dossier est en pause.</p></div></section>
+
+      <section class="result hidden" id="president-result" aria-live="polite"><div class="result-paper"><p class="eyebrow">AVIS DU PRÉSIDENT · QUESTIONS SUR LE CIGARE</p><div class="result-stamp" id="president-result-stamp"></div><h2 id="president-result-title"></h2><p id="president-result-text"></p><a id="president-source" class="source-link" target="_blank" rel="noopener noreferrer">Vérifier la réponse chez Habanos, S.A. ↗</a><div class="result-ledger" id="president-result-ledger"></div><button class="primary-button" id="president-next" type="button">REPRENDRE LE GUICHET <span>→</span></button></div></section>
 
       <section class="result hidden" id="event-result" aria-live="polite"><div class="result-paper"><p class="eyebrow" id="event-result-kicker"></p><div class="result-stamp" id="event-result-stamp"></div><h2 id="event-result-title"></h2><p id="event-result-text"></p><div class="result-ledger" id="event-result-ledger"></div><button class="primary-button" id="event-next" type="button">REPRENDRE LE SERVICE <span>→</span></button></div></section>
 
