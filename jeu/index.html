@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#241b19">
   <meta name="description" content="La Grande Homologation : examinez les dossiers du Cruising Rats Cigar Club, appliquez le règlement et tamponnez vos décisions.">
   <title>La Grande Homologation — CRCC</title>
-  <link rel="stylesheet" href="game.css?v=7">
-  <script src="game.js?v=8" defer></script>
+  <link rel="stylesheet" href="game.css?v=9">
+  <script src="game.js?v=9" defer></script>
 </head>
 <body>
   <div class="game-shell">
@@ -28,7 +28,7 @@
           <div><b>02</b><span><strong>Appliquez le règlement</strong> : de nouvelles circulaires entrent en vigueur au fil des quatre journées. Les consignes orales du Président peuvent compliquer l'affaire.</span></div>
           <div><b>03</b><span><strong>Tamponnez votre décision</strong> : validez un dossier conforme. Pour refuser, sélectionnez deux mentions qui prouvent l'écart, puis choisissez le motif.</span></div>
         </div>
-        <p class="intro-explainer">Vous traiterez <strong>29 dossiers</strong>, dont trois à expédier en 20 secondes même en mode tranquille. Une commission d'appel et l'inspection du Coupe-cigare ponctuent le service. À la fin, comparez vos décisions exactes, vos observations et la caisse finale.</p>
+        <p class="intro-explainer">Vous traiterez <strong>29 dossiers</strong>, dont trois à expédier en 20 secondes même en mode tranquille. Entre deux dossiers, le Hamster Riding Pipe Club perturbe une fois chaque journée le guichet : démasquez son tampon, reconstituez une règle, rattrapez une pièce et jugez sa délégation. Le chrono des dossiers est alors en pause. Une commission d'appel et l'inspection du Coupe-cigare ponctuent aussi le service. À la fin, comparez vos décisions exactes, vos observations et la caisse finale.</p>
         <div class="duo-panel" aria-labelledby="duo-title">
           <p class="eyebrow">DEUX AGENTS · UN MÊME DÉFI</p>
           <h2 id="duo-title">Comment jouer à deux&nbsp;?</h2>
@@ -94,6 +94,10 @@
       <section class="event hidden" id="appeal" aria-live="polite"><div class="event-card"><p class="eyebrow">COMMISSION D’APPEL · DOSSIER N° 002</p><h2>Le retour de<br><em>Monsieur Rature</em></h2><p id="appeal-intro"></p><div class="appeal-docs"><div><span>CARTE PRÉSENTÉE LE JOUR 1</span><strong>Validation du Comité : ABSENTE</strong><p>La pièce versée au dossier au moment de votre décision.</p></div><div><span>PIÈCE NOUVELLE</span><strong>Validation apposée le jour 2</strong><p>Un tampon authentique, mais postérieur au premier passage.</p></div></div><p class="committee-note" id="appeal-question"></p><div class="event-actions"><button class="stamp approve" id="appeal-uphold" type="button">CONFIRMER LA DÉCISION</button><button class="stamp refuse" id="appeal-revise" type="button">RECTIFIER LA DÉCISION</button></div></div></section>
 
       <section class="event hidden" id="cutter" aria-live="polite"><div class="event-card"><p class="eyebrow">EXAMEN CONTRADICTOIRE · OBJET PRÉSIDENTIEL</p><h2>Le Coupe-cigare<br><em>revient au bureau</em></h2><p>Comparez l’état des lieux avant et après l’emprunt. Une différence éventuelle doit être consignée. « Il était déjà comme ça avant » n’est pas une mesure.</p><div class="cutter-views"><div><span>AVANT</span><div id="cutter-before"></div></div><div><span>APRÈS</span><div id="cutter-after"></div></div></div><p class="comparison-label">QUELLE PARTIE A CHANGÉ ?</p><div class="cutter-options" id="cutter-options"><button type="button" data-part="blade">La lame</button><button type="button" data-part="pivot">Le pivot</button><button type="button" data-part="handle">La poignée</button><button type="button" data-part="none">Aucune</button></div></div></section>
+
+      <section class="event hidden" id="hamster" aria-live="polite"><div class="event-card hamster-card"><p class="eyebrow" id="hamster-kicker"></p><div class="hamster-header"><div><h2 id="hamster-title"></h2><p id="hamster-copy"></p></div><div class="hamster-avatar" aria-hidden="true">🐹</div></div><div class="hamster-evidence" id="hamster-evidence"></div><div class="hamster-options" id="hamster-options"></div><div class="hamster-race hidden" id="hamster-race"><p>La pièce est dans ses pattes. Lancez la poursuite, puis cliquez quand le hamster traverse la zone verte. Trop tôt ou trop tard : l’annexe disparaît.</p><div class="hamster-track" role="img" aria-label="Piste avec zone verte de capture"><div class="hamster-target"></div><div class="hamster-runner" id="hamster-runner">🐹</div></div><p id="hamster-race-status" role="status">Prêt pour la poursuite.</p><button class="primary-button" id="hamster-race-button" type="button">LANCER LA POURSUITE <span>→</span></button></div><p class="hamster-note">Incident séparé de la décision sur le dossier. Le chrono du guichet est en pause.</p></div></section>
+
+      <section class="result hidden" id="hamster-result" aria-live="polite"><div class="result-paper"><p class="eyebrow">PROCÈS-VERBAL · HAMSTER RIDING PIPE CLUB</p><div class="result-stamp" id="hamster-result-stamp"></div><h2 id="hamster-result-title"></h2><p id="hamster-result-text"></p><div class="result-ledger" id="hamster-result-ledger"></div><button class="primary-button" id="hamster-next" type="button">REPRENDRE LE GUICHET <span>→</span></button></div></section>
 
       <section class="result hidden" id="event-result" aria-live="polite"><div class="result-paper"><p class="eyebrow" id="event-result-kicker"></p><div class="result-stamp" id="event-result-stamp"></div><h2 id="event-result-title"></h2><p id="event-result-text"></p><div class="result-ledger" id="event-result-ledger"></div><button class="primary-button" id="event-next" type="button">REPRENDRE LE SERVICE <span>→</span></button></div></section>
 
