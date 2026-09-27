@@ -17,6 +17,7 @@ Toute information publiée ici est réputée sérieuse jusqu’à preuve du cont
 ## Organisation
 
 - `index.html` — portail officiel du Club
+- `jeu/` — La Grande Homologation, jeu de contrôle des dossiers (HTML, CSS et JavaScript)
 - `activites.html` — activités et procédures approuvées
 - `degustation.html` — méthode officielle pour déguster un cigare
 - `actualites.html` — dernières communications du Comité

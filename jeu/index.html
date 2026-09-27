@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#241b19">
+  <meta name="description" content="La Grande Homologation : examinez les dossiers du Cruising Rats Cigar Club, appliquez le règlement et tamponnez vos décisions.">
+  <title>La Grande Homologation — CRCC</title>
+  <link rel="stylesheet" href="game.css">
+  <script src="game.js" defer></script>
+</head>
+<body>
+  <div class="game-shell">
+    <header class="topbar">
+      <a href="../index.html" class="brand" aria-label="Retour au site du CRCC"><span class="brand-mark">CRCC</span><span>CRUISING RATS<br>CIGAR CLUB</span></a>
+      <div class="topbar-center">DIRECTION DES ADMISSIONS &amp; DES FICHES</div>
+      <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="false">♪ Son coupé</button>
+    </header>
+
+    <main>
+      <section class="intro" id="intro">
+        <div class="intro-seal">SERVICE PUBLIC<br>DE LA FUMÉE<br><span>★</span></div>
+        <p class="eyebrow">CRCC · BUREAU N° 03 · SESSION 2026</p>
+        <h1>La Grande<br><em>Homologation</em></h1>
+        <p class="intro-copy">Les membres défilent. Les pièces s'accumulent. Le Comité attend une décision <strong>rigoureusement justifiable</strong> pour chacun.</p>
+        <div class="briefing">
+          <div><b>01</b><span>Examinez la carte, la fiche et les demandes.</span></div>
+          <div><b>02</b><span>Consultez le règlement du jour. Il change.</span></div>
+          <div><b>03</b><span>Validez ou refusez en indiquant le motif.</span></div>
+        </div>
+        <button class="primary-button" id="start-button" type="button">PRENDRE SON SERVICE <span>→</span></button>
+        <p class="intro-foot">Une partie · 10 dossiers · Aucune compétence réelle en cigare requise</p>
+      </section>
+
+      <section class="play hidden" id="play" aria-label="Guichet des admissions">
+        <div class="statusbar">
+          <div><span class="status-label">JOUR DE SERVICE</span><strong id="day-label">01 / 03</strong></div>
+          <div><span class="status-label">DOSSIER</span><strong id="case-label">01 / 10</strong></div>
+          <div><span class="status-label">CAISSE DU BUREAU</span><strong id="balance-label">0 F</strong></div>
+          <div><span class="status-label">ERREURS</span><strong id="errors-label">0</strong></div>
+        </div>
+        <div class="workplace">
+          <aside class="rules panel" aria-label="Règlement du jour">
+            <div class="panel-top"><span>DOCUMENT PERMANENT</span><span>CRCC / R-01</span></div>
+            <h2>Règlement<br><em>du guichet</em></h2>
+            <p class="rules-note">Seuls les faits inscrits au dossier font foi. Une plaisanterie n'est pas, à elle seule, un motif de refus.</p>
+            <div id="rules-list" class="rules-list"></div>
+            <div class="rules-footer">ON PIPE RIEN, MAIS ON A DES FICHES.</div>
+          </aside>
+
+          <div class="desk">
+            <div class="bulletin" id="bulletin" role="status"></div>
+            <div class="visitor-strip"><div class="visitor-avatar" id="visitor-avatar" aria-hidden="true">R</div><div><span>AU GUICHET</span><h2 id="visitor-name"></h2><p id="visitor-quote"></p></div><div class="queue-number" id="queue-number"></div></div>
+            <div class="documents" id="documents" aria-label="Documents à examiner"></div>
+            <div class="decision-area">
+              <p class="decision-hint" id="decision-hint">Vérifiez les pièces et appliquez le règlement en vigueur.</p>
+              <div class="actions" id="actions"><button id="approve-button" class="stamp approve" type="button"><span>✓</span> VALIDER</button><button id="refuse-button" class="stamp refuse" type="button"><span>✕</span> REFUSER</button></div>
+              <div class="reason-picker hidden" id="reason-picker"><label for="reason-select">MOTIF DE REFUS À INSCRIRE AU REGISTRE</label><select id="reason-select"><option value="">Choisir le motif…</option></select><div><button id="confirm-refusal" class="stamp refuse" type="button" disabled>✕ TAMPONNER LE REFUS</button><button id="cancel-refusal" class="text-button" type="button">Annuler</button></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="result hidden" id="result" aria-live="polite">
+        <div class="result-paper"><p class="eyebrow" id="result-kicker">AVIS DU COMITÉ</p><div class="result-stamp" id="result-stamp"></div><h2 id="result-title"></h2><p id="result-text"></p><div class="result-ledger" id="result-ledger"></div><button class="primary-button" id="next-button" type="button">DOSSIER SUIVANT <span>→</span></button></div>
+      </section>
+
+      <section class="ending hidden" id="ending" aria-live="polite"><div class="ending-card"><p class="eyebrow">PROCÈS-VERBAL DE FIN DE SERVICE</p><h1 id="ending-title"></h1><p id="ending-copy"></p><div class="ending-stats" id="ending-stats"></div><button class="primary-button" id="restart-button" type="button">REPRENDRE LE SERVICE <span>↻</span></button><a href="../index.html" class="back-link">Retour au portail officiel</a></div></section>
+    </main>
+    <footer>CRCC / DIRECTION DES ADMISSIONS · TOUTE RESSEMBLANCE AVEC UNE PROCÉDURE RAISONNABLE SERAIT FORTUITE</footer>
+  </div>
+</body>
+</html>
