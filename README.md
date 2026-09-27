@@ -29,13 +29,13 @@ Toute information publiée ici est réputée sérieuse jusqu’à preuve du cont
 
 ## La Grande Homologation
 
-Le jeu est accessible à `jeu/` sur GitHub Pages. Au fil de quatre journées et 26 dossiers, examinez la carte, la fiche de dégustation et l'objet de la visite. Pour refuser, comparez deux mentions puis choisissez le motif réglementaire. Les décisions influencent certaines visites suivantes. La Commission d'appel et l'inspection du Coupe-cigare ponctuent le service.
+Le jeu est accessible à `jeu/` sur GitHub Pages. Au fil de quatre journées et 29 dossiers, dont trois express à traiter en 20 secondes, examinez la carte, la fiche de dégustation et l'objet de la visite. Pour refuser, comparez la preuve déterminante du dossier et l'article du règlement correspondant, puis choisissez le motif réglementaire. Un guide contextuel indique les deux pièces utiles : pour emprunter le Coupe-cigare sans assez de fiches, sélectionnez le nombre de fiches archivées et l'article 04 ; le motif vient ensuite. Les décisions influencent certaines visites suivantes. La Commission d'appel et l'inspection du Coupe-cigare ponctuent le service.
 
 Le tutoriel surligné démarre au premier dossier et se relance avec le bouton « ? Tutoriel ». Les demandes couvrent le dépôt et l'archivage de fiches, l'emprunt et la restitution du Coupe-cigare, des questions sur les feuilles du cigare, des dérogations administratives absurdes, des mesures disciplinaires, des promotions et des exclusions. Le catalogue du Club permet aussi de repérer les cigares entièrement inventés.
 
 Une fois par journée, un cigare se consume sur le bureau : détacher sa cendre rapporte davantage si elle est longue, mais sa chute coûte 30 F. On peut classer ce bonus sans jouer. Les questions techniques sont d'autres bonus, distincts de la décision sur le dossier ; leurs réponses s'appuient sur [l'anatomie du Habano publiée par Habanos, S.A.](https://www.habanos.com/en/the-anatomy-of-a-habano/).
 
-La partie en cours est conservée localement dans le navigateur. Le score final peut être partagé ou copié. Pour jouer à deux, créez un lien de défi dès l'accueil, envoyez-le à l'autre joueur et démarrez chacun sur un appareil ou navigateur distinct : l'ordre des dossiers est commun, les décisions restent individuelles. Le mode chrono de 120 secondes par dossier est facultatif et figure dans le lien. Aucun compte ni serveur de scores n'est nécessaire.
+La partie en cours est conservée localement dans le navigateur. Le score final peut être partagé ou copié. Pour jouer à deux, créez un lien de défi dès l'accueil, envoyez-le à l'autre joueur et démarrez chacun sur un appareil ou navigateur distinct : l'ordre des dossiers est commun, les décisions restent individuelles. Le mode chrono de 30 secondes par dossier est facultatif et figure dans le lien ; les dossiers express sont limités à 20 secondes dans tous les modes. Aucun compte ni serveur de scores n'est nécessaire.
 
 ## Doctrine technique
 
