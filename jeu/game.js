@@ -212,6 +212,11 @@
       data.flatteryCount ??= 0;
       data.suspicion ??= 0;
       data.interruptions ??= interruptionSchedule(data.seed, data.order);
+      if (!Object.values(data.interruptions).flat().some(event => event.type === 'special')) {
+        const addition = Object.entries(interruptionSchedule(data.seed, data.order))
+          .find(([position, events]) => Number(position) > data.index && events.some(event => event.type === 'special'));
+        if (addition) (data.interruptions[addition[0]] ??= []).push(addition[1].find(event => event.type === 'special'));
+      }
       data.pendingEvents ??= [];
       data.pendingEventIndex ??= 0;
       data.hrpcBlockDay ??= 2 + seedNumber(`${data.seed || 'LEGACY'}-BLOC`) % 3;
@@ -609,6 +614,7 @@
     if (!target || buttons.length !== 2) return;
     invertedReplay = true;
     buttons[1 - buttons.indexOf(target)]?.click();
+    $('inverted-cursor').classList.add('hidden');
     invertedReplay = false;
   }
   function showCase() {
