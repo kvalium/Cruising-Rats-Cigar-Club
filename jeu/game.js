@@ -103,6 +103,7 @@
     { selector: '#documents .document:nth-child(2)', title: 'La fiche de dégustation', copy: 'Elle doit être complète. Le cigare doit aussi figurer au catalogue du règlement : un nom inventé invalide la fiche.' },
     { selector: '#documents .document:nth-child(3)', title: 'Que demande la personne ?', copy: '« Objet de la visite » indique l’action souhaitée : déposer une fiche, emprunter ou rendre le Coupe-cigare, demander une promotion… La mention en dessous apporte un détail ou une pièce justificative. Ce n’est pas toujours une demande d’accès.' },
     { selector: '.rules', title: 'Le règlement tranche', copy: 'Comparez les pièces aux articles. De nouvelles règles s’ajoutent chaque jour. Une demande farfelue reste recevable si aucune règle ne l’interdit.' },
+    { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes. Détachez-la tard pour gagner davantage, mais avant qu’elle tombe : sinon −30 F. « Classer sans jouer » annule ce risque. Le tutoriel met le cigare en pause.' },
     { selector: '.comparison', title: 'Prouvez un refus', copy: 'Cliquez sur deux mentions qui montrent le problème, par exemple une carte sans tampon et l’article 01. Elles apparaîtront ici. Vous choisirez ensuite le motif exact.' },
     { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon, sélectionnez les deux preuves, cliquez sur Refuser et choisissez le motif. Le mini-jeu de cendre et les questions sont des bonus séparés de cette décision.' }
   ];
@@ -286,7 +287,8 @@
     if (status !== 'skipped') { state.balance += delta; state.ashHistory.push({ caseId: state.ash.caseId, status, delta }); }
     $('balance-label').textContent = `${state.balance} F`;
     $('ash-button').disabled = true;
-    $('ash-message').textContent = status === 'fallen' ? 'Patatras. La cendre est tombée : −30 F.' : status === 'collected' ? `Cendre déposée sur le registre : +${delta} F.` : '';
+    $('ash-skip').disabled = true;
+    $('ash-message').textContent = status === 'fallen' ? 'Patatras. La cendre est tombée : −30 F.' : status === 'collected' ? `Cendre déposée sur le registre : +${delta} F.` : 'Cigare classé sans suite. Aucun bonus ni malus.';
     save();
   }
   function startAsh(item) {
@@ -296,9 +298,10 @@
     if (!firstOfDay) return;
     if (state.ash?.caseId !== item.id) state.ash = { caseId: item.id, startedAt: Date.now(), status: 'burning', delta: 0 };
     $('ash-button').disabled = state.ash.status !== 'burning';
-    $('ash-message').textContent = state.ash.status === 'fallen' ? 'Patatras. La cendre est tombée : −30 F.' : state.ash.status === 'collected' ? `Cendre déposée : +${state.ash.delta} F.` : '';
+    $('ash-skip').disabled = state.ash.status !== 'burning';
+    $('ash-message').textContent = state.ash.status === 'fallen' ? 'Patatras. La cendre est tombée : −30 F.' : state.ash.status === 'collected' ? `Cendre déposée : +${state.ash.delta} F.` : state.ash.status === 'skipped' ? 'Cigare classé sans suite. Aucun bonus ni malus.' : '';
     $('ash-length').style.width = '0px';
-    $('ash-meter').textContent = state.ash.status === 'collected' ? 'DÉTACHÉE' : state.ash.status === 'fallen' ? 'TOMBÉE' : '0 %';
+    $('ash-meter').textContent = state.ash.status === 'collected' ? 'DÉTACHÉE' : state.ash.status === 'fallen' ? 'TOMBÉE' : state.ash.status === 'skipped' ? 'CLASSÉ' : '0 %';
     if (state.ash.status === 'burning' && !((state.index === 0 && !state.tutorialDone) || state.tutorialPausedAt)) { ashTimer = setInterval(tickAsh, 100); tickAsh(); }
     save();
   }
@@ -585,6 +588,7 @@
   $('documents').addEventListener('click', event => { const button = event.target.closest('[data-evidence]'); if (button) selectEvidence(button); });
   $('quiz-panel').addEventListener('click', event => { const button = event.target.closest('[data-quiz-choice]'); if (button) answerQuiz(Number(button.dataset.quizChoice)); });
   $('ash-button').addEventListener('click', collectAsh);
+  $('ash-skip').addEventListener('click', () => { if (state?.phase === 'play') settleAsh('skipped', 0); });
   $('help-button').addEventListener('click', openTutorial);
   $('tutorial-next').addEventListener('click', () => { if (++tutorialStep >= TUTORIAL.length) closeTutorial(); else showTutorialStep(); });
   $('tutorial-skip').addEventListener('click', closeTutorial);
