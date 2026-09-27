@@ -77,19 +77,15 @@
     { id: '029', day: 4, express: true, name: 'Madame Double', avatar: 'D', quote: '« Un chiffre sur deux est exact. C’est déjà la moitié du travail. »', card: { number: '0103', grade: 'Rat homologué', archived: 5, valid: true }, sheet: { memberNumber: '0130', cigar: 'San Pedro de Macorís', observation: 'Tirage net', appreciation: 'Bien' }, request: { action: 'Soumission express de fiche de dégustation', note: 'Numéro saisi dans une grande précipitation.' }, reason: 'numero', explanation: 'La carte indique 0103, la fiche 0130 : les numéros ne correspondent pas.' },
     { id: '030', day: 2, name: 'Monsieur Hors-Registre', avatar: 'H', quote: '« Le registre est sûrement en retard sur mon élégance. »', card: { number: '0124', grade: 'Rat homologué', archived: 4, valid: true }, sheet: { cigar: 'Flor de Oliva', observation: 'Bois léger', appreciation: 'Très convenable' }, request: { action: 'Accès à la séance', note: 'Carte plastifiée avec soin. Aucun certificat annexe.' }, reason: 'registre_absent', explanation: 'Aucun membre à ce nom ni à ce numéro dans le registre. Le tampon de la carte ne crée pas une inscription.' },
     { id: '031', day: 3, name: 'Madame Transposition', avatar: 'T', quote: '« 0134, 0143… le Comité aime jouer aux chiffres. »', card: { number: '0134', grade: 'Rat homologué', archived: 4, valid: true }, sheet: { cigar: 'Don Tomás Clásico', observation: 'Cèdre doux', appreciation: 'Honnête' }, request: { action: 'Emprunt du Coupe-cigare du Président', note: 'État des lieux préalable : signé, lame intacte.' }, reason: 'registre_numero', explanation: 'Le registre rattache Madame Transposition au n° 0143, non au n° 0134 imprimé sur la carte.' },
-    { id: '032', day: 4, name: 'Monsieur Autopromotion', avatar: 'A', quote: '« Mon grade est calligraphié. Cela devrait compter. »', card: { number: '0152', grade: 'Grand Rat', archived: 9, valid: true }, sheet: { memberNumber: '0152', cigar: 'San Pedro de Macorís', observation: 'Tirage franc', appreciation: 'Approuvé' }, request: { action: 'Accès à la séance', note: 'Suggère que sa carte fasse foi, surtout pour le grade.' }, reason: 'registre_grade', explanation: 'Sa carte indique Grand Rat, mais le registre indique Rat homologué. La calligraphie ne vaut pas promotion.' }
+    { id: '032', day: 4, name: 'Monsieur Autopromotion', avatar: 'A', quote: '« Mon grade est calligraphié. Cela devrait compter. »', card: { number: '0152', grade: 'Grand Rat', archived: 9, valid: true }, sheet: { memberNumber: '0152', cigar: 'San Pedro de Macorís', observation: 'Tirage franc', appreciation: 'Approuvé' }, request: { action: 'Accès à la séance', note: 'Suggère que sa carte fasse foi, surtout pour le grade.' }, reason: 'registre_grade', explanation: 'Sa carte indique Grand Rat, mais le registre indique Rat homologué. La calligraphie ne vaut pas promotion.' },
+    { id: '033', day: 2, name: 'Señor Cedro', avatar: 'C', quote: '« Son nom a l’air assez noble pour être dans le livre. »', card: { number: '0161', grade: 'Rat homologué', archived: 4, valid: true }, sheet: { cigar: 'Valle de Cedro Reserva', observation: 'Cèdre doux', appreciation: 'Distingué' }, request: { action: 'Soumission de fiche de dégustation', note: 'Bague sobre et facture jointe ; aucune référence au catalogue du CRCC.' }, reason: 'fictif', explanation: 'Valle de Cedro Reserva paraît crédible, mais ne figure pas au catalogue homologué du CRCC.' },
+    { id: '034', day: 3, name: 'Madame Havane', avatar: 'H', quote: '« Regardez cette belle boîte. Elle fait très officiel. »', card: { number: '0162', grade: 'Rat homologué', archived: 5, valid: true }, sheet: { cigar: 'Casa del Monte Robusto', observation: 'Noix et cacao', appreciation: 'Excellent' }, request: { action: 'Soumission de fiche de dégustation', note: 'Boîte élégante avec étiquette de la maison ; pas d’homologation au Club.' }, reason: 'fictif', explanation: 'Casa del Monte Robusto n’est pas dans le catalogue homologué du CRCC, quelle que soit la qualité de sa boîte.' },
+    { id: '035', day: 4, name: 'Comte Torpedo', avatar: 'T', quote: '« Finca, Sol, Torpedo. Trois mots sérieux. »', card: { number: '0163', grade: 'Rat homologué', archived: 9, valid: true }, sheet: { memberNumber: '0163', cigar: 'Finca del Sol Torpedo', observation: 'Terre et bois', appreciation: 'Remarquable' }, request: { action: 'Soumission de fiche de dégustation', note: 'Demande de classement au catalogue, non encore approuvée.' }, reason: 'fictif', explanation: 'Finca del Sol Torpedo n’a pas été homologué par le CRCC : une demande de classement ne vaut pas inscription.' }
   ];
 
   const ALL_CASES = [...CASES, ...EXTRA_CASES];
   const REASON_RULE = { carte: '01', fiche: '02', habano: '03', coupe_grade: '04', parrain: '05', inspection: '06', numero: '07', fictif: '08', exclusion: '09', registre_absent: '12', registre_numero: '12', registre_grade: '12' };
   REASONS.numero = 'Numéro de membre différent sur la fiche';
-  const EVIDENCE = {
-    carte: ['card.valid', 'rule.01'], fiche: ['sheet.appreciation', 'rule.02'],
-    habano: ['sheet.cigar', 'request.note'], coupe_grade: ['registry.archived', 'rule.04'],
-    parrain: ['registry.archived', 'rule.05'], inspection: ['request.note', 'rule.06'],
-    numero: ['card.number', 'sheet.memberNumber'], fictif: ['sheet.cigar', 'rule.08'], exclusion: ['request.note', 'rule.09'],
-    registre_absent: ['card.number', 'registry.absent'], registre_numero: ['card.number', 'registry.number'], registre_grade: ['card.grade', 'registry.grade']
-  };
   const CATALOG = ['Flor de Oliva', 'San Pedro de Macorís', 'Don Tomás Clásico', 'Habano — origine cubaine'];
   // Questions fondées sur les pages officielles de Habanos, S.A.
   const ANATOMY_SOURCE = 'https://www.habanos.com/en/the-anatomy-of-a-habano/';
@@ -120,7 +116,6 @@
   const $ = id => document.getElementById(id);
   const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   let state = null;
-  let selection = [];
   let audio = null;
   let soundEnabled = false;
   let timer = null;
@@ -132,16 +127,16 @@
   let referenceKind = null;
   let referenceOpener = null;
   const TUTORIAL = [
-    { selector: '.visitor-strip', title: 'Qui se présente ?', copy: 'Voici le membre, son numéro de dossier et sa petite déclaration. Lisez-la, mais seuls les documents et le règlement font foi.' },
-    { selector: '#documents .document:nth-child(1)', title: 'La carte de membre', copy: 'Elle montre le numéro, le grade et le tampon, mais pas le nombre de fiches archivées. Vérifiez-la contre le registre du bureau : certaines cartes sont fabriquées ou portent un faux numéro ou un faux grade.' },
-    { selector: '#registry-open', title: 'Le registre des membres', copy: 'Cliquez sur ce registre pour chercher le numéro de la carte. Si le numéro manque, cherchez aussi le nom. Vous y trouverez le vrai grade et le nombre de fiches archivées. Les mentions du registre sont sélectionnables comme preuves.' },
-    { selector: '#documents .document:nth-child(2)', title: 'La fiche de dégustation', copy: 'Elle doit être complète. Le cigare doit aussi figurer au catalogue du règlement : un nom inventé invalide la fiche.' },
-    { selector: '#catalog-open', title: 'Le catalogue officiel', copy: 'Cliquez sur le livre rouge pour voir les cigares autorisés. La liste n’est plus recopiée dans l’article 08. Fermez la fenêtre pour revenir au dossier ; la consultation met le chrono en pause.' },
-    { selector: '#documents .document:nth-child(3)', title: 'Que demande la personne ?', copy: '« Objet de la visite » indique l’action souhaitée : déposer une fiche, emprunter ou rendre le Coupe-cigare, demander une promotion… La mention en dessous apporte un détail ou une pièce justificative. Ce n’est pas toujours une demande d’accès.' },
-    { selector: '.rules', title: 'Le règlement tranche', copy: 'Comparez les pièces aux articles. De nouvelles règles s’ajoutent chaque jour. Une demande farfelue reste recevable si aucune règle ne l’interdit.' },
-    { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes. Détachez-la tard pour gagner davantage, mais avant qu’elle tombe : sinon −30 F. « Classer sans jouer » annule ce risque. Le tutoriel met le cigare en pause.' },
-    { selector: '.comparison', title: 'Prouvez un refus', copy: 'Choisissez le fait qui pose problème et l’article applicable. Pour un emprunt avec trop peu de fiches : « Fiches archivées » dans le registre + article 04. Pour une fausse carte, comparez la carte et le registre. Si deux pièces se contredisent, sélectionnez leurs deux valeurs.' },
-    { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon, sélectionnez les deux preuves, cliquez sur Refuser et choisissez le motif. Trois dossiers sont limités à 20 secondes. Le Hamster Riding Pipe Club surgit une fois par journée à un moment variable ; le Président pose une à trois questions par jour. Le chrono est en pause pendant ces interruptions.' }
+    { selector: '.visitor-strip', title: 'Qui se présente ?', copy: 'Voici la personne au guichet et sa déclaration. Les documents et le règlement font foi.' },
+    { selector: '#documents .document:nth-child(1)', title: 'La carte de membre', copy: 'Vérifiez le numéro, le grade et le tampon. Certaines cartes sont fausses ; le nombre de fiches archivées n’y apparaît pas.' },
+    { selector: '#registry-open', title: 'Le registre des membres', copy: 'Cherchez le numéro de la carte, puis éventuellement le nom. Vous y trouverez le vrai grade, le numéro officiel et les fiches archivées.' },
+    { selector: '#documents .document:nth-child(2)', title: 'La fiche de dégustation', copy: 'Lisez le cigare, l’observation et l’appréciation. Un nom plausible peut être absent du catalogue.' },
+    { selector: '#catalog-open', title: 'Le catalogue officiel', copy: 'Ce livre rouge contient les seuls cigares admis sur une fiche. La consultation suspend le chrono du dossier.' },
+    { selector: '#documents .document:nth-child(3)', title: 'La demande au guichet', copy: '« Objet de la visite » est l’action demandée : déposer une fiche, emprunter le Coupe-cigare, demander une promotion… La mention dessous apporte le détail.' },
+    { selector: '#rules-open', title: 'Le règlement du guichet', copy: 'Cliquez sur le livre pour lire tous les articles en vigueur. Chaque début de journée présente ses nouvelles règles. Un sabotage du HRPC peut fermer ce livre pour toute une journée.' },
+    { selector: '.bureau-shop', title: 'La caisse du bureau', copy: 'Dépensez 100 F pour décider immédiatement et correctement, 300 F pour gagner une faveur présidentielle, ou 500 F pour mettre le HRPC hors service jusqu’à la fin de la partie.' },
+    { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes. Détachez-la tard pour gagner davantage, avant qu’elle tombe : sinon −30 F.' },
+    { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon cliquez sur Refuser et choisissez le bon motif. Aucun autre élément n’est à sélectionner. Les dossiers express durent 20 secondes, et le mode chrono 30 secondes par dossier.' }
   ];
 
   function randomSeed() {
@@ -188,11 +183,11 @@
           cutter: nextDay > 3 ? { skipped: true } : null, timerCaseId: null, timerDeadline: null };
       }
       if (incomingSeed && data?.seed !== incomingSeed) return null;
-      if (data?.version !== 3 || !Array.isArray(data.order) || ![18, 26, 29, ALL_CASES.length].includes(data.order.length) ||
+      if (data?.version !== 3 || !Array.isArray(data.order) || ![18, 26, 29, 32, ALL_CASES.length].includes(data.order.length) ||
           new Set(data.order).size !== data.order.length || !data.order.every(id => ALL_CASES.some(item => item.id === id)) ||
           !Number.isInteger(data.index) || data.index < 0 || data.index > data.order.length ||
           (data.index === data.order.length && !['daily', 'ending'].includes(data.phase)) ||
-          !['play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult', 'hamster', 'hamsterResult', 'president', 'presidentResult'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
+          !['briefing', 'play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult', 'hamster', 'hamsterResult', 'president', 'presidentResult'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
       data.hamsterResults ??= {};
       data.presidentResults ??= {};
       data.flatteryCount ??= 0;
@@ -200,13 +195,15 @@
       data.interruptions ??= interruptionSchedule(data.seed, data.order);
       data.pendingEvents ??= [];
       data.pendingEventIndex ??= 0;
+      data.hrpcBlockDay ??= 2 + seedNumber(`${data.seed || 'LEGACY'}-BLOC`) % 3;
+      data.hrpcDisabled ??= false;
       return data;
     } catch (_) { return null; }
   }
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (_) { /* Partie jouable sans stockage. */ } }
   function visible(section) {
     if (section !== 'play') stopTimer();
-    ['intro', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'president', 'president-result', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
+    ['intro', 'day-briefing', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'president', 'president-result', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function tone(frequency, duration, type = 'triangle') {
@@ -226,10 +223,10 @@
     const order = [1, 2, 3, 4].flatMap(day => shuffle(ALL_CASES.filter(item => item.day === day), random).map(item => item.id));
     state = { version: 3, seed, timed: $('timed-mode').checked,
       order, interruptions: interruptionSchedule(seed, order), pendingEvents: [], pendingEventIndex: 0, activeInterruption: null,
-      index: 0, balance: 0, errors: 0, exact: 0, favor: 0, appeal: null, cutter: null,
+      index: 0, balance: 0, errors: 0, exact: 0, favor: 0, hrpcBlockDay: 2 + seedNumber(`${seed}-BLOC`) % 3, hrpcDisabled: false, appeal: null, cutter: null,
       timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], quizResults: {}, ash: null, ashHistory: [], hamsterResults: {}, hamsterRaceStart: null, hamsterMissingCaseId: null,
       presidentResults: {}, flatteryCount: 0, suspicion: 0, referencePausedAt: null, tutorialDone: false, phase: 'play' };
-    showCase();
+    showDayBriefing(1);
   }
   function current() {
     const item = structuredClone(ALL_CASES.find(entry => entry.id === state.order[state.index]));
@@ -259,14 +256,11 @@
     }
     return item;
   }
-  function evidenceButton(key, label, value, css = '') {
-    return `<button type="button" class="evidence ${css}" data-evidence="${escapeHTML(key)}" data-label="${escapeHTML(label)} : ${escapeHTML(value || '—')}" aria-pressed="false">${escapeHTML(value || '—')}</button>`;
-  }
   function row(key, label, value) {
-    return `<div class="doc-row"><span>${escapeHTML(label)}</span>${evidenceButton(key, label, value)}</div>`;
+    return `<div class="doc-row"><span>${escapeHTML(label)}</span><strong>${escapeHTML(value || '—')}</strong></div>`;
   }
   function documentCard(code, title, rows, note, noteKey, stamp, stampKey, annex = '') {
-    return `<article class="document"><div class="document-head"><span>CRCC / ${escapeHTML(code)}</span><span>PIÈCE OFFICIELLE</span></div><h3>${escapeHTML(title)}</h3>${code === 'REQ' ? '<p class="request-help">L’objet indique ce que la personne vient demander au Club. La mention donne le détail ou la pièce jointe.</p>' : ''}${rows}${note ? `<div class="doc-note">${evidenceButton(noteKey, 'Mention', note)}</div>` : ''}${stamp ? evidenceButton(stampKey, 'Validation', stamp, stamp === 'VALIDATION ABSENTE' ? 'doc-stamp bad' : 'doc-stamp') : ''}${annex}</article>`;
+    return `<article class="document"><div class="document-head"><span>CRCC / ${escapeHTML(code)}</span><span>PIÈCE OFFICIELLE</span></div><h3>${escapeHTML(title)}</h3>${code === 'REQ' ? '<p class="request-help">L’objet indique ce que la personne vient demander au Club. La mention donne le détail ou la pièce jointe.</p>' : ''}${rows}${note ? `<div class="doc-note">${escapeHTML(note)}</div>` : ''}${stamp ? `<span class="doc-stamp ${stamp === 'VALIDATION ABSENTE' ? 'bad' : ''}">${escapeHTML(stamp)}</span>` : ''}${annex}</article>`;
   }
   function portrait(item) {
     const hash = seedNumber(item.name), coats = ['#735146', '#3a6159', '#745a78', '#8a5744', '#4c5878'];
@@ -296,35 +290,7 @@
     state.quizResults ??= {};
     state.quizResults[item.id] = { choice, correct, delta };
     state.balance += delta; $('balance-label').textContent = `${state.balance} F`;
-    save(); showQuiz(item); tone(correct ? 500 : 170, .12);
-  }
-  function selectionUI() {
-    document.querySelectorAll('[data-evidence]').forEach(button => button.setAttribute('aria-pressed', String(selection.some(part => part.key === button.dataset.evidence))));
-    $('evidence-slot-1').textContent = selection[0] ? `1 · ${selection[0].label}` : '1 · Fait du dossier';
-    $('evidence-slot-2').textContent = selection[1] ? `2 · ${selection[1].label}` : '2 · Article ou autre pièce';
-    $('comparison-text').textContent = selection.length === 2 ? 'Comparaison prête. Cliquez sur Refuser, puis choisissez le motif réglementaire.' : selection.length === 1 ? (selection[0].key.startsWith('rule.') ? 'Choisissez maintenant le fait du dossier ou du registre auquel cet article s’applique.' : 'Choisissez maintenant l’article pertinent ou une seconde valeur contradictoire.') : 'Choisissez un fait précis, puis la règle applicable. Si deux pièces se contredisent, comparez les deux valeurs.';
-    $('decision-hint').textContent = selection.length === 2 ? 'Deux éléments choisis : indiquez le motif du refus.' : 'Si tout est conforme, validez. Sinon, réunissez deux preuves pour refuser.';
-    $('clear-evidence').disabled = !selection.length;
-    $('refuse-button').disabled = selection.length !== 2;
-    $('confirm-refusal').disabled = selection.length !== 2 || !$('reason-select').value;
-  }
-  function auditGuide(item) {
-    const action = item.request.action;
-    const number = item.day >= 4 ? ' Comparez aussi le numéro de la carte à celui de la fiche.' : '';
-    if (item.reason?.startsWith('registre_')) return 'Vérifiez la carte dans le registre. Un nom absent se prouve avec le numéro de carte et « aucune inscription » ; un numéro ou un grade différent se prouve en comparant les deux mentions.';
-    if (action.includes('Emprunt')) return `L’objet confirme qu’il s’agit d’un emprunt. Pour le seuil, comparez « Fiches archivées » dans le registre à l’article 04${item.day >= 3 ? ' ; pour l’état des lieux, comparez sa mention à l’article 06' : ''}. Ne prenez pas l’objet de la demande comme preuve du nombre de fiches.${number}`;
-    if (action.includes('Proposition')) return `Pour un parrainage, comparez « Fiches archivées » dans le registre à l’article 05. L’objet indique seulement qu’il s’agit d’une proposition.${number}`;
-    if (action.includes('exclusion')) return `Pour une exclusion, comparez la mention sur le procès-verbal à l’article 09.${number}`;
-    if (action.includes('Promotion')) return `Pour une promotion, examinez les fiches archivées dans le registre et la validation de la carte selon l’article 10.${number}`;
-    if (action.includes('fiche')) return `Pour une fiche, comparez une case manquante à l’article 02, ou le nom du cigare au catalogue de l’article 08.${number}`;
-    if (item.sheet.cigar.toLowerCase().includes('habano')) return `Pour un « habano », comparez la mention du cigare à la preuve de provenance jointe. L’article 03 vous indique pourquoi.${number}`;
-    return `Cherchez un fait qui enfreint un article, ou deux valeurs contradictoires dans les documents. Une demande bizarre ne suffit pas à refuser.${number}`;
-  }
-  function selectEvidence(button) {
-    const key = button.dataset.evidence;
-    if (selection.some(part => part.key === key)) selection = selection.filter(part => part.key !== key);
-    else selection = selection.length === 2 ? [{ key, label: button.dataset.label }] : [...selection, { key, label: button.dataset.label }];
-    selectionUI(); tone(240, .06);
+    save(); showQuiz(item); updateShop(); tone(correct ? 500 : 170, .12);
   }
   function registerEntry(item) {
     if (item.id === '030') return null;
@@ -348,21 +314,23 @@
       const relevant = found.name === item.name;
       const entryRows = relevant ? row('registry.number', 'N° au registre', found.number) + row('registry.grade', 'Grade au registre', found.grade) + row('registry.archived', 'Fiches archivées', String(found.archived)) :
         `<div class="doc-row"><span>N° au registre</span><strong>${escapeHTML(found.number)}</strong></div><div class="doc-row"><span>Grade</span><strong>${escapeHTML(found.grade)}</strong></div><div class="doc-row"><span>Fiches archivées</span><strong>${found.archived}</strong></div>`;
-      $('registry-result').innerHTML = `<p class="registry-found">INSCRIPTION TROUVÉE · ${escapeHTML(found.name)}</p>${entryRows}<p class="registry-tip">${relevant ? 'Cliquez sur une mention pour l’ajouter à la comparaison.' : 'Autre membre : ces mentions ne prouvent rien pour le dossier en cours.'}</p>`;
+      $('registry-result').innerHTML = `<p class="registry-found">INSCRIPTION TROUVÉE · ${escapeHTML(found.name)}</p>${entryRows}<p class="registry-tip">${relevant ? 'Comparez ces mentions à la carte et au règlement.' : 'Autre membre : ces mentions ne concernent pas le dossier en cours.'}</p>`;
     } else if (!registerEntry(item) && (term === item.card.number.toLocaleLowerCase('fr') || term === item.name.toLocaleLowerCase('fr'))) {
-      $('registry-result').innerHTML = `<p class="registry-not-found">Aucune inscription au nom de ${escapeHTML(item.name)} ni au numéro ${escapeHTML(item.card.number)}.</p>${evidenceButton('registry.absent', 'Registre', 'Aucune inscription pour cette carte')}`;
+      $('registry-result').innerHTML = `<p class="registry-not-found">Aucune inscription au nom de ${escapeHTML(item.name)} ni au numéro ${escapeHTML(item.card.number)}.</p><p class="registry-tip">Cette carte n’est pas inscrite au registre.</p>`;
     } else $('registry-result').innerHTML = '<p class="registry-not-found">Aucune fiche à cette entrée. Cherchez aussi le nom indiqué sur la carte : son numéro peut être faux.</p>';
   }
   function openReference(kind, opener) {
-    if (state?.phase !== 'play' || !$('reference-modal').classList.contains('hidden')) return;
+    if (state?.phase !== 'play' || !$('reference-modal').classList.contains('hidden') || (kind === 'rules' && rulesBlocked())) return;
     referenceKind = kind; referenceOpener = opener;
     state.referencePausedAt = Date.now(); stopTimer(); stopAsh(); save();
-    $('reference-kicker').textContent = kind === 'catalog' ? 'CRCC / C-08 · OUVRAGE HOMOLOGUÉ' : 'CRCC / M-12 · INSCRIPTIONS OFFICIELLES';
-    $('reference-title').textContent = kind === 'catalog' ? 'Catalogue des cigares' : 'Registre des membres';
+    $('reference-kicker').textContent = kind === 'rules' ? 'CRCC / R-01 · TEXTE EN VIGUEUR' : kind === 'catalog' ? 'CRCC / C-08 · OUVRAGE HOMOLOGUÉ' : 'CRCC / M-12 · INSCRIPTIONS OFFICIELLES';
+    $('reference-title').textContent = kind === 'rules' ? 'Règlement du guichet' : kind === 'catalog' ? 'Catalogue des cigares' : 'Registre des membres';
+    $('rules-content').classList.toggle('hidden', kind !== 'rules');
+    if (kind === 'rules') $('rules-content').innerHTML = renderRules(current().day);
     $('catalog-content').classList.toggle('hidden', kind !== 'catalog');
     $('registry-content').classList.toggle('hidden', kind !== 'registry');
     if (kind === 'catalog') $('catalog-content').innerHTML = `<p>Seuls ces cigares sont admis sur une fiche au titre de l’article 08 :</p><ol>${CATALOG.map(name => `<li>${escapeHTML(name)}</li>`).join('')}</ol><p>La mention « Habano — origine cubaine » exige aussi une preuve de provenance jointe au dossier (article 03). Tout nom inventé reste un nom inventé, même calligraphié par le Président.</p>`;
-    else { $('registry-search').value = current().card.number; registryLookup(current().card.number); }
+    else if (kind === 'registry') { $('registry-search').value = current().card.number; registryLookup(current().card.number); }
     $('reference-modal').classList.remove('hidden');
     $('reference-close').focus();
   }
@@ -408,7 +376,7 @@
     if (state?.phase !== 'play' || state.ash?.status !== 'burning') return;
     const progress = Math.min(1, (Date.now() - state.ash.startedAt) / 14000);
     $('ash-length').style.width = `${Math.round(progress * 44)}px`;
-    $('ash-meter').textContent = `${Math.floor(progress * 100)} %`;
+    $('ash-meter').textContent = progress < .25 ? 'CENDRE COURTE' : progress < .55 ? 'CENDRE MOYENNE' : progress < .8 ? 'CENDRE LONGUE' : 'CENDRE FRAGILE';
     if (progress >= 1) settleAsh('fallen', -30);
   }
   function settleAsh(status, delta) {
@@ -421,7 +389,7 @@
     $('ash-skip').disabled = true;
     $('ash-meter').textContent = status === 'fallen' ? 'TOMBÉE' : status === 'collected' ? 'DÉTACHÉE' : 'CLASSÉ';
     $('ash-message').textContent = status === 'fallen' ? 'Patatras. La cendre est tombée : −30 F.' : status === 'collected' ? `Cendre déposée sur le registre : +${delta} F.` : 'Cigare classé sans suite. Aucun bonus ni malus.';
-    save();
+    save(); updateShop();
   }
   function startAsh(item) {
     stopAsh();
@@ -433,7 +401,7 @@
     $('ash-skip').disabled = state.ash.status !== 'burning';
     $('ash-message').textContent = state.ash.status === 'fallen' ? 'Patatras. La cendre est tombée : −30 F.' : state.ash.status === 'collected' ? `Cendre déposée : +${state.ash.delta} F.` : state.ash.status === 'skipped' ? 'Cigare classé sans suite. Aucun bonus ni malus.' : '';
     $('ash-length').style.width = '0px';
-    $('ash-meter').textContent = state.ash.status === 'collected' ? 'DÉTACHÉE' : state.ash.status === 'fallen' ? 'TOMBÉE' : state.ash.status === 'skipped' ? 'CLASSÉ' : '0 %';
+    $('ash-meter').textContent = state.ash.status === 'collected' ? 'DÉTACHÉE' : state.ash.status === 'fallen' ? 'TOMBÉE' : state.ash.status === 'skipped' ? 'CLASSÉ' : 'CENDRE COURTE';
     if (state.ash.status === 'burning' && !((state.index === 0 && !state.tutorialDone) || state.tutorialPausedAt)) { ashTimer = setInterval(tickAsh, 100); tickAsh(); }
     save();
   }
@@ -475,6 +443,42 @@
     $('tutorial-overlay').classList.remove('hidden'); document.body.classList.add('tutorial-active');
     showTutorialStep();
   }
+  function rulesBlocked() { return !state.hrpcDisabled && current().day === state.hrpcBlockDay; }
+  function renderRules(day) {
+    return [1, 2, 3, 4].filter(number => number <= day).map(number =>
+      `<div class="rule-group"><h3>${number === 1 ? 'DISPOSITIONS PERMANENTES' : `CIRCULAIRE DU JOUR ${number}`}</h3>${RULES.filter(rule => rule.day === number).map(rule => `<div class="rule"><b>${rule.id}</b><span>${escapeHTML(rule.text)}</span></div>`).join('')}</div>`
+    ).join('');
+  }
+  function showDayBriefing(day) {
+    state.phase = 'briefing'; save();
+    $('briefing-kicker').textContent = `CRCC / OUVERTURE DU JOUR ${String(day).padStart(2, '0')}`;
+    $('briefing-title').textContent = day === 1 ? 'Votre premier jour au guichet' : `Nouvelles règles · jour ${day}`;
+    $('briefing-rules').innerHTML = RULES.filter(rule => rule.day === day).map(rule => `<div class="rule"><b>${rule.id}</b><span>${escapeHTML(rule.text)}</span></div>`).join('');
+    $('briefing-note').textContent = day === state.hrpcBlockDay && !state.hrpcDisabled ? '🐹 Sabotage du HRPC : le règlement sera indisponible pendant toute cette journée. Prenez connaissance de ces règles maintenant ; un raid peut ensuite rétablir l’accès.' : state.hrpcDisabled ? 'Le HRPC est hors service. Le règlement restera accessible.' : 'Le règlement, le catalogue et le registre sont consultables depuis le bureau.';
+    visible('day-briefing');
+  }
+  function updateShop() {
+    const blocked = rulesBlocked();
+    $('rules-open').disabled = blocked;
+    $('rules-lock').classList.toggle('hidden', !blocked);
+    $('rush-case').disabled = state.balance < 100;
+    $('gift-president').disabled = state.balance < 300;
+    $('raid-hrpc').disabled = state.balance < 500 || state.hrpcDisabled;
+    if (state.hrpcDisabled) $('shop-status').textContent = 'Le HRPC est hors service jusqu’à la fin de la partie. Le règlement est accessible.';
+    else if (blocked) $('shop-status').textContent = 'Le HRPC a bloqué le règlement aujourd’hui. Un raid à 500 F rétablit son accès et neutralise le Club.';
+    else $('shop-status').textContent = '100 F : décision immédiate et correcte · 300 F : +1 faveur présidentielle · 500 F : neutraliser le HRPC jusqu’à la fin.';
+  }
+  function spend(kind) {
+    if (state?.phase !== 'play') return;
+    const cost = { rush: 100, gift: 300, raid: 500 }[kind];
+    if (!cost || state.balance < cost || (kind === 'raid' && state.hrpcDisabled)) return;
+    if (kind === 'rush') { const item = current(); decide(item.reason ? 'refuse' : 'approve', item.reason, true); return; }
+    state.balance -= cost;
+    if (kind === 'gift') state.favor += 1;
+    if (kind === 'raid') state.hrpcDisabled = true;
+    $('balance-label').textContent = `${state.balance} F`;
+    save(); updateShop(); tone(kind === 'raid' ? 530 : 420, .13);
+  }
   function showCase() {
     const item = current(), card = item.card, sheet = item.sheet, request = item.request;
     if (state.referencePausedAt) {
@@ -498,38 +502,31 @@
     $('visitor-quote').textContent = item.quote;
     $('queue-number').textContent = `N° ${item.id}`;
     const activeRules = RULES.filter(rule => rule.day <= item.day);
-    $('rules-list').innerHTML = [1, 2, 3, 4].filter(day => day <= item.day).map(day =>
-      `<div class="rule-group"><h3>${day === 1 ? 'DISPOSITIONS PERMANENTES' : `CIRCULAIRE DU JOUR ${day}`}</h3>${activeRules.filter(rule => rule.day === day).map(rule => `<div class="rule"><b>${rule.id}</b>${evidenceButton(`rule.${rule.id}`, `Article ${rule.id}`, rule.text)}</div>`).join('')}</div>`
-    ).join('');
     $('documents').innerHTML =
       documentCard('MEM', 'Carte de membre', row('card.number', 'N°', card.number) + row('card.grade', 'Grade', card.grade), `Titulaire : ${item.name}`, 'card.name', card.valid ? 'VALIDÉ · COMITÉ' : 'VALIDATION ABSENTE', 'card.valid') +
       documentCard('FD', 'Fiche du jour', (sheet.memberNumber ? row('sheet.memberNumber', 'N° membre', sheet.memberNumber) : '') + row('sheet.cigar', 'Cigare', sheet.cigar) + row('sheet.observation', 'Observation', sheet.observation) + row('sheet.appreciation', 'Appréciation', sheet.appreciation), 'Document destiné aux archives du Club.', 'sheet.note', 'FICHE REÇUE', 'sheet.stamp') +
       documentCard('REQ', 'Demande au guichet', row('request.action', 'Objet de la visite', request.action), request.note, 'request.note', 'DÉPOSÉ CE JOUR', 'request.stamp',
         state.hamsterMissingCaseId === item.id ? '<p class="hamster-annex">ANNEXE AU PROCÈS-VERBAL HRPC : emportée par le hamster. Les pièces officielles restent présentes ; cette annexe sans valeur réglementaire n’est pas un motif de refus.</p>' : '');
-    $('audit-guide-text').textContent = auditGuide(item);
-    $('audit-guide').open = false;
     showQuiz(item);
     $('reason-select').innerHTML = '<option value="">Choisir le motif…</option>' + Object.entries(REASONS).filter(([key]) => activeRules.some(rule => rule.id === REASON_RULE[key])).map(([key, label]) => `<option value="${key}">${escapeHTML(label)}</option>`).join('');
     $('reason-select').value = '';
-    selection = [];
     $('reason-picker').classList.add('hidden'); $('actions').classList.remove('hidden');
-    selectionUI(); state.phase = 'play'; save(); visible('play'); startTimer(item); startAsh(item);
+    $('confirm-refusal').disabled = true; state.phase = 'play'; save(); visible('play'); updateShop(); startTimer(item); startAsh(item);
     if ((state.index === 0 && !state.tutorialDone) || state.tutorialPausedAt) openTutorial();
   }
-  function decide(verdict, reason = null) {
-    if (state.phase !== 'play' || (verdict === 'refuse' && (selection.length !== 2 || !reason))) return;
+  function decide(verdict, reason = null, fast = false) {
+    if (state.phase !== 'play' || (verdict === 'refuse' && !reason) || (fast && state.balance < 100)) return;
     const item = current();
     if (state.ash?.caseId === item.id && state.ash.status === 'burning') settleAsh('skipped', 0);
     stopAsh();
     const correctVerdict = verdict !== 'timeout' && (verdict === 'refuse') === Boolean(item.reason);
     const correctReason = verdict === 'approve' || reason === item.reason;
-    const correctEvidence = verdict === 'approve' || EVIDENCE[item.reason]?.every(key => selection.some(part => part.key === key));
-    const exact = Boolean(correctVerdict && correctReason && correctEvidence);
-    const delta = verdict === 'timeout' ? -40 : exact ? (verdict === 'refuse' ? 75 : 50) : correctVerdict ? -30 : -80;
+    const exact = Boolean(correctVerdict && correctReason);
+    const delta = (verdict === 'timeout' ? -40 : exact ? (verdict === 'refuse' ? 75 : 50) : correctVerdict ? -30 : -80) - (fast ? 100 : 0);
     state.balance += delta;
     if (exact) state.exact++; else state.errors++;
     if (DIRECTIVES[item.id] && verdict !== 'timeout') state.favor += verdict === 'approve' ? 1 : -1;
-    state.history[item.id] = { verdict, reason, evidence: selection.map(part => part.key), exact, delta, day: item.day };
+    state.history[item.id] = { verdict, reason, fast, exact, delta, day: item.day };
     stopTimer(); state.timerCaseId = null; state.timerLimit = null; state.timerDeadline = null;
     state.phase = 'result'; save(); showResult();
     tone(exact ? 330 : 130, .13, exact ? 'triangle' : 'sawtooth');
@@ -541,10 +538,9 @@
     $('result-stamp').className = `result-stamp ${outcome.exact ? 'good' : 'bad'}`;
     $('result-stamp').textContent = outcome.exact ? 'CONFORME' : 'OBSERVATION';
     $('result-title').textContent = outcome.verdict === 'timeout' ? 'Délai expiré.' : outcome.exact ? (outcome.verdict === 'approve' ? 'Demande validée.' : 'Refus motivé.') : 'Le Comité relève une anomalie.';
-    const expectedPair = item.reason ? `La comparaison utile était : ${EVIDENCE[item.reason].map(key => ({ 'card.valid': 'validation de la carte', 'rule.01': 'article 01', 'sheet.appreciation': 'appréciation', 'rule.02': 'article 02', 'sheet.cigar': 'cigare déclaré', 'rule.08': 'article 08 et catalogue', 'rule.09': 'article 09', 'request.note': 'pièce ou mention jointe', 'registry.archived': 'fiches archivées dans le registre', 'registry.absent': 'absence d’inscription au registre', 'registry.number': 'numéro inscrit au registre', 'registry.grade': 'grade inscrit au registre', 'card.grade': 'grade de la carte', 'rule.04': 'article 04', 'rule.05': 'article 05', 'rule.06': 'article 06', 'card.number': 'numéro de la carte', 'sheet.memberNumber': 'numéro de la fiche' }[key])).join(' et ')}.` : '';
     const pressure = DIRECTIVES[item.id] && outcome.verdict !== 'timeout' ? (outcome.verdict === 'approve' ? ' Le Président apprécie votre docilité. Le règlement, moins.' : ' Le Président prend personnellement note de votre indépendance.') : '';
-    $('result-text').textContent = (outcome.verdict === 'timeout' ? `Le dossier a été renvoyé sans décision. ${item.explanation}` : outcome.exact ? item.explanation : `${item.explanation} ${expectedPair}`) + pressure;
-    $('result-ledger').textContent = `${outcome.delta > 0 ? '+' : ''}${outcome.delta} F · Caisse du bureau : ${state.balance} F`;
+    $('result-text').textContent = (outcome.verdict === 'timeout' ? `Le dossier a été renvoyé sans décision. ${item.explanation}` : item.explanation) + pressure;
+    $('result-ledger').textContent = `${outcome.fast ? 'Traitement immédiat · frais 100 F inclus · ' : ''}${outcome.delta > 0 ? '+' : ''}${outcome.delta} F · Caisse du bureau : ${state.balance} F`;
     const lastOfDay = state.index === state.order.length - 1 || ALL_CASES.find(entry => entry.id === state.order[state.index + 1]).day !== item.day;
     $('next-button').innerHTML = lastOfDay ? 'CLÔTURER LA JOURNÉE <span>→</span>' : 'DOSSIER SUIVANT <span>→</span>';
     visible('result');
@@ -555,7 +551,7 @@
     state.index++;
     if (state.index === state.order.length || current().day !== lastDay) closeDay(lastDay);
     else {
-      state.pendingEvents = (state.interruptions?.[state.index] || []).filter(event => event.type === 'hamster' ? !state.hamsterResults?.[event.day] : !state.presidentResults?.[event.id]);
+      state.pendingEvents = (state.interruptions?.[state.index] || []).filter(event => event.type === 'hamster' ? !state.hrpcDisabled && !state.hamsterResults?.[event.day] : !state.presidentResults?.[event.id]);
       state.pendingEventIndex = 0;
       showScheduledEvent();
     }
@@ -605,7 +601,7 @@
     if (day === 1 && !state.appeal) showAppeal();
     else if (day === 3 && !state.cutter) showCutter();
     else if (state.index === state.order.length) finish();
-    else showCase();
+    else showDayBriefing(current().day);
   }
   function showAppeal() {
     const earlier = state.history['002'];
@@ -654,7 +650,7 @@
     $('event-result-ledger').textContent = `${result.delta > 0 ? '+' : ''}${result.delta} F · Caisse du bureau : ${state.balance} F`;
     visible('event-result');
   }
-  function eventNext() { if (state.phase === 'eventResult') showCase(); }
+  function eventNext() { if (state.phase === 'eventResult') showDayBriefing(current().day); }
   function hamsterEvent(day) {
     return {
       1: { title: 'Le faux tampon', copy: 'Le Hamster Riding Pipe Club a mélangé ses cachets à ceux du bureau. Quel cachet atteste réellement la validation du Comité exécutif ?', evidence: 'REGISTRE DES CACHETS · La carte doit porter la validation du Comité exécutif (article 01). Le dessin d’une roue ou une formule ressemblante ne suffit pas.', options: [
@@ -864,7 +860,8 @@
   $('restart-button').addEventListener('click', start);
   $('resume-button').addEventListener('click', () => {
     state = stored(); if (!state) return;
-    if (state.phase === 'play') showCase();
+    if (state.phase === 'briefing') showDayBriefing(current().day);
+    else if (state.phase === 'play') showCase();
     else if (state.phase === 'result') showResult();
     else if (state.phase === 'daily') showDaily(state.index === state.order.length ? 4 : current().day - 1);
     else if (state.phase === 'appeal') showAppeal();
@@ -876,7 +873,6 @@
     else if (state.phase === 'presidentResult') showPresidentResult();
     else finish();
   });
-  $('documents').addEventListener('click', event => { const button = event.target.closest('[data-evidence]'); if (button) selectEvidence(button); });
   $('quiz-panel').addEventListener('click', event => { const button = event.target.closest('[data-quiz-choice]'); if (button) answerQuiz(Number(button.dataset.quizChoice)); });
   $('ash-button').addEventListener('click', collectAsh);
   $('ash-skip').addEventListener('click', () => { if (state?.phase === 'play') settleAsh('skipped', 0); });
@@ -891,12 +887,10 @@
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     }
   });
-  $('rules-list').addEventListener('click', event => { const button = event.target.closest('[data-evidence]'); if (button) selectEvidence(button); });
-  $('clear-evidence').addEventListener('click', () => { selection = []; selectionUI(); });
   $('approve-button').addEventListener('click', () => decide('approve'));
-  $('refuse-button').addEventListener('click', () => { if (selection.length !== 2) return; $('actions').classList.add('hidden'); $('reason-picker').classList.remove('hidden'); $('reason-select').focus(); });
+  $('refuse-button').addEventListener('click', () => { $('actions').classList.add('hidden'); $('reason-picker').classList.remove('hidden'); $('reason-select').focus(); });
   $('cancel-refusal').addEventListener('click', () => { $('reason-picker').classList.add('hidden'); $('actions').classList.remove('hidden'); $('refuse-button').focus(); });
-  $('reason-select').addEventListener('change', selectionUI);
+  $('reason-select').addEventListener('change', () => { $('confirm-refusal').disabled = !$('reason-select').value; });
   $('confirm-refusal').addEventListener('click', () => decide('refuse', $('reason-select').value));
   $('next-button').addEventListener('click', next);
   $('continue-button').addEventListener('click', continueDay);
@@ -909,6 +903,11 @@
   $('hamster-next').addEventListener('click', hamsterNext);
   $('president-answers').addEventListener('click', event => { const button = event.target.closest('[data-president-choice]'); if (button) decidePresident(button.dataset.presidentChoice); });
   $('president-next').addEventListener('click', presidentNext);
+  $('briefing-next').addEventListener('click', () => { if (state?.phase === 'briefing') showCase(); });
+  $('rush-case').addEventListener('click', () => spend('rush'));
+  $('gift-president').addEventListener('click', () => spend('gift'));
+  $('raid-hrpc').addEventListener('click', () => spend('raid'));
+  $('rules-open').addEventListener('click', event => openReference('rules', event.currentTarget));
   $('catalog-open').addEventListener('click', event => openReference('catalog', event.currentTarget));
   $('registry-open').addEventListener('click', event => openReference('registry', event.currentTarget));
   $('reference-close').addEventListener('click', closeReference);
@@ -924,7 +923,6 @@
   $('registry-find').addEventListener('click', () => registryLookup($('registry-search').value));
   $('registry-search').addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); registryLookup(event.target.value); } });
   $('registry-by-name').addEventListener('click', () => { $('registry-search').value = current().name; registryLookup(current().name); });
-  $('registry-result').addEventListener('click', event => { const button = event.target.closest('[data-evidence]'); if (button) { selectEvidence(button); closeReference(); } });
   $('share-button').addEventListener('click', shareScore);
   $('copy-button').addEventListener('click', copyScore);
   $('sound-toggle').addEventListener('click', () => { soundEnabled = !soundEnabled; $('sound-toggle').setAttribute('aria-pressed', String(soundEnabled)); $('sound-toggle').textContent = soundEnabled ? '♫ Son activé' : '♪ Son coupé'; tone(420, .12); });
