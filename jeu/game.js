@@ -161,7 +161,7 @@
     { selector: '#registry-open', title: 'Le registre des membres', copy: 'Cherchez le numéro de la carte, puis éventuellement le nom. Vous y trouverez le vrai grade, le numéro officiel et les fiches archivées.' },
     { selector: '#catalog-open', title: 'Le catalogue officiel', copy: 'Ce livre rouge contient les seuls cigares admis sur une fiche. Un nom très plausible peut aussi manquer au catalogue.' },
     { selector: '#rules-open', title: 'Le règlement du guichet', copy: 'Cliquez sur le livre pour lire tous les articles en vigueur. Chaque début de journée présente ses nouvelles règles. Un sabotage du HRPC peut fermer ce livre pour toute une journée.' },
-    { selector: '.bureau-shop', title: 'La caisse du bureau', copy: 'Dépensez 100 F pour décider immédiatement et correctement, 300 F pour gagner une faveur présidentielle, ou 500 F pour mettre le HRPC hors service.' },
+    { selector: '.bureau-shop', title: 'La caisse du bureau', copy: 'Une fois par journée, dépensez 100 F pour décider immédiatement et gagner 50 F nets en plus. Offrez un habano pour 300 F et une faveur, ou lancez un raid sur le HRPC pour 500 F.' },
     { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes à mesure que le cigare raccourcit. Détachez-la avant sa chute pour gagner un bonus.' },
     { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon cliquez sur Refuser et choisissez le bon motif. Aucun autre élément n’est à sélectionner. Le bouton ? permet de revoir ce tutoriel à tout moment.' }
   ];
@@ -249,6 +249,7 @@
       data.specialEffect ??= null;
       data.appealCaseId ??= ['002', '003', '019'][seedNumber(`${data.seed || 'LEGACY'}-APPEL`) % 3];
       data.pipaHearts ??= [];
+      data.rushDays ??= [];
       if (tutorialSeen() && !data.tutorialPausedAt) data.tutorialDone = true;
       return data;
     } catch (_) { return null; }
@@ -277,7 +278,7 @@
     state = { version: 3, seed, timed: $('timed-mode').checked,
       order, interruptions: interruptionSchedule(seed, order), pendingEvents: [], pendingEventIndex: 0, activeInterruption: null,
       index: 0, balance: 0, errors: 0, exact: 0, favor: 0, hrpcBlockDay: 2 + seedNumber(`${seed}-BLOC`) % 3, hrpcDisabled: false, appeal: null, appealCaseId: ['002', '003', '019'][seedNumber(`${seed}-APPEL`) % 3], cutter: null,
-      timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], quizResults: {}, ash: null, ashHistory: [], hamsterResults: {}, hamsterRaceStart: null, hamsterMissingCaseId: null,
+      timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], rushDays: [], quizResults: {}, ash: null, ashHistory: [], hamsterResults: {}, hamsterRaceStart: null, hamsterMissingCaseId: null,
       presidentResults: {}, flatteryCount: 0, suspicion: 0, specialPlayed: false, specialEffect: null, pipaHearts: [], referencePausedAt: null, purchasePausedAt: null, purchaseKind: null, tutorialDone: tutorialSeen(), phase: 'play' };
     showDayBriefing(1);
   }
@@ -543,19 +544,19 @@
     const blocked = rulesBlocked();
     $('rules-open').disabled = blocked;
     $('rules-lock').classList.toggle('hidden', !blocked);
-    $('rush-case').disabled = state.balance < 100;
+    $('rush-case').disabled = state.balance < 100 || state.rushDays.includes(current().day);
     $('gift-president').disabled = state.balance < 300;
     $('raid-hrpc').disabled = state.balance < 500 || state.hrpcDisabled;
     if (state.hrpcDisabled) $('shop-status').textContent = 'Le HRPC est hors service jusqu’à la fin de la partie. Le règlement est accessible.';
     else if (blocked) $('shop-status').textContent = 'Le HRPC a bloqué le règlement aujourd’hui. Un raid à 500 F rétablit son accès et neutralise le Club.';
-    else $('shop-status').textContent = '100 F : décision juste et prime de 150 F (gain net +50 F) · 300 F : +1 faveur · 500 F : neutraliser le HRPC.';
+    else $('shop-status').textContent = '100 F : décision juste et prime de 150 F (gain net +50 F, une fois par jour) · 300 F : +1 faveur · 500 F : neutraliser le HRPC.';
     $('shop-status').textContent += ` Faveur : ${state.favor > 0 ? '+' : ''}${state.favor} · Soupçons : ${state.suspicion}/3.`;
     $('president-opinion').textContent = `AVIS DU PRÉSIDENT · ${presidentOpinion()}`;
   }
   function spend(kind) {
     if (state?.phase !== 'play' || !$('purchase-modal').classList.contains('hidden')) return;
     const cost = { rush: 100, gift: 300, raid: 500 }[kind];
-    if (!cost || state.balance < cost || (kind === 'raid' && state.hrpcDisabled)) return;
+    if (!cost || state.balance < cost || (kind === 'raid' && state.hrpcDisabled) || (kind === 'rush' && state.rushDays.includes(current().day))) return;
     if (kind === 'rush') { const item = current(); decide(item.reason ? 'refuse' : 'approve', item.reason, true); return; }
     state.balance -= cost;
     if (kind === 'gift') state.favor += 1;
@@ -767,7 +768,7 @@
     if ((state.index === 0 && !state.tutorialDone && !tutorialSeen()) || state.tutorialPausedAt) openTutorial();
   }
   function decide(verdict, reason = null, fast = false) {
-    if (state.phase !== 'play' || (verdict === 'refuse' && !reason) || (fast && state.balance < 100)) return;
+    if (state.phase !== 'play' || (verdict === 'refuse' && !reason) || (fast && (state.balance < 100 || state.rushDays.includes(current().day)))) return;
     const item = current();
     if (state.specialEffect?.caseId === item.id) clearSpecialEffect();
     if (state.ash?.caseId === item.id && state.ash.status === 'burning') settleAsh('skipped', 0);
@@ -777,6 +778,7 @@
     const exact = Boolean(correctVerdict && correctReason);
     const delta = (verdict === 'timeout' ? -40 : exact ? (verdict === 'refuse' ? 75 : 50) : correctVerdict ? -30 : -80) + (fast ? 50 : 0);
     state.balance += delta;
+    if (fast) state.rushDays.push(item.day);
     if (exact) state.exact++; else state.errors++;
     if (DIRECTIVES[item.id] && verdict !== 'timeout') state.favor += verdict === 'approve' ? 1 : -1;
     state.history[item.id] = { verdict, reason, fast, exact, delta, day: item.day };
