@@ -39,7 +39,7 @@
             <li>À la fin, partagez vos rapports et comparez vos résultats. Le Comité se charge de ne féliciter personne trop vite.</li>
           </ol>
           <p class="duo-note">Ce défi se joue chacun de son côté, sans partie en direct ni compte à créer.</p>
-          <div class="game-options"><label><input id="timed-mode" type="checkbox"> Guichet sous pression <small>30 secondes par dossier · facultatif (les express restent à 20 secondes)</small></label></div>
+          <div class="game-options"><label><input id="timed-mode" type="checkbox"> Guichet sous pression <small>30 secondes par dossier · +10 points par décision exacte (les express restent à 20 secondes)</small></label></div>
           <div class="challenge-actions"><button class="secondary-button" id="create-challenge" type="button">CRÉER UN LIEN DE DÉFI</button><p id="challenge-label" class="challenge-label hidden"></p></div>
           <div class="challenge-share hidden" id="challenge-share"><label for="challenge-url">LIEN À ENVOYER À L'AUTRE JOUEUR</label><div><input id="challenge-url" type="text" readonly><button class="secondary-button" id="copy-challenge" type="button">COPIER LE LIEN</button></div><p id="challenge-status" role="status"></p></div>
         </div>
@@ -67,7 +67,7 @@
 
           <div class="desk">
             <div class="bulletin" id="bulletin" role="status"></div>
-            <div class="bureau-shop" aria-label="Dépenses de la caisse"><span>DÉPENSES DU BUREAU</span><div><button id="rush-case" type="button">100 F · TRAITER CE DOSSIER</button><button id="gift-president" type="button">300 F · HABANO AU PRÉSIDENT</button><button id="raid-hrpc" type="button">300 F · RAID SUR LE HRPC</button></div><p id="shop-status" role="status">Le traitement immédiat rend la bonne décision et rapporte une prime de 150 F en plus du gain normal, une fois par journée. L’habano ajoute 1 faveur. Le raid arrête les hamsters jusqu’à la fin de la partie.</p></div>
+            <div class="bureau-shop" aria-label="Dépenses de la caisse"><span>DÉPENSES DU BUREAU</span><div><button id="rush-case" type="button">100 F · TRAITER CE DOSSIER</button><button id="gift-president" type="button">300 F · HABANO AU PRÉSIDENT</button><button id="raid-hrpc" type="button">300 F · RAID SUR LE HRPC</button></div><p id="shop-status" role="status">Le traitement immédiat rend la bonne décision et rapporte une prime de 150 F en plus du gain normal, une fois par journée. L’habano ajoute 1 faveur et efface un soupçon déjà acquis. Le raid arrête les hamsters jusqu’à la fin de la partie.</p></div>
             <p class="president-opinion" id="president-opinion" role="status"></p>
             <p class="effect-notice hidden" id="effect-notice" role="status"></p>
             <div class="express-notice hidden" id="express-notice" role="status"><strong>DOSSIER EXPRESS · 20 SECONDES</strong><span>Le Comité vous laisse le temps de lire l’essentiel. À zéro, le dossier repart sans décision.</span></div>
@@ -115,7 +115,7 @@
 
       <section class="result hidden" id="hamster-result" aria-live="polite"><div class="result-paper"><p class="eyebrow">PROCÈS-VERBAL · HAMSTER RIDING PIPE CLUB</p><div class="result-stamp" id="hamster-result-stamp"></div><h2 id="hamster-result-title"></h2><p id="hamster-result-text"></p><div class="result-ledger" id="hamster-result-ledger"></div><button class="primary-button" id="hamster-next" type="button">REPRENDRE LE GUICHET <span>→</span></button></div></section>
 
-      <section class="event hidden" id="president" aria-live="polite"><div class="event-card president-card"><p class="eyebrow" id="president-kicker">CONVOCATION DU PRÉSIDENT</p><h2>Une question<br><em>présidentielle</em></h2><p class="president-intro" id="president-intro"></p><p id="president-question"></p><div class="president-meter" id="president-meter"></div><div class="president-answers" id="president-answers"></div><p class="hamster-note">Une réponse flatteuse mais fausse plaît d’abord au Président. À partir de la troisième flatterie, il devient soupçonneux. Le chrono du dossier est en pause.</p></div></section>
+      <section class="event hidden" id="president" aria-live="polite"><div class="event-card president-card"><p class="eyebrow" id="president-kicker">CONVOCATION DU PRÉSIDENT</p><h2>Une question<br><em>présidentielle</em></h2><p class="president-intro" id="president-intro"></p><p id="president-question"></p><div class="president-meter" id="president-meter"></div><div class="president-answers" id="president-answers"></div><p class="hamster-note">La première flatterie rapporte une faveur ; la deuxième ne rapporte rien. À partir de la troisième flatterie, il devient soupçonneux. Le chrono du dossier est en pause.</p></div></section>
 
       <section class="result hidden" id="president-result" aria-live="polite"><div class="result-paper"><p class="eyebrow">AVIS DU PRÉSIDENT · QUESTIONS SUR LE CIGARE</p><div class="result-stamp" id="president-result-stamp"></div><h2 id="president-result-title"></h2><p id="president-result-text"></p><a id="president-source" class="source-link" target="_blank" rel="noopener noreferrer">Vérifier la réponse chez Habanos, S.A. ↗</a><div class="result-ledger" id="president-result-ledger"></div><button class="primary-button" id="president-next" type="button">REPRENDRE LE GUICHET <span>→</span></button></div></section>
 
