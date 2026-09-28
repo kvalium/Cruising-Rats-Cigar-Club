@@ -561,7 +561,7 @@
     if (state?.phase !== 'play' || state.ash?.status !== 'burning' || summonActive()) return;
     const progress = ashProgress();
     if (Date.now() - state.ash.startedAt >= state.ash.durationMs) settleAsh('fallen', -30);
-    else settleAsh('collected', Math.max(5, Math.round(progress * 60)));
+    else settleAsh('collected', Math.max(5, Math.round(progress * state.ash.maxLength * .65)));
   }
   function updateTutorialSpotlight() {
     if (!highlighted || $('tutorial-overlay').classList.contains('hidden')) return;
@@ -1259,7 +1259,9 @@
   function showPresident() {
     const event = state.activeInterruption, question = PRESIDENT_QUESTIONS[event.question];
     $('president-kicker').textContent = `CONVOCATION DU PRÉSIDENT · JOUR ${String(event.day).padStart(2, '0')} / 04`;
-    $('president-intro').textContent = PRESIDENT_INTROS[seedNumber(`${state.seed || 'LEGACY'}-${event.id}-INTRO`) % PRESIDENT_INTROS.length];
+    const introEvents = Object.values(state.interruptions).flat().filter(entry => entry.type === 'president');
+    const introIndex = introEvents.findIndex(entry => entry.id === event.id);
+    $('president-intro').textContent = PRESIDENT_INTROS[(seedNumber(`${state.seed || 'LEGACY'}-INTROS`) + Math.max(0, introIndex)) % PRESIDENT_INTROS.length];
     $('president-question').textContent = question.q;
     $('president-meter').textContent = `Faveur : ${state.favor > 0 ? '+' : ''}${state.favor} · Flatteries : ${state.flatteryCount} · Soupçons : ${state.suspicion}`;
     const options = [
