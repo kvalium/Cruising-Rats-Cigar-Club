@@ -97,16 +97,16 @@
   REASONS.numero = 'Numéro de membre différent sur la fiche';
   const CATALOG = ['Flor de Oliva', 'San Pedro de Macorís', 'Don Tomás Clásico', 'Habano — origine cubaine', 'Montecristo No. 4', 'Partagás Serie D No. 4', 'Romeo y Julieta Short Churchills', 'Cohiba Siglo VI', 'H. Upmann Magnum 46', 'Hoyo de Monterrey Epicure No. 2'];
   const MATERIA = {
-    loupe: { name: 'Loupe du Greffier', color: 'green', day: 1, description: 'Un indice sur la règle à vérifier, une fois par jour. Deux fois au niveau 2.' },
-    cendrier: { name: 'Cendrier de Schrödinger', color: 'purple', day: 1, description: '+10 F sur une cendre détachée, +20 F au niveau 2.' },
-    caisse: { name: 'Caisse à double fond', color: 'purple', day: 1, description: '+25 F après trois décisions exactes de suite, une fois par jour. +40 F au niveau 2.' },
-    montre: { name: 'Montre du secrétaire', color: 'yellow', day: 2, description: '+5 secondes sur un dossier chronométré, une fois par jour. +8 secondes au niveau 2.' },
-    duplicata: { name: 'Duplicata certifié', color: 'blue', day: 2, description: 'Renforce la Matéria dans le logement relié. Seul, ce duplicata ne certifie rien.' },
-    oreille: { name: 'Oreille présidentielle', color: 'purple', day: 3, description: '+15 F sur la première bonne réponse au Président du jour. +25 F au niveau 2.' },
-    grandrat: { name: 'Le Grand Rat des Archives', color: 'red', day: 3, description: 'Après cinq décisions exactes avec lui : une invocation par partie qui suspend le bureau pendant dix secondes.' }
+    loupe: { name: 'Loupe du Greffier', color: 'green', day: 1, price: 90, description: 'Un indice sur la règle à vérifier, une fois par jour. Deux fois au niveau 2.' },
+    cendrier: { name: 'Cendrier de Schrödinger', color: 'purple', day: 1, price: 60, description: '+10 F sur une cendre détachée, +20 F au niveau 2.' },
+    caisse: { name: 'Caisse à double fond', color: 'purple', day: 1, price: 100, description: '+25 F après trois décisions exactes de suite, une fois par jour. +40 F au niveau 2.' },
+    montre: { name: 'Montre du secrétaire', color: 'yellow', day: 2, price: 130, description: '+5 secondes sur un dossier chronométré, une fois par jour. +8 secondes au niveau 2.' },
+    duplicata: { name: 'Duplicata certifié', color: 'blue', day: 2, price: 180, description: 'Renforce la Matéria dans le logement relié. Seul, ce duplicata ne certifie rien.' },
+    oreille: { name: 'Oreille présidentielle', color: 'purple', day: 3, price: 120, description: '+15 F sur la première bonne réponse au Président du jour. +25 F au niveau 2.' },
+    grandrat: { name: 'Le Grand Rat des Archives', color: 'red', day: 3, price: 300, description: 'Après cinq décisions exactes avec lui : une invocation par partie qui suspend le bureau pendant dix secondes.' }
   };
   const MATERIA_COLORS = { green: 'VERTE · INDICE', yellow: 'JAUNE · COMMANDE', purple: 'VIOLETTE · PASSIF', blue: 'BLEUE · SOUTIEN', red: 'ROUGE · INVOCATION' };
-  function initialMateria() { return { introduced: false, equipped: ['loupe', 'cendrier'], xp: {}, uses: {}, procs: {}, streak: 0, summonUsed: false, activeFrom: null, activeUntil: null, referenceWithinSummon: false, lastNote: '' }; }
+  function initialMateria() { return { introduced: false, freeChoice: null, owned: [], equipped: [null, null], xp: {}, uses: {}, procs: {}, streak: 0, summonUsed: false, activeFrom: null, activeUntil: null, referenceWithinSummon: false, lastNote: '' }; }
   // Questions fondées sur les pages officielles de Habanos, S.A.
   const ANATOMY_SOURCE = 'https://www.habanos.com/en/the-anatomy-of-a-habano/';
   const GLOSSARY_SOURCE = 'https://www.habanos.com/en/glossary/';
@@ -265,7 +265,13 @@
       data.rushDays ??= [];
       if (data.materia && typeof data.materia.introduced !== 'boolean') data.materia.introduced = true;
       data.materia ??= initialMateria();
-      data.materia.equipped ??= ['loupe', 'cendrier'];
+      data.materia.equipped ??= [null, null];
+      if (!Array.isArray(data.materia.owned)) {
+        // Les parties commencées avant la boutique gardent leurs deux orbes acquises.
+        data.materia.owned = [...new Set(data.materia.equipped.filter(id => MATERIA[id]))];
+        data.materia.freeChoice = data.materia.owned[0] || null;
+      }
+      data.materia.freeChoice ??= null;
       data.materia.xp ??= {}; data.materia.uses ??= {}; data.materia.procs ??= {};
       data.materia.streak ??= 0;
       data.materia.summonUsed ??= false;
@@ -547,12 +553,27 @@
   function materiaUseLimit(id) { return (id === 'loupe' && materiaLevel(id) === 2 ? 2 : 1) + (materiaLinked(id) ? materiaLevel('duplicata') : 0); }
   function materiaOrb(id) { return `<span class="materia-orb ${MATERIA[id].color}" aria-hidden="true"></span>`; }
   function renderBriefingMateria(day, prefix = 'materia-briefing') {
-    $(`${prefix}-slots`).innerHTML = state.materia.equipped.map((id, index) => `<button type="button" class="materia-slot ${index === materiaSelectedSlot ? 'selected' : ''}" data-materia-slot="${index}" aria-pressed="${index === materiaSelectedSlot}">${materiaOrb(id)}<span>LOGEMENT ${index + 1}<strong>${escapeHTML(MATERIA[id].name)}</strong></span></button>`).join('<span class="materia-link" aria-hidden="true">◆──◆</span>');
-    $(`${prefix}-choices`).innerHTML = Object.entries(MATERIA).filter(([, entry]) => prefix !== 'materia-intro' || entry.day <= day).map(([id, entry]) => entry.day <= day ? `<button type="button" class="materia-choice ${entry.color} ${materiaEquipped(id) ? 'equipped' : ''}" data-equip-materia="${id}">${materiaOrb(id)}<span><strong>${escapeHTML(entry.name)}</strong><small>${MATERIA_COLORS[entry.color]} · NIVEAU ${materiaLevel(id)} · ${Math.min(6, state.materia.xp[id] || 0)}/6 AP</small><span>${escapeHTML(entry.description)}</span></span></button>` : `<div class="materia-choice locked"><span class="materia-orb locked-orb" aria-hidden="true"></span><span><strong>Scellée jusqu’au jour ${entry.day}</strong><small>ARCHIVES CONFIDENTIELLES</small></span></div>`).join('');
-    $(`${prefix}-note`).textContent = `Les deux logements sont reliés : la Matéria bleue améliore l’autre. Une décision exacte donne 1 AP aux Matérias équipées ; le niveau 2 arrive à 6 AP. L’équipement sera figé jusqu’à la prochaine journée.${day === 3 ? ' Nouvelle pièce : la Matéria rouge peut invoquer le Grand Rat après cinq décisions exactes avec elle.' : ''}`;
+    $(`${prefix}-slots`).innerHTML = state.materia.equipped.map((id, index) => `<button type="button" class="materia-slot ${index === materiaSelectedSlot ? 'selected' : ''}" data-materia-slot="${index}" aria-pressed="${index === materiaSelectedSlot}">${id ? materiaOrb(id) : '<span class="materia-orb locked-orb" aria-hidden="true"></span>'}<span>LOGEMENT ${index + 1}<strong>${id ? escapeHTML(MATERIA[id].name) : 'Vide'}</strong></span></button>`).join('<span class="materia-link" aria-hidden="true">◆──◆</span>');
+    $(`${prefix}-choices`).innerHTML = Object.entries(MATERIA).filter(([, entry]) => prefix !== 'materia-intro' || entry.day <= day).map(([id, entry]) => {
+      if (entry.day > day) return `<div class="materia-choice locked"><span class="materia-orb locked-orb" aria-hidden="true"></span><span><strong>Scellée jusqu’au jour ${entry.day}</strong><small>ARCHIVES CONFIDENTIELLES</small></span></div>`;
+      const owned = state.materia.owned.includes(id), offered = !owned && !state.materia.freeChoice;
+      const unaffordable = !owned && !offered && state.balance < entry.price;
+      const action = owned ? 'ACQUISE · ÉQUIPER' : offered ? 'PREMIÈRE OFFERTE' : `${entry.price} F · ACHETER ET ÉQUIPER`;
+      return `<button type="button" class="materia-choice ${entry.color} ${materiaEquipped(id) ? 'equipped' : ''}" data-equip-materia="${id}" ${unaffordable ? 'disabled' : ''}>${materiaOrb(id)}<span><strong>${escapeHTML(entry.name)}</strong><small>${MATERIA_COLORS[entry.color]} · NIVEAU ${materiaLevel(id)} · ${Math.min(6, state.materia.xp[id] || 0)}/6 AP</small><span>${escapeHTML(entry.description)}</span><b class="materia-price">${action}${unaffordable ? ' · CAISSE INSUFFISANTE' : ''}</b></span></button>`;
+    }).join('');
+    $(`${prefix}-note`).textContent = `Caisse : ${state.balance} F. ${state.materia.freeChoice ? 'Les achats sont définitifs pour cette partie ; vous pourrez rééquiper vos orbes acquises aux prochains briefings.' : 'La première Matéria est offerte. Choisissez-la avant de continuer.'} Les deux logements sont reliés : la bleue améliore l’autre. Une décision exacte donne 1 AP aux Matérias équipées ; le niveau 2 arrive à 6 AP.${day === 3 ? ' La rouge invoque le Grand Rat après cinq décisions exactes avec elle.' : ''}`;
+    if (prefix === 'materia-intro') $('materia-intro-next').disabled = !state.materia.freeChoice;
   }
   function equipMateria(id) {
     if (!['briefing', 'materiaIntro'].includes(state?.phase) || !MATERIA[id] || MATERIA[id].day > current().day) return;
+    if (!state.materia.owned.includes(id)) {
+      if (!state.materia.freeChoice) state.materia.freeChoice = id;
+      else {
+        if (state.balance < MATERIA[id].price) return;
+        state.balance -= MATERIA[id].price;
+      }
+      state.materia.owned.push(id);
+    }
     const slots = state.materia.equipped, other = 1 - materiaSelectedSlot;
     if (slots[other] === id) [slots[materiaSelectedSlot], slots[other]] = [slots[other], slots[materiaSelectedSlot]];
     else slots[materiaSelectedSlot] = id;
@@ -563,7 +584,7 @@
     $('materia-tray').classList.toggle('hidden', !state.materia.introduced);
     if (!state.materia.introduced) return;
     const day = current().day;
-    $('materia-play-slots').innerHTML = state.materia.equipped.map(id => `<div class="materia-mini ${MATERIA[id].color}">${materiaOrb(id)}<span><strong>${escapeHTML(MATERIA[id].name)}</strong><small>NV ${materiaLevel(id)} · ${Math.min(6, state.materia.xp[id] || 0)}/6 AP</small></span></div>`).join('<span class="materia-link" aria-hidden="true">◆</span>');
+    $('materia-play-slots').innerHTML = state.materia.equipped.map(id => id ? `<div class="materia-mini ${MATERIA[id].color}">${materiaOrb(id)}<span><strong>${escapeHTML(MATERIA[id].name)}</strong><small>NV ${materiaLevel(id)} · ${Math.min(6, state.materia.xp[id] || 0)}/6 AP</small></span></div>` : '<div class="materia-mini empty"><span class="materia-orb locked-orb" aria-hidden="true"></span><span><strong>Logement vide</strong><small>PROCHAIN ACHAT AU BRIEFING</small></span></div>').join('<span class="materia-link" aria-hidden="true">◆</span>');
     const actions = [];
     if (materiaEquipped('loupe')) actions.push(`<button type="button" data-use-materia="loupe" ${materiaUseCount('loupe', day) >= materiaUseLimit('loupe') ? 'disabled' : ''}>🟢 INDICE · ${Math.max(0, materiaUseLimit('loupe') - materiaUseCount('loupe', day))} RESTANT(S)</button>`);
     if (materiaEquipped('montre')) actions.push(`<button type="button" data-use-materia="montre" ${!caseLimit(current()) || materiaUseCount('montre', day) >= materiaUseLimit('montre') ? 'disabled' : ''}>🟡 +${materiaLevel('montre') === 2 ? 8 : 5} S · ${Math.max(0, materiaUseLimit('montre') - materiaUseCount('montre', day))} RESTANT(S)</button>`);
@@ -593,7 +614,7 @@
     if (!state.materia.introduced) return '';
     if (!exact) { state.materia.streak = 0; return ''; }
     const notes = [];
-    for (const id of state.materia.equipped) {
+    for (const id of state.materia.equipped.filter(Boolean)) {
       const before = state.materia.xp[id] || 0;
       state.materia.xp[id] = Math.min(6, before + 1);
       if (before === 5) notes.push(`${MATERIA[id].name} atteint le niveau 2`);
@@ -678,7 +699,7 @@
     visible('materia-intro');
   }
   function continueMateriaIntro() {
-    if (state?.phase !== 'materiaIntro') return;
+    if (state?.phase !== 'materiaIntro' || !state.materia.freeChoice) return;
     state.materia.introduced = true; save();
     showNextCaseEvents();
   }
@@ -1252,7 +1273,7 @@
     const expressCount = state.order.filter(id => ALL_CASES.find(item => item.id === id)?.express).length;
     const hamsters = Object.values(state.hamsterResults || {});
     const president = Object.values(state.presidentResults || {});
-    return `CRCC — La Grande Homologation : ${finalScore().total} points, ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. Président : ${state.favor > 0 ? '+' : ''}${state.favor} faveurs, ${state.suspicion} soupçon${state.suspicion > 1 ? 's' : ''} ; ${presidentOpinion()} Matérias : ${state.materia.equipped.map(id => `${MATERIA[id].name} niv. ${materiaLevel(id)}`).join(' + ')}${state.materia.summonUsed ? ' ; Grand Rat invoqué' : ''}. HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Interrogatoires : ${president.filter(result => result.correct).length}/${president.length} justes. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
+    return `CRCC — La Grande Homologation : ${finalScore().total} points, ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. Président : ${state.favor > 0 ? '+' : ''}${state.favor} faveurs, ${state.suspicion} soupçon${state.suspicion > 1 ? 's' : ''} ; ${presidentOpinion()} Matérias : ${state.materia.equipped.filter(Boolean).map(id => `${MATERIA[id].name} niv. ${materiaLevel(id)}`).join(' + ')}${state.materia.summonUsed ? ' ; Grand Rat invoqué' : ''}. HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Interrogatoires : ${president.filter(result => result.correct).length}/${president.length} justes. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
   }
   function finalScore() {
     const decisions = state.exact * 100, cash = state.balance, favor = state.favor * 75, suspicion = state.suspicion * -200;
@@ -1273,7 +1294,7 @@
     $('ending-stats').innerHTML = `<div><strong>${points.total}</strong><span>Score final</span></div><div><strong>${score}/${total}</strong><span>Décisions exactes</span></div><div><strong>${state.balance} F</strong><span>Caisse finale</span></div>`;
     $('score-breakdown').innerHTML = `<h2>Calcul du score</h2><div><span>Décisions exactes · ${score} × 100</span><strong>+${points.decisions}</strong></div><div><span>Caisse finale</span><strong>${points.cash > 0 ? '+' : ''}${points.cash}</strong></div><div><span>Faveur présidentielle · ${state.favor} × 75</span><strong>${points.favor > 0 ? '+' : ''}${points.favor}</strong></div><div><span>Soupçons · ${state.suspicion} × −200</span><strong>${points.suspicion}</strong></div><p>Minimum 0 point. Une exclusion met fin au service immédiatement.</p>`;
     $('ending-opinion').textContent = `OPINION DU PRÉSIDENT · ${presidentOpinion()}`;
-    $('materia-summary').textContent = `MATÉRIAS ÉQUIPÉES · ${state.materia.equipped.map(id => `${MATERIA[id].name} (niv. ${materiaLevel(id)}, ${state.materia.xp[id] || 0} AP)`).join(' + ')}. ${state.materia.summonUsed ? 'Le Grand Rat a suspendu la réalité.' : 'Aucune invocation consignée.'}`;
+    $('materia-summary').textContent = `MATÉRIAS ÉQUIPÉES · ${state.materia.equipped.filter(Boolean).map(id => `${MATERIA[id].name} (niv. ${materiaLevel(id)}, ${state.materia.xp[id] || 0} AP)`).join(' + ') || 'aucune'}. ${state.materia.summonUsed ? 'Le Grand Rat a suspendu la réalité.' : 'Aucune invocation consignée.'}`;
     const hamsters = Object.values(state.hamsterResults || {});
     const president = Object.values(state.presidentResults || {});
     $('ending-special').textContent = `HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Interrogatoires du Président : ${president.filter(result => result.correct).length}/${president.length} justes, ${state.flatteryCount} flatteries, ${state.suspicion} soupçons. Commission d’appel : ${state.appeal?.correct ? 'avis juste' : state.appeal?.skipped ? 'non tenue' : 'avis contesté'}. Coupe-cigare : ${state.cutter?.correct ? 'inspection juste' : state.cutter?.skipped ? 'non inspecté' : 'inspection contestée'}. Questions bonus justes : ${Object.values(state.quizResults || {}).filter(result => result.correct).length}. Cendres détachées : ${(state.ashHistory || []).filter(result => result.status === 'collected').length}. Faveur du Président : ${state.favor > 0 ? '+' : ''}${state.favor}.`;
