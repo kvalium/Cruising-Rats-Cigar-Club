@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#241b19">
   <meta name="description" content="La Grande Homologation : examinez les dossiers du Cruising Rats Cigar Club, appliquez le règlement et tamponnez vos décisions.">
   <title>La Grande Homologation — CRCC</title>
-  <link rel="stylesheet" href="game.css?v=12">
-  <script src="game.js?v=16" defer></script>
+  <link rel="stylesheet" href="game.css?v=13">
+  <script src="game.js?v=17" defer></script>
 </head>
 <body>
   <div class="game-shell">
@@ -28,7 +28,7 @@
           <div><b>02</b><span><strong>Appliquez le règlement</strong> : de nouvelles circulaires entrent en vigueur au fil des quatre journées. Les consignes orales du Président peuvent compliquer l'affaire.</span></div>
           <div><b>03</b><span><strong>Tamponnez votre décision</strong> : validez un dossier conforme. Pour refuser, choisissez simplement le bon motif.</span></div>
         </div>
-        <p class="intro-explainer">Vous traiterez <strong>35 dossiers</strong>, dont trois à expédier en 20 secondes. Chaque journée commence par ses nouvelles règles. Consultez le règlement, le catalogue et le registre en cliquant sur les ouvrages du bureau : la carte ne donne pas le nombre de fiches, et certaines sont fausses. Le Hamster Riding Pipe Club peut même rendre le règlement inaccessible toute une journée. Le Président vous interroge aussi sur le cigare. La caisse permet de traiter immédiatement un dossier, d'offrir un habano au Président ou de neutraliser définitivement le HRPC. Les chronos sont en pause pendant les interruptions et les consultations.</p>
+        <p class="intro-explainer">Vous traiterez <strong>43 dossiers</strong>, dont trois à expédier en 20 secondes. Chaque journée commence par ses nouvelles règles. Consultez le règlement, le catalogue et le registre en cliquant sur les ouvrages du bureau : la carte ne donne pas le nombre de fiches, et certaines sont fausses. Le Hamster Riding Pipe Club peut même rendre le règlement inaccessible toute une journée. Le Président vous interroge aussi sur le cigare. La caisse permet de traiter immédiatement un dossier, d'offrir un habano au Président ou de neutraliser définitivement le HRPC. Les chronos sont en pause pendant les interruptions et les consultations.</p>
         <div class="duo-panel" aria-labelledby="duo-title">
           <p class="eyebrow">DEUX AGENTS · UN MÊME DÉFI</p>
           <h2 id="duo-title">Comment jouer à deux&nbsp;?</h2>
@@ -44,13 +44,13 @@
           <div class="challenge-share hidden" id="challenge-share"><label for="challenge-url">LIEN À ENVOYER À L'AUTRE JOUEUR</label><div><input id="challenge-url" type="text" readonly><button class="secondary-button" id="copy-challenge" type="button">COPIER LE LIEN</button></div><p id="challenge-status" role="status"></p></div>
         </div>
         <div class="intro-actions"><button class="primary-button" id="start-button" type="button">PRENDRE SON SERVICE <span>→</span></button><button class="secondary-button hidden" id="resume-button" type="button">REPRENDRE LE DOSSIER EN COURS</button></div>
-        <p class="intro-foot">En solo ou à deux · 35 dossiers · 4 journées · Un tutoriel guidé dès le premier dossier</p>
+        <p class="intro-foot">En solo ou à deux · 43 dossiers · 4 journées · Un tutoriel guidé dès le premier dossier</p>
       </section>
 
       <section class="play hidden" id="play" aria-label="Guichet des admissions">
         <div class="statusbar">
           <div><span class="status-label">JOUR DE SERVICE</span><strong id="day-label">01 / 04</strong></div>
-          <div><span class="status-label">DOSSIER</span><strong id="case-label">01 / 35</strong></div>
+          <div><span class="status-label">DOSSIER</span><strong id="case-label">01 / 43</strong></div>
           <div><span class="status-label">CAISSE DU BUREAU</span><strong id="balance-label">0 F</strong></div>
           <div><span class="status-label">ERREURS</span><strong id="errors-label">0</strong></div>
           <div class="timer-box hidden" id="timer-box"><span class="status-label" id="timer-mode-label">TEMPS RESTANT</span><strong id="timer-label">0:30</strong></div>
@@ -67,7 +67,8 @@
 
           <div class="desk">
             <div class="bulletin" id="bulletin" role="status"></div>
-            <div class="bureau-shop" aria-label="Dépenses de la caisse"><span>DÉPENSES DU BUREAU</span><div><button id="rush-case" type="button">100 F · TRAITER CE DOSSIER</button><button id="gift-president" type="button">300 F · HABANO AU PRÉSIDENT</button><button id="raid-hrpc" type="button">500 F · RAID SUR LE HRPC</button></div><p id="shop-status" role="status">Le traitement immédiat rend la bonne décision et débite 100 F. L’habano ajoute 1 faveur. Le raid arrête les hamsters jusqu’à la fin de la partie.</p></div>
+            <div class="bureau-shop" aria-label="Dépenses de la caisse"><span>DÉPENSES DU BUREAU</span><div><button id="rush-case" type="button">100 F · TRAITER CE DOSSIER</button><button id="gift-president" type="button">300 F · HABANO AU PRÉSIDENT</button><button id="raid-hrpc" type="button">500 F · RAID SUR LE HRPC</button></div><p id="shop-status" role="status">Le traitement immédiat rend la bonne décision et rapporte une prime de 150 F en plus du gain normal. L’habano ajoute 1 faveur. Le raid arrête les hamsters jusqu’à la fin de la partie.</p></div>
+            <p class="president-opinion" id="president-opinion" role="status"></p>
             <p class="effect-notice hidden" id="effect-notice" role="status"></p>
             <div class="express-notice hidden" id="express-notice" role="status"><strong>DOSSIER EXPRESS · 20 SECONDES</strong><span>Le Comité vous laisse le temps de lire l’essentiel. À zéro, le dossier repart sans décision.</span></div>
             <div class="president-note hidden" id="president-note"></div>
@@ -82,14 +83,16 @@
             </div>
           </div>
         </div>
-        <div class="blackout-shade hidden" id="blackout-shade" aria-hidden="true"></div><button class="lighter-button hidden" id="lighter-button" type="button" aria-label="Allumer le briquet pour éclairer le bureau deux secondes">🔥<span>BRIQUET · 2 S</span></button><div class="inverted-cursor hidden" id="inverted-cursor" aria-hidden="true">↖</div>
+        <div class="pipa-hearts hidden" id="pipa-hearts"></div><div class="pipa-counter hidden" id="pipa-counter" role="status">Cœurs de Pipa : 0 / 24 · Cliquez pour les chasser</div><div class="blackout-shade hidden" id="blackout-shade" aria-hidden="true"></div><button class="lighter-button hidden" id="lighter-button" type="button" aria-label="Allumer le briquet pour éclairer le bureau deux secondes">🔥<span>BRIQUET · 2 S</span></button><div class="inverted-cursor hidden" id="inverted-cursor" aria-hidden="true">↖</div>
       </section>
 
       <div class="tutorial-overlay hidden" id="tutorial-overlay" role="dialog" aria-modal="true" aria-labelledby="tutorial-title"><div class="tutorial-spotlight" id="tutorial-spotlight" aria-hidden="true"></div><div class="tutorial-card"><span class="eyebrow" id="tutorial-progress"></span><h2 id="tutorial-title"></h2><p id="tutorial-copy"></p><div class="tutorial-controls"><button class="text-button" id="tutorial-skip" type="button">Passer le tutoriel</button><button class="primary-button" id="tutorial-next" type="button">SUIVANT <span>→</span></button></div></div></div>
 
       <div class="reference-modal hidden" id="reference-modal" role="dialog" aria-modal="true" aria-labelledby="reference-title"><div class="reference-paper"><button class="reference-close" id="reference-close" type="button" aria-label="Fermer l’ouvrage">×</button><p class="eyebrow" id="reference-kicker"></p><h2 id="reference-title"></h2><div id="rules-content" class="hidden"></div><div id="catalog-content" class="hidden"></div><div id="registry-content" class="hidden"><label for="registry-search">Chercher par numéro ou par nom</label><div class="registry-search-row"><input id="registry-search" type="search" autocomplete="off"><button id="registry-find" type="button">CONSULTER</button></div><button id="registry-by-name" class="text-button" type="button">Chercher le nom de la carte</button><div id="registry-result" aria-live="polite"></div></div><p class="reference-foot">Le chrono du dossier est en pause pendant la consultation.</p></div></div>
 
-      <section class="event hidden" id="day-briefing" aria-live="polite"><div class="event-card day-briefing-card"><p class="eyebrow" id="briefing-kicker"></p><h2 id="briefing-title"></h2><p id="briefing-intro"></p><p id="briefing-story" class="briefing-story hidden"></p><div id="briefing-rules" class="briefing-rules"></div><p id="briefing-note" class="committee-note"></p><button class="primary-button" id="briefing-next" type="button">OUVRIR LE GUICHET <span>→</span></button></div></section>
+      <div class="purchase-modal hidden" id="purchase-modal" role="dialog" aria-modal="true" aria-labelledby="purchase-title"><div class="purchase-paper"><p class="eyebrow" id="purchase-kicker"></p><h2 id="purchase-title"></h2><p id="purchase-copy"></p><p class="purchase-ledger" id="purchase-ledger"></p><button class="primary-button" id="purchase-close" type="button">RETOURNER AU GUICHET <span>→</span></button></div></div>
+
+      <section class="event hidden" id="day-briefing" aria-live="polite"><div class="event-card day-briefing-card"><p class="eyebrow" id="briefing-kicker"></p><h2 id="briefing-title"></h2><p id="briefing-intro"></p><p id="briefing-story" class="briefing-story hidden"></p><h3 class="briefing-rules-title">Les règles applicables aujourd’hui</h3><div id="briefing-rules" class="briefing-rules"></div><p id="briefing-note" class="committee-note"></p><button class="primary-button" id="briefing-next" type="button">OUVRIR LE GUICHET <span>→</span></button></div></section>
 
       <section class="event hidden" id="special" aria-live="polite"><div class="event-card special-card"><p class="eyebrow" id="special-kicker">INCIDENT IMPRÉVU</p><h2 id="special-title"></h2><p id="special-copy"></p><p class="committee-note" id="special-warning"></p><button class="primary-button" id="special-next" type="button">TRAITER LE PROCHAIN DOSSIER <span>→</span></button></div></section>
 
@@ -99,7 +102,7 @@
 
       <section class="daily hidden" id="daily" aria-live="polite"><div class="result-paper"><p class="eyebrow" id="daily-kicker">CLÔTURE DU JOUR</p><h2 id="daily-title"></h2><p id="daily-copy"></p><div class="daily-lines" id="daily-lines"></div><p class="committee-note" id="daily-note"></p><button class="primary-button" id="continue-button" type="button">OUVRIR LE GUICHET DEMAIN <span>→</span></button></div></section>
 
-      <section class="event hidden" id="appeal" aria-live="polite"><div class="event-card"><p class="eyebrow">COMMISSION D’APPEL · DOSSIER N° 002</p><h2>Le retour de<br><em>Monsieur Rature</em></h2><p id="appeal-intro"></p><div class="appeal-docs"><div><span>CARTE PRÉSENTÉE LE JOUR 1</span><strong>Validation du Comité : ABSENTE</strong><p>La pièce versée au dossier au moment de votre décision.</p></div><div><span>PIÈCE NOUVELLE</span><strong>Validation apposée le jour 2</strong><p>Un tampon authentique, mais postérieur au premier passage.</p></div></div><p class="committee-note" id="appeal-question"></p><div class="event-actions"><button class="stamp approve" id="appeal-uphold" type="button">CONFIRMER LA DÉCISION</button><button class="stamp refuse" id="appeal-revise" type="button">RECTIFIER LA DÉCISION</button></div></div></section>
+      <section class="event hidden" id="appeal" aria-live="polite"><div class="event-card"><p class="eyebrow" id="appeal-kicker"></p><h2 id="appeal-title"></h2><p id="appeal-intro"></p><div class="appeal-docs"><div><span>PIÈCE PRÉSENTÉE LE JOUR 1</span><strong id="appeal-old"></strong><p>La pièce versée au dossier au moment de votre décision.</p></div><div><span>PIÈCE NOUVELLE</span><strong id="appeal-new"></strong><p id="appeal-new-note"></p></div></div><p class="committee-note" id="appeal-question"></p><div class="event-actions"><button class="stamp approve" id="appeal-uphold" type="button">CONFIRMER LA DÉCISION</button><button class="stamp refuse" id="appeal-revise" type="button">RECTIFIER LA DÉCISION</button></div></div></section>
 
       <section class="event hidden" id="cutter" aria-live="polite"><div class="event-card"><p class="eyebrow">EXAMEN CONTRADICTOIRE · OBJET PRÉSIDENTIEL</p><h2>Le Coupe-cigare<br><em>revient au bureau</em></h2><p>Comparez l’état des lieux avant et après l’emprunt. Une différence éventuelle doit être consignée. « Il était déjà comme ça avant » n’est pas une mesure.</p><div class="cutter-views"><div><span>AVANT</span><div id="cutter-before"></div></div><div><span>APRÈS</span><div id="cutter-after"></div></div></div><p class="comparison-label">QUELLE PARTIE A CHANGÉ ?</p><div class="cutter-options" id="cutter-options"><button type="button" data-part="blade">La lame</button><button type="button" data-part="pivot">Le pivot</button><button type="button" data-part="handle">La poignée</button><button type="button" data-part="none">Aucune</button></div></div></section>
 
@@ -113,7 +116,7 @@
 
       <section class="result hidden" id="event-result" aria-live="polite"><div class="result-paper"><p class="eyebrow" id="event-result-kicker"></p><div class="result-stamp" id="event-result-stamp"></div><h2 id="event-result-title"></h2><p id="event-result-text"></p><div class="result-ledger" id="event-result-ledger"></div><button class="primary-button" id="event-next" type="button">REPRENDRE LE SERVICE <span>→</span></button></div></section>
 
-      <section class="ending hidden" id="ending" aria-live="polite"><div class="ending-card"><p class="eyebrow">PROCÈS-VERBAL DE FIN DE SERVICE</p><h1 id="ending-title"></h1><p id="ending-copy"></p><div class="ending-stats" id="ending-stats"></div><p id="ending-special" class="committee-note"></p><div class="share-box"><p id="share-preview"></p><div class="share-actions"><button id="share-button" class="secondary-button" type="button">PARTAGER MON SCORE ↗</button><button id="copy-button" class="secondary-button" type="button">COPIER LE RÉSULTAT</button></div><span id="share-status" role="status"></span></div><button class="primary-button" id="restart-button" type="button">REPRENDRE LE SERVICE <span>↻</span></button><a href="../index.html" class="back-link">Retour au portail officiel</a></div></section>
+      <section class="ending hidden" id="ending" aria-live="polite"><div class="ending-card"><p class="eyebrow">PROCÈS-VERBAL DE FIN DE SERVICE</p><h1 id="ending-title"></h1><p id="ending-copy"></p><div class="ending-stats" id="ending-stats"></div><div class="score-breakdown" id="score-breakdown"></div><p class="president-opinion" id="ending-opinion"></p><p id="ending-special" class="committee-note"></p><div class="share-box"><p id="share-preview"></p><div class="share-actions"><button id="share-button" class="secondary-button" type="button">PARTAGER MON SCORE ↗</button><button id="copy-button" class="secondary-button" type="button">COPIER LE RÉSULTAT</button></div><span id="share-status" role="status"></span></div><button class="primary-button" id="restart-button" type="button">REPRENDRE LE SERVICE <span>↻</span></button><a href="../index.html" class="back-link">Retour au portail officiel</a></div></section>
     </main>
     <footer>CRCC / DIRECTION DES ADMISSIONS · TOUTE RESSEMBLANCE AVEC UNE PROCÉDURE RAISONNABLE SERAIT FORTUITE</footer>
   </div>
