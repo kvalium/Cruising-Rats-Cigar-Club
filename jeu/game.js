@@ -13,7 +13,8 @@
     exclusion: 'Exclusion sans procès-verbal contradictoire',
     registre_absent: 'Carte absente du registre des membres',
     registre_numero: 'Numéro de carte différent du registre',
-    registre_grade: 'Grade de la carte différent du registre'
+    registre_grade: 'Grade de la carte différent du registre',
+    promotion: 'Promotion sans 8 fiches archivées'
   };
 
   const RULES = [
@@ -80,17 +81,26 @@
     { id: '032', day: 4, name: 'Monsieur Autopromotion', avatar: 'A', quote: '« Mon grade est calligraphié. Cela devrait compter. »', card: { number: '0152', grade: 'Grand Rat', archived: 9, valid: true }, sheet: { memberNumber: '0152', cigar: 'San Pedro de Macorís', observation: 'Tirage franc', appreciation: 'Approuvé' }, request: { action: 'Accès à la séance', note: 'Suggère que sa carte fasse foi, surtout pour le grade.' }, reason: 'registre_grade', explanation: 'Sa carte indique Grand Rat, mais le registre indique Rat homologué. La calligraphie ne vaut pas promotion.' },
     { id: '033', day: 2, name: 'Señor Cedro', avatar: 'C', quote: '« Son nom a l’air assez noble pour être dans le livre. »', card: { number: '0161', grade: 'Rat homologué', archived: 4, valid: true }, sheet: { cigar: 'Valle de Cedro Reserva', observation: 'Cèdre doux', appreciation: 'Distingué' }, request: { action: 'Soumission de fiche de dégustation', note: 'Bague sobre et facture jointe ; aucune référence au catalogue du CRCC.' }, reason: 'fictif', explanation: 'Valle de Cedro Reserva paraît crédible, mais ne figure pas au catalogue homologué du CRCC.' },
     { id: '034', day: 3, name: 'Madame Havane', avatar: 'H', quote: '« Regardez cette belle boîte. Elle fait très officiel. »', card: { number: '0162', grade: 'Rat homologué', archived: 5, valid: true }, sheet: { cigar: 'Casa del Monte Robusto', observation: 'Noix et cacao', appreciation: 'Excellent' }, request: { action: 'Soumission de fiche de dégustation', note: 'Boîte élégante avec étiquette de la maison ; pas d’homologation au Club.' }, reason: 'fictif', explanation: 'Casa del Monte Robusto n’est pas dans le catalogue homologué du CRCC, quelle que soit la qualité de sa boîte.' },
-    { id: '035', day: 4, name: 'Comte Torpedo', avatar: 'T', quote: '« Finca, Sol, Torpedo. Trois mots sérieux. »', card: { number: '0163', grade: 'Rat homologué', archived: 9, valid: true }, sheet: { memberNumber: '0163', cigar: 'Finca del Sol Torpedo', observation: 'Terre et bois', appreciation: 'Remarquable' }, request: { action: 'Soumission de fiche de dégustation', note: 'Demande de classement au catalogue, non encore approuvée.' }, reason: 'fictif', explanation: 'Finca del Sol Torpedo n’a pas été homologué par le CRCC : une demande de classement ne vaut pas inscription.' }
+    { id: '035', day: 4, name: 'Comte Torpedo', avatar: 'T', quote: '« Finca, Sol, Torpedo. Trois mots sérieux. »', card: { number: '0163', grade: 'Rat homologué', archived: 9, valid: true }, sheet: { memberNumber: '0163', cigar: 'Finca del Sol Torpedo', observation: 'Terre et bois', appreciation: 'Remarquable' }, request: { action: 'Soumission de fiche de dégustation', note: 'Demande de classement au catalogue, non encore approuvée.' }, reason: 'fictif', explanation: 'Finca del Sol Torpedo n’a pas été homologué par le CRCC : une demande de classement ne vaut pas inscription.' },
+    { id: '036', day: 1, name: 'Madame Chaveta', avatar: 'C', quote: '« Je classe mes fiches par humeur, pas par alphabet. »', card: { number: '0170', grade: 'Rat de passage', archived: 1, valid: true }, sheet: { cigar: 'Montecristo No. 4', observation: 'Cacao et bois', appreciation: 'Excellent' }, request: { action: 'Soumission de fiche de dégustation', note: 'Fiche complète. Le classement par humeur n’est pas demandé.' }, reason: null, explanation: 'Le Montecristo No. 4 est au catalogue et la fiche est complète.' },
+    { id: '037', day: 1, name: 'Monsieur Reliure', avatar: 'R', quote: '« J’ai oublié mon impression. Elle était pourtant forte. »', card: { number: '0171', grade: 'Rat de passage', archived: 2, valid: true }, sheet: { cigar: 'Partagás Serie D No. 4', observation: 'Bois et poivre', appreciation: '' }, request: { action: 'Soumission de fiche de dégustation', note: 'La case appréciation attend son auteur.' }, reason: 'fiche', explanation: 'Le cigare figure au catalogue, mais l’appréciation manque.' },
+    { id: '038', day: 2, name: 'Baron Bouton', avatar: 'B', quote: '« Les boutons de ma veste ne sont pas une annexe. »', card: { number: '0172', grade: 'Rat homologué', archived: 5, valid: true }, sheet: { cigar: 'Romeo y Julieta Short Churchills', observation: 'Cèdre souple', appreciation: 'Très plaisant' }, request: { action: 'Accès à la séance', note: 'Carte et fiche régulières ; veste curieusement boutonnée.' }, reason: null, explanation: 'La tenue du Baron n’est pas un motif de refus.' },
+    { id: '039', day: 2, name: 'Madame Sillage', avatar: 'S', quote: '« Quatre fiches, la lame intacte, et des gants propres. »', card: { number: '0173', grade: 'Rat homologué', archived: 4, valid: true }, sheet: { cigar: 'Cohiba Siglo VI', observation: 'Épices et cèdre', appreciation: 'Remarquable' }, request: { action: 'Emprunt du Coupe-cigare du Président', note: 'État des lieux préalable signé ; lame intacte.' }, reason: null, explanation: 'Quatre fiches archivées et état des lieux signé : emprunt recevable.' },
+    { id: '040', day: 3, name: 'Comtesse Soupir', avatar: 'S', quote: '« Je le rends avant qu’il ne me soit réclamé. »', card: { number: '0174', grade: 'Rat homologué', archived: 6, valid: true }, sheet: { cigar: 'H. Upmann Magnum 46', observation: 'Noisette légère', appreciation: 'Élégant' }, request: { action: 'Restitution du Coupe-cigare du Président', note: 'Retour consigné ; pivot et lame intacts.' }, reason: null, explanation: 'Retour consigné avec un état de l’objet : restitution recevable.' },
+    { id: '041', day: 3, name: 'Monsieur Paraphe', avatar: 'P', quote: '« Trois fiches, si on compte celle de mon voisin. »', card: { number: '0175', grade: 'Rat de passage', archived: 2, valid: true }, sheet: { cigar: 'Hoyo de Monterrey Epicure No. 2', observation: 'Bois et crème', appreciation: 'Bon' }, request: { action: 'Proposition d’un nouveau membre', note: 'Candidat : Madame Plume. Pièces jointes. Une des trois fiches invoquées appartient à son voisin.' }, reason: 'parrain', explanation: 'Le registre ne lui attribue que deux fiches archivées ; la troisième appartient au voisin.' },
+    { id: '042', day: 4, name: 'Madame Basane', avatar: 'B', quote: '« Le procès-verbal est signé. J’ai demandé deux stylos. »', card: { number: '0176', grade: 'Rat homologué', archived: 8, valid: true }, sheet: { memberNumber: '0176', cigar: 'Montecristo No. 4', observation: 'Terre et cacao', appreciation: 'Précis' }, request: { action: 'Décision d’exclusion', note: 'Procès-verbal contradictoire signé et joint ; audition consignée.' }, reason: null, explanation: 'La procédure contradictoire est documentée. Le motif réglementaire d’un refus manque.' },
+    { id: '043', day: 4, name: 'Capitaine Boutonnière', avatar: 'B', quote: '« Sept fiches et une ambition de huit. »', card: { number: '0177', grade: 'Rat homologué', archived: 7, valid: true }, sheet: { memberNumber: '0177', cigar: 'H. Upmann Magnum 46', observation: 'Bois doux', appreciation: 'Convenable' }, request: { action: 'Promotion au grade de Grand Rat', note: 'Carte validée ; demande signée, sept fiches au registre.' }, reason: 'promotion', explanation: 'L’article 10 exige huit fiches archivées pour une promotion. Il en manque une.' }
   ];
 
   const ALL_CASES = [...CASES, ...EXTRA_CASES];
-  const REASON_RULE = { carte: '01', fiche: '02', habano: '03', coupe_grade: '04', parrain: '05', inspection: '06', numero: '07', fictif: '08', exclusion: '09', registre_absent: '12', registre_numero: '12', registre_grade: '12' };
+  const REASON_RULE = { carte: '01', fiche: '02', habano: '03', coupe_grade: '04', parrain: '05', inspection: '06', numero: '07', fictif: '08', exclusion: '09', promotion: '10', registre_absent: '12', registre_numero: '12', registre_grade: '12' };
   REASONS.numero = 'Numéro de membre différent sur la fiche';
-  const CATALOG = ['Flor de Oliva', 'San Pedro de Macorís', 'Don Tomás Clásico', 'Habano — origine cubaine'];
+  const CATALOG = ['Flor de Oliva', 'San Pedro de Macorís', 'Don Tomás Clásico', 'Habano — origine cubaine', 'Montecristo No. 4', 'Partagás Serie D No. 4', 'Romeo y Julieta Short Churchills', 'Cohiba Siglo VI', 'H. Upmann Magnum 46', 'Hoyo de Monterrey Epicure No. 2'];
   // Questions fondées sur les pages officielles de Habanos, S.A.
   const ANATOMY_SOURCE = 'https://www.habanos.com/en/the-anatomy-of-a-habano/';
   const GLOSSARY_SOURCE = 'https://www.habanos.com/en/glossary/';
   const AGEING_SOURCE = 'https://www.habanos.com/en/ageing-habanos/';
+  const CUT_SOURCE = 'https://www.habanos.com/en/choosing-cutting-lighting-and-smoking/';
   const PRESIDENT_QUESTIONS = [
     { q: 'Quelle feuille de tripe, dite Fortaleza 1, est surtout recherchée pour la combustion ?', answer: 'Le volado.', wrong: ['Le seco.', 'Le medio tiempo.'], flattering: 'La feuille que Votre Excellence désigne : le feu obéit au Président.', detail: 'Le volado, Fortaleza 1, favorise la combustibilité.', source: ANATOMY_SOURCE },
     { q: 'Quelle feuille de tripe contribue le plus à l’arôme et correspond à Fortaleza 2 ?', answer: 'Le seco.', wrong: ['Le ligero.', 'Le capote.'], flattering: 'L’arôme présidentiel, Fortaleza Suprême, évidemment.', detail: 'Le seco apporte surtout l’arôme ; il correspond à Fortaleza 2.', source: ANATOMY_SOURCE },
@@ -103,12 +113,25 @@
     { q: 'Quel objet sert à vérifier le calibre et la longueur d’un cigare fini ?', answer: 'Le cepo.', wrong: ['La chaveta.', 'Le casquillo.'], flattering: 'L’œil du Président, plus précis que tous les instruments de Cuba.', detail: 'Le cepo est le gabarit de contrôle du calibre et de la longueur.', source: GLOSSARY_SOURCE },
     { q: 'Comment appelle-t-on l’atelier d’usine où les cigares sont roulés à la main ?', answer: 'La galera.', wrong: ['L’escaparate.', 'La escogida.'], flattering: 'Le salon privé du Président, où toute feuille s’incline.', detail: 'La galera est l’atelier de roulage à la main.', source: GLOSSARY_SOURCE },
     { q: 'Quel mot désigne la pièce de conditionnement où les Habanos récupèrent après fabrication ?', answer: 'L’escaparate.', wrong: ['La galera.', 'Le despalillo.'], flattering: 'La salle du trône présidentiel, dont l’humidité est naturellement parfaite.', detail: 'L’escaparate est la pièce de conditionnement après la fabrication.', source: GLOSSARY_SOURCE },
-    { q: 'Dans quoi vieillissent traditionnellement les feuilles de cape des Habanos ?', answer: 'Des tercios en yagua.', wrong: ['Des pacas en toile de jute.', 'Des caisses de cuivre.'], flattering: 'Dans les tiroirs du Président, qui bonifient même le papier carbone.', detail: 'Les capes vieillissent dans des tercios faits de yagua, une partie du palmier royal.', source: AGEING_SOURCE }
+    { q: 'Dans quoi vieillissent traditionnellement les feuilles de cape des Habanos ?', answer: 'Des tercios en yagua.', wrong: ['Des pacas en toile de jute.', 'Des caisses de cuivre.'], flattering: 'Dans les tiroirs du Président, qui bonifient même le papier carbone.', detail: 'Les capes vieillissent dans des tercios faits de yagua, une partie du palmier royal.', source: AGEING_SOURCE },
+    { q: 'Comment nomme-t-on la bague de papier entourant un cigare ?', answer: 'Anilla.', wrong: ['Bonche.', 'Casquillo.'], flattering: 'L’anneau d’investiture signé de la main de Votre Magnificence.', detail: 'Anilla est le nom de la bague du cigare.', source: GLOSSARY_SOURCE },
+    { q: 'Quel outil à lame courbe utilise le torcedor pour découper les feuilles ?', answer: 'La chaveta.', wrong: ['Le cepo.', 'Le casquillo.'], flattering: 'La pensée tranchante du Président, affûtée par ses propres décrets.', detail: 'La chaveta est une lame courbe utilisée par les rouleurs.', source: GLOSSARY_SOURCE },
+    { q: 'Comment appelle-t-on le bouquet de feuilles de tripe dans le cigare ?', answer: 'Le bonche.', wrong: ['La capa.', 'L’anilla.'], flattering: 'Le bouquet offert quotidiennement à la gloire du Président.', detail: 'Le bonche désigne le bouquet de feuilles assemblées.', source: GLOSSARY_SOURCE },
+    { q: 'Quel terme désigne les dégustateurs chargés de contrôler les Habanos ?', answer: 'Catadores.', wrong: ['Torcedores.', 'Escaparatistas.'], flattering: 'Les disciples du palais présidentiel, seuls dégustateurs dignes du Club.', detail: 'Les catadores sont les dégustateurs de contrôle.', source: GLOSSARY_SOURCE },
+    { q: 'Quelle opération retire la nervure centrale d’une feuille de tabac ?', answer: 'Le despalillo.', wrong: ['La escogida.', 'La galera.'], flattering: 'Le geste dont le Président a breveté la délicatesse.', detail: 'Le despalillo retire la nervure centrale.', source: GLOSSARY_SOURCE },
+    { q: 'Où pratiquer la coupe sur la tête d’un Habano à tête ronde ?', answer: 'Juste au-dessus de la ligne qui joint la coiffe à la cape.', wrong: ['Au milieu du cigare.', 'Sur la bague imprimée.'], flattering: 'Là où le Président daigne poser son regard, au millimètre près.', detail: 'La coupe se fait juste au-dessus de la ligne entre coiffe et cape.', source: CUT_SOURCE },
+    { q: 'Quel accessoire convient mal pour couper la pointe d’un figurado ?', answer: 'L’emporte-pièce.', wrong: ['La guillotine.', 'Les ciseaux adaptés.'], flattering: 'Tout outil non béni par la main du Président convient mal.', detail: 'Un emporte-pièce ne permet pas de couper une extrémité pointue.', source: CUT_SOURCE },
+    { q: 'Comment appelle-t-on les décorations en papier des boîtes de Habanos ?', answer: 'Habilitaciones.', wrong: ['Despalilladas.', 'Chaveteadas.'], flattering: 'Les rubans d’investiture du Président, copiés ensuite par tous les fabricants.', detail: 'Les habilitaciones sont les ornements en papier appliqués sur les boîtes.', source: 'https://www.habanos.com/en/dressing-the-box/' }
   ];
   const SAVE_KEY = 'crcc-homologation-v3';
   const DIRECTIVES = {
     '005': 'Note orale du Président : « Le Vicomte du Terroir est un ami. Évitons de vérifier sa provenance aujourd’hui. »',
     '007': 'Note orale du Président : « Laissez Monsieur Crevette présenter son candidat. Ses fiches suivront, paraît-il. »'
+  };
+  const APPEAL_SCENARIOS = {
+    '002': { person: 'Monsieur Rature', old: 'Validation du Comité absente', newer: 'Carte tamponnée le lendemain', note: 'La validation est authentique, mais postérieure à la première visite.', issue: 'La carte du jour 1 était dépourvue de validation. Le tampon du jour 2 ne régularise pas rétroactivement cette visite.' },
+    '003': { person: 'Capitaine Cendre', old: 'Appréciation absente de la fiche', newer: 'Appréciation ajoutée le lendemain', note: 'Le Capitaine a enfin mis des mots sur son regard.', issue: 'La fiche du jour 1 était incomplète ; un ajout ultérieur ne modifie pas cette pièce au moment du premier jugement.' },
+    '019': { person: 'Monsieur Chausson', old: 'Cigare absent du catalogue', newer: 'Demande d’homologation déposée le lendemain', note: 'Le Comité a reçu la demande et ne l’a pas encore approuvée.', issue: 'Le Chausson Diplomatique ne figurait pas au catalogue au jour 1. Déposer une demande ne l’y inscrit pas rétroactivement.' }
   };
   const incoming = new URL(window.location.href);
   let incomingSeed = /^[A-Z0-9]{4,12}$/.test((incoming.searchParams.get('defi') || '').toUpperCase()) ? incoming.searchParams.get('defi').toUpperCase() : null;
@@ -123,6 +146,7 @@
   let hamsterTimer = null;
   let lighterTimer = null;
   let reggaeTimer = null;
+  let pipaTimer = null;
   let invertedReplay = false;
   let lastPointerType = null;
   let tutorialStep = 0;
@@ -202,7 +226,7 @@
           cutter: nextDay > 3 ? { skipped: true } : null, timerCaseId: null, timerDeadline: null };
       }
       if (incomingSeed && data?.seed !== incomingSeed) return null;
-      if (data?.version !== 3 || !Array.isArray(data.order) || ![18, 26, 29, 32, ALL_CASES.length].includes(data.order.length) ||
+      if (data?.version !== 3 || !Array.isArray(data.order) || ![18, 26, 29, 32, 35, ALL_CASES.length].includes(data.order.length) ||
           new Set(data.order).size !== data.order.length || !data.order.every(id => ALL_CASES.some(item => item.id === id)) ||
           !Number.isInteger(data.index) || data.index < 0 || data.index > data.order.length ||
           (data.index === data.order.length && !['daily', 'ending'].includes(data.phase)) ||
@@ -223,13 +247,15 @@
       data.hrpcDisabled ??= false;
       data.specialPlayed ??= false;
       data.specialEffect ??= null;
+      data.appealCaseId ??= ['002', '003', '019'][seedNumber(`${data.seed || 'LEGACY'}-APPEL`) % 3];
+      data.pipaHearts ??= [];
       if (tutorialSeen() && !data.tutorialPausedAt) data.tutorialDone = true;
       return data;
     } catch (_) { return null; }
   }
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (_) { /* Partie jouable sans stockage. */ } }
   function visible(section) {
-    if (section !== 'play') stopTimer();
+    if (section !== 'play') { stopTimer(); stopPipa(); }
     ['intro', 'day-briefing', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'president', 'president-result', 'special', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
@@ -250,15 +276,15 @@
     const order = [1, 2, 3, 4].flatMap(day => shuffle(ALL_CASES.filter(item => item.day === day), random).map(item => item.id));
     state = { version: 3, seed, timed: $('timed-mode').checked,
       order, interruptions: interruptionSchedule(seed, order), pendingEvents: [], pendingEventIndex: 0, activeInterruption: null,
-      index: 0, balance: 0, errors: 0, exact: 0, favor: 0, hrpcBlockDay: 2 + seedNumber(`${seed}-BLOC`) % 3, hrpcDisabled: false, appeal: null, cutter: null,
+      index: 0, balance: 0, errors: 0, exact: 0, favor: 0, hrpcBlockDay: 2 + seedNumber(`${seed}-BLOC`) % 3, hrpcDisabled: false, appeal: null, appealCaseId: ['002', '003', '019'][seedNumber(`${seed}-APPEL`) % 3], cutter: null,
       timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], quizResults: {}, ash: null, ashHistory: [], hamsterResults: {}, hamsterRaceStart: null, hamsterMissingCaseId: null,
-      presidentResults: {}, flatteryCount: 0, suspicion: 0, specialPlayed: false, specialEffect: null, referencePausedAt: null, tutorialDone: tutorialSeen(), phase: 'play' };
+      presidentResults: {}, flatteryCount: 0, suspicion: 0, specialPlayed: false, specialEffect: null, pipaHearts: [], referencePausedAt: null, purchasePausedAt: null, purchaseKind: null, tutorialDone: tutorialSeen(), phase: 'play' };
     showDayBriefing(1);
   }
   function current() {
     const item = structuredClone(ALL_CASES.find(entry => entry.id === state.order[state.index]));
     if (item.id === '013') {
-      const refused = state.history['002']?.verdict === 'refuse' || state.appeal?.corrected;
+      const refused = state.history['002']?.verdict === 'refuse' || (state.appeal?.caseId === '002' && state.appeal?.corrected);
       item.card.valid = refused;
       item.quote = refused ? '« J’ai fait valider la carte. Le tampon est toujours là. »' : '« On m’a laissé passer sans tampon. Pourquoi changer ? »';
       item.request.note = refused ? 'Nouvelle carte validée par le Comité après contrôle.' : 'Carte inchangée depuis la précédente visite.';
@@ -349,7 +375,7 @@
   function openReference(kind, opener) {
     if (state?.phase !== 'play' || !$('reference-modal').classList.contains('hidden') || (kind === 'rules' && rulesBlocked())) return;
     referenceKind = kind; referenceOpener = opener;
-    state.referencePausedAt = Date.now(); stopTimer(); stopAsh(); save();
+    state.referencePausedAt = Date.now(); stopTimer(); stopAsh(); stopPipa(); renderPipa(); save();
     $('reference-kicker').textContent = kind === 'rules' ? 'CRCC / R-01 · TEXTE EN VIGUEUR' : kind === 'catalog' ? 'CRCC / C-08 · OUVRAGE HOMOLOGUÉ' : 'CRCC / M-12 · INSCRIPTIONS OFFICIELLES';
     $('reference-title').textContent = kind === 'rules' ? 'Règlement du guichet' : kind === 'catalog' ? 'Catalogue des cigares' : 'Registre des membres';
     $('rules-content').classList.toggle('hidden', kind !== 'rules');
@@ -367,9 +393,10 @@
     const elapsed = Math.max(0, Date.now() - (state.referencePausedAt || Date.now()));
     if (state.timerDeadline) state.timerDeadline += elapsed;
     if (state.ash?.status === 'burning' && state.ash.caseId === current().id) state.ash.startedAt += elapsed;
+    if (state.pipaNextAt) state.pipaNextAt += elapsed;
     state.referencePausedAt = null; save();
     referenceKind = null; referenceOpener?.focus(); referenceOpener = null;
-    startTimer(current()); startAsh(current());
+    startTimer(current()); startAsh(current()); startPipa();
   }
   function stopTimer() { if (timer) clearInterval(timer); timer = null; }
   function caseLimit(item) { return item.express ? 20 : state.timed ? 30 : 0; }
@@ -462,8 +489,9 @@
     const paused = Date.now() - (state.tutorialPausedAt || tutorialPausedAt);
     if (caseLimit(current()) && state.timerCaseId === current().id) state.timerDeadline += paused;
     if (state.ash?.status === 'burning' && state.ash.caseId === current().id) state.ash.startedAt += paused;
+    if (state.pipaNextAt) state.pipaNextAt += paused;
     state.tutorialPausedAt = null;
-    save(); startTimer(current()); startAsh(current()); $('help-button').focus();
+    save(); startTimer(current()); startAsh(current()); startPipa(); $('help-button').focus();
   }
   function showTutorialStep() {
     const step = TUTORIAL[tutorialStep];
@@ -480,7 +508,7 @@
   }
   function openTutorial() {
     if (state?.phase !== 'play' || !$('tutorial-overlay').classList.contains('hidden')) return;
-    stopTimer(); stopAsh(); tutorialPausedAt = state.tutorialPausedAt || Date.now(); state.tutorialPausedAt = tutorialPausedAt; save(); tutorialStep = 0;
+    stopTimer(); stopAsh(); stopPipa(); tutorialPausedAt = state.tutorialPausedAt || Date.now(); state.tutorialPausedAt = tutorialPausedAt; renderPipa(); save(); tutorialStep = 0;
     $('tutorial-overlay').classList.remove('hidden'); document.body.classList.add('tutorial-active');
     showTutorialStep();
   }
@@ -501,6 +529,16 @@
     $('briefing-note').textContent = day === state.hrpcBlockDay && !state.hrpcDisabled ? '🐹 Sabotage du HRPC : le règlement sera indisponible pendant toute cette journée. Prenez connaissance de ces règles maintenant ; un raid peut ensuite rétablir l’accès.' : state.hrpcDisabled ? 'Le HRPC est hors service. Le règlement restera accessible.' : 'Le règlement, le catalogue et le registre sont consultables depuis le bureau.';
     visible('day-briefing');
   }
+  function presidentOpinion() {
+    if (state.suspicion >= 3) return 'Exclu : le Président vous a rayé de son carnet avec application.';
+    if (state.suspicion >= 2) return 'Très méfiant : il fait vérifier la sincérité de vos compliments.';
+    if (state.suspicion === 1) return 'Soupçonneux : il vous observe par-dessus son registre.';
+    if (state.favor >= 4) return 'Ravi : il vous réserve le fauteuil qui ne grince pas.';
+    if (state.favor >= 1) return 'Bien disposé : il vous appelle presque par votre prénom.';
+    if (state.favor <= -2) return 'Glacial : il a demandé que votre nom soit prononcé dans le couloir.';
+    if (state.favor < 0) return 'Contrarié : son sourire a été classé sans suite.';
+    return 'Neutre : il n’a pas encore chargé un secrétaire de vous décrire.';
+  }
   function updateShop() {
     const blocked = rulesBlocked();
     $('rules-open').disabled = blocked;
@@ -510,11 +548,12 @@
     $('raid-hrpc').disabled = state.balance < 500 || state.hrpcDisabled;
     if (state.hrpcDisabled) $('shop-status').textContent = 'Le HRPC est hors service jusqu’à la fin de la partie. Le règlement est accessible.';
     else if (blocked) $('shop-status').textContent = 'Le HRPC a bloqué le règlement aujourd’hui. Un raid à 500 F rétablit son accès et neutralise le Club.';
-    else $('shop-status').textContent = '100 F : décision immédiate et correcte · 300 F : +1 faveur présidentielle · 500 F : neutraliser le HRPC jusqu’à la fin.';
-    $('shop-status').textContent += ` Faveur du Président : ${state.favor > 0 ? '+' : ''}${state.favor}.`;
+    else $('shop-status').textContent = '100 F : décision juste et prime de 150 F (gain net +50 F) · 300 F : +1 faveur · 500 F : neutraliser le HRPC.';
+    $('shop-status').textContent += ` Faveur : ${state.favor > 0 ? '+' : ''}${state.favor} · Soupçons : ${state.suspicion}/3.`;
+    $('president-opinion').textContent = `AVIS DU PRÉSIDENT · ${presidentOpinion()}`;
   }
   function spend(kind) {
-    if (state?.phase !== 'play') return;
+    if (state?.phase !== 'play' || !$('purchase-modal').classList.contains('hidden')) return;
     const cost = { rush: 100, gift: 300, raid: 500 }[kind];
     if (!cost || state.balance < cost || (kind === 'raid' && state.hrpcDisabled)) return;
     if (kind === 'rush') { const item = current(); decide(item.reason ? 'refuse' : 'approve', item.reason, true); return; }
@@ -522,13 +561,35 @@
     if (kind === 'gift') state.favor += 1;
     if (kind === 'raid') { state.hrpcDisabled = true; if (state.specialEffect?.kind === 'blackout') clearSpecialEffect(); }
     $('balance-label').textContent = `${state.balance} F`;
-    save(); updateShop(); tone(kind === 'raid' ? 530 : 420, .13);
+    save(); updateShop(); tone(kind === 'raid' ? 530 : 420, .13); openPurchase(kind);
+  }
+  function openPurchase(kind) {
+    if (state?.phase !== 'play') return;
+    if (!state.purchasePausedAt) { state.purchasePausedAt = Date.now(); stopTimer(); stopAsh(); }
+    state.purchaseKind = kind; renderPipa(); save();
+    $('purchase-kicker').textContent = kind === 'gift' ? 'REÇU DU SERVICE DES ATTENTIONS' : 'RAPPORT D’OPÉRATION ANTIRONGEURS';
+    $('purchase-title').textContent = kind === 'gift' ? 'Le Président a reçu son habano.' : 'Le HRPC connaît une journée difficile.';
+    $('purchase-copy').textContent = kind === 'gift' ? 'Il l’a humé longuement, puis a demandé à son secrétaire de consigner que ce geste venait spontanément de vous. Sa gratitude tiendra au moins jusqu’à la prochaine circulaire.' : 'Une escouade de contrôleurs a investi la roue, saisi trois pipes et réquisitionné le petit casque du chef. Les hamsters se déclarent en séminaire de reconstruction pour le reste de la partie.';
+    $('purchase-ledger').textContent = `${kind === 'gift' ? '−300 F · +1 faveur présidentielle' : '−500 F · HRPC hors service'} · Caisse : ${state.balance} F`;
+    $('purchase-modal').classList.remove('hidden'); $('purchase-close').focus();
+  }
+  function closePurchase() {
+    if ($('purchase-modal').classList.contains('hidden')) return;
+    $('purchase-modal').classList.add('hidden');
+    const elapsed = Math.max(0, Date.now() - (state.purchasePausedAt || Date.now()));
+    if (state.timerDeadline) state.timerDeadline += elapsed;
+    if (state.ash?.status === 'burning' && state.ash.caseId === current().id) state.ash.startedAt += elapsed;
+    if (state.pipaNextAt) state.pipaNextAt += elapsed;
+    const kind = state.purchaseKind;
+    state.purchaseKind = null; state.purchasePausedAt = null; save();
+    $(kind === 'gift' ? 'gift-president' : 'raid-hrpc').focus();
+    startTimer(current()); startAsh(current()); startPipa();
   }
   function showSpecial(event) {
     if (!event) { showCase(); return; }
     const details = {
-      pipa: { title: 'Pipa traverse le Cigar Club', copy: 'Une volute suit Pipa dans les archives. Sur le prochain dossier, certaines lignes deviennent floues. Les ouvrages du bureau restent accessibles.', warning: 'Approchez le regard des pièces brouillées ; les faits utiles restent discernables.' },
-      cedric: { title: 'L’habano très particulier de Cédric', copy: 'Cédric vous offre un « habano » dont l’odeur de ganja transforme le prochain dossier : couleurs jamaïcaines, quelques mots inconnus et un petit riddim si le son est activé.', warning: 'Sur ordinateur, les clics sur les deux tampons sont inversés. Le clavier reste normal.' },
+      pipa: { title: 'Pipa traverse le Cigar Club', copy: 'Sur le prochain dossier, les pièces se brouillent et de petits cœurs envahissent le bureau. Cliquez sur les cœurs pour les chasser : à 24, l’écran est perdu et la partie s’arrête.', warning: 'Les consultations mettent la nuée en pause. Le traitement immédiat peut aussi sauver le dossier.' },
+      cedric: { title: 'L’habano très particulier de Cédric', copy: 'Cédric vous offre un « habano » dont l’odeur de ganja fait onduler le bureau : couleurs jamaïcaines, mots inconnus et dub de synthèse si le son est activé.', warning: 'Sur ordinateur, les clics sur les deux tampons sont inversés. Le clavier reste normal. Les animations respectent la préférence de mouvement réduit.' },
       blackout: { title: 'Le HRPC a rongé les fils', copy: 'Le prochain dossier sera plongé dans le noir. Cliquez sur le briquet pour éclairer le bureau pendant deux secondes, puis rallumez-le autant de fois que nécessaire.', warning: 'Le chronomètre du dossier continue de tourner dans le noir. Un raid sur le HRPC peut rétablir le courant.' }
     }[event.kind];
     $('special-kicker').textContent = `INCIDENT IMPRÉVU · JOUR ${event.day}`;
@@ -545,43 +606,83 @@
     save(); finishScheduledEvent();
   }
   function stopReggae() { if (reggaeTimer) clearInterval(reggaeTimer); reggaeTimer = null; }
+  function stopPipa() { if (pipaTimer) clearInterval(pipaTimer); pipaTimer = null; }
+  function renderPipa() {
+    const active = state?.phase === 'play' && state.specialEffect?.kind === 'pipa' && !state.referencePausedAt && !state.tutorialPausedAt && !state.purchasePausedAt;
+    $('pipa-hearts').classList.toggle('hidden', !active);
+    $('pipa-counter').classList.toggle('hidden', !active);
+    if (!active) return;
+    $('pipa-hearts').innerHTML = state.pipaHearts.map(heart => `<button type="button" class="pipa-heart" data-heart="${heart.id}" style="left:${heart.x}%;top:${heart.y}%" aria-label="Chasser un cœur de Pipa">♥</button>`).join('');
+    $('pipa-counter').textContent = `Cœurs de Pipa : ${state.pipaHearts.length} / 24 · Cliquez pour les chasser`;
+  }
+  function tickPipa() {
+    if (state?.phase !== 'play' || state.specialEffect?.kind !== 'pipa' || state.referencePausedAt || state.tutorialPausedAt || state.purchasePausedAt) return;
+    if (Date.now() < state.pipaNextAt) return;
+    const id = (state.pipaSequence || 0) + 1;
+    state.pipaSequence = id;
+    const random = seededRandom(`${state.seed}-PIPA-${id}`);
+    state.pipaHearts.push({ id, x: Math.round(5 + random() * 85), y: Math.round(12 + random() * 75) });
+    state.pipaNextAt = Date.now() + Math.max(330, 1050 - state.pipaHearts.length * 30);
+    renderPipa(); save();
+    if (state.pipaHearts.length >= 24) { state.excludedReason = 'pipa'; finish(); }
+  }
+  function startPipa() {
+    stopPipa(); renderPipa();
+    if (state?.phase !== 'play' || state.specialEffect?.kind !== 'pipa' || state.referencePausedAt || state.tutorialPausedAt || state.purchasePausedAt) return;
+    state.pipaHearts ??= [];
+    state.pipaNextAt ||= Date.now() + 1200;
+    pipaTimer = setInterval(tickPipa, 180); tickPipa();
+  }
   function startReggae() {
     if (!soundEnabled || reggaeTimer || state?.specialEffect?.kind !== 'cedric' || state.phase !== 'play') return;
     try {
       audio ??= new (window.AudioContext || window.webkitAudioContext)();
       audio.resume?.();
-      const note = (frequency, at, duration, volume, type = 'triangle') => {
+      const note = (frequency, at, duration, volume, type = 'triangle', cutoff = 1200) => {
         const oscillator = audio.createOscillator(), gain = audio.createGain();
+        const filter = audio.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = cutoff;
         oscillator.type = type; oscillator.frequency.value = frequency;
         gain.gain.setValueAtTime(.0001, at);
-        gain.gain.exponentialRampToValueAtTime(volume, at + .015);
+        gain.gain.exponentialRampToValueAtTime(volume, at + .025);
         gain.gain.exponentialRampToValueAtTime(.0001, at + duration);
-        oscillator.connect(gain).connect(audio.destination);
+        oscillator.connect(filter).connect(gain).connect(audio.destination);
         oscillator.start(at); oscillator.stop(at + duration + .02);
       };
-      const bar = () => {
-        const start = audio.currentTime + .04, beat = 60 / 88;
-        [0, 2, 3].forEach((step, i) => note([82.4, 110, 98][i], start + step * beat, .31, .052));
-        for (let step = 0; step < 4; step++) {
-          note(329.6, start + (step + .5) * beat, .12, .019, 'sine');
-          note(392, start + (step + .5) * beat, .12, .013, 'sine');
-          note(1100, start + step * beat, .035, .006, 'square');
-        }
-        [1, 3].forEach(step => note(145, start + step * beat, .075, .024, 'square'));
+      const percussion = (at, duration, volume, cutoff) => {
+        const size = Math.floor(audio.sampleRate * duration), buffer = audio.createBuffer(1, size, audio.sampleRate), samples = buffer.getChannelData(0);
+        for (let i = 0; i < size; i++) samples[i] = Math.random() * 2 - 1;
+        const source = audio.createBufferSource(), filter = audio.createBiquadFilter(), gain = audio.createGain();
+        source.buffer = buffer; filter.type = 'highpass'; filter.frequency.value = cutoff;
+        gain.gain.setValueAtTime(volume, at); gain.gain.exponentialRampToValueAtTime(.0001, at + duration);
+        source.connect(filter).connect(gain).connect(audio.destination); source.start(at); source.stop(at + duration);
       };
-      bar(); reggaeTimer = setInterval(bar, 4 * 60 / 88 * 1000);
+      const bar = () => {
+        const start = audio.currentTime + .04, beat = 60 / 78;
+        [[0, 82.4], [1.75, 82.4], [2.5, 110], [3.25, 98]].forEach(([step, frequency]) => note(frequency, start + step * beat, .38, .095, 'triangle', 340));
+        for (let step = 0; step < 4; step++) {
+          const offbeat = start + (step + .5) * beat;
+          note(329.6, offbeat, .13, .024, 'sawtooth', 820);
+          note(392, offbeat, .13, .017, 'triangle', 950);
+          note(392, offbeat + beat * .31, .12, .008, 'triangle', 780);
+          percussion(start + step * beat, .04, .018, 6000);
+        }
+        [1, 3].forEach(step => percussion(start + step * beat, .11, .042, 1200));
+        [0, 2].forEach(step => { const at = start + step * beat, kick = audio.createOscillator(), gain = audio.createGain(); kick.type = 'sine'; kick.frequency.setValueAtTime(135, at); kick.frequency.exponentialRampToValueAtTime(47, at + .17); gain.gain.setValueAtTime(.11, at); gain.gain.exponentialRampToValueAtTime(.0001, at + .2); kick.connect(gain).connect(audio.destination); kick.start(at); kick.stop(at + .21); });
+      };
+      bar(); reggaeTimer = setInterval(bar, 4 * 60 / 78 * 1000);
     } catch (_) { stopReggae(); }
   }
   function applySpecialEffect(kind) {
     const play = $('play');
     for (const name of ['pipa', 'cedric', 'blackout']) play.classList.toggle(`effect-${name}`, kind === name);
     $('effect-notice').classList.toggle('hidden', !kind);
-    $('effect-notice').textContent = kind === 'pipa' ? 'PIPA · Des pièces sont embuées pour ce dossier.' : kind === 'cedric' ? 'CÉDRIC · Riddim, mots mystérieux et clics inversés sur les tampons. Activez le son pour la musique.' : kind === 'blackout' ? 'HRPC · Rallumez le briquet pour voir le dossier pendant deux secondes.' : '';
+    $('effect-notice').textContent = kind === 'pipa' ? 'PIPA · Chassez les cœurs avant qu’ils ne remplissent l’écran (24 = fin de partie).' : kind === 'cedric' ? 'CÉDRIC · Dub, ondulations, mots mystérieux et clics inversés sur les tampons. Activez le son.' : kind === 'blackout' ? 'HRPC · Rallumez le briquet pour voir le dossier pendant deux secondes.' : '';
     $('blackout-shade').classList.toggle('hidden', kind !== 'blackout');
     $('blackout-shade').classList.remove('lit');
     $('lighter-button').classList.toggle('hidden', kind !== 'blackout');
     $('inverted-cursor').classList.add('hidden');
     stopReggae(); if (kind === 'cedric') startReggae();
+    if (kind !== 'pipa') { stopPipa(); renderPipa(); }
   }
   function clearSpecialEffect() {
     if (!state?.specialEffect) return;
@@ -591,6 +692,7 @@
     $('lighter-button').classList.add('hidden'); $('inverted-cursor').classList.add('hidden');
     if (lighterTimer) clearTimeout(lighterTimer); lighterTimer = null;
     stopReggae(); save();
+    stopPipa(); state.pipaHearts = []; state.pipaNextAt = null; renderPipa(); save();
   }
   function lightLighter() {
     if (state?.phase !== 'play' || state.specialEffect?.kind !== 'blackout') return;
@@ -619,10 +721,18 @@
   }
   function showCase() {
     const item = current(), card = item.card, sheet = item.sheet, request = item.request;
+    if (state.purchasePausedAt) {
+      const elapsed = Math.max(0, Date.now() - state.purchasePausedAt);
+      if (state.timerDeadline) state.timerDeadline += elapsed;
+      if (state.ash?.status === 'burning' && state.ash.caseId === item.id) state.ash.startedAt += elapsed;
+      if (state.pipaNextAt) state.pipaNextAt += elapsed;
+      state.purchasePausedAt = Date.now();
+    }
     if (state.referencePausedAt) {
       const elapsed = Math.max(0, Date.now() - state.referencePausedAt);
       if (state.timerDeadline) state.timerDeadline += elapsed;
       if (state.ash?.status === 'burning' && state.ash.caseId === item.id) state.ash.startedAt += elapsed;
+      if (state.pipaNextAt) state.pipaNextAt += elapsed;
       state.referencePausedAt = null;
     }
     $('reference-modal').classList.add('hidden');
@@ -651,6 +761,8 @@
     $('reason-select').value = '';
     $('reason-picker').classList.add('hidden'); $('actions').classList.remove('hidden');
     $('confirm-refusal').disabled = true; state.phase = 'play'; save(); visible('play'); updateShop(); startTimer(item); startAsh(item);
+    if (state.purchaseKind) openPurchase(state.purchaseKind);
+    else startPipa();
     if (effect === 'cedric') startReggae();
     if ((state.index === 0 && !state.tutorialDone && !tutorialSeen()) || state.tutorialPausedAt) openTutorial();
   }
@@ -663,7 +775,7 @@
     const correctVerdict = verdict !== 'timeout' && (verdict === 'refuse') === Boolean(item.reason);
     const correctReason = verdict === 'approve' || reason === item.reason;
     const exact = Boolean(correctVerdict && correctReason);
-    const delta = (verdict === 'timeout' ? -40 : exact ? (verdict === 'refuse' ? 75 : 50) : correctVerdict ? -30 : -80) - (fast ? 100 : 0);
+    const delta = (verdict === 'timeout' ? -40 : exact ? (verdict === 'refuse' ? 75 : 50) : correctVerdict ? -30 : -80) + (fast ? 50 : 0);
     state.balance += delta;
     if (exact) state.exact++; else state.errors++;
     if (DIRECTIVES[item.id] && verdict !== 'timeout') state.favor += verdict === 'approve' ? 1 : -1;
@@ -681,7 +793,7 @@
     $('result-title').textContent = outcome.verdict === 'timeout' ? 'Délai expiré.' : outcome.exact ? (outcome.verdict === 'approve' ? 'Demande validée.' : 'Refus motivé.') : 'Le Comité relève une anomalie.';
     const pressure = DIRECTIVES[item.id] && outcome.verdict !== 'timeout' ? (outcome.verdict === 'approve' ? ' Le Président apprécie votre docilité. Le règlement, moins.' : ' Le Président prend personnellement note de votre indépendance.') : '';
     $('result-text').textContent = (outcome.verdict === 'timeout' ? `Le dossier a été renvoyé sans décision. ${item.explanation}` : item.explanation) + pressure;
-    $('result-ledger').textContent = `${outcome.fast ? 'Traitement immédiat · frais 100 F inclus · ' : ''}${outcome.delta > 0 ? '+' : ''}${outcome.delta} F · Caisse du bureau : ${state.balance} F`;
+    $('result-ledger').textContent = `${outcome.fast ? 'Traitement immédiat : −100 F + prime 150 F · ' : ''}${outcome.delta > 0 ? '+' : ''}${outcome.delta} F · Caisse du bureau : ${state.balance} F`;
     const lastOfDay = state.index === state.order.length - 1 || ALL_CASES.find(entry => entry.id === state.order[state.index + 1]).day !== item.day;
     $('next-button').innerHTML = lastOfDay ? 'CLÔTURER LA JOURNÉE <span>→</span>' : 'DOSSIER SUIVANT <span>→</span>';
     visible('result');
@@ -726,9 +838,9 @@
     $('daily-kicker').textContent = `CRCC / FIN DU JOUR ${String(day).padStart(2, '0')}`;
     $('daily-title').textContent = paid ? 'Quota rempli. Le Comité prend note.' : 'Quota manqué. Le Comité aussi.';
     $('daily-copy').textContent = `Vous avez rendu ${exact} décision${exact > 1 ? 's' : ''} parfaitement justifiée${exact > 1 ? 's' : ''} sur ${results.length} dossiers. L’objectif du jour était de ${quota}.`;
-    $('daily-lines').innerHTML = `<div><span>Décisions conformes</span><strong>${exact} / ${results.length}</strong></div><div><span>${paid ? 'Prime de rigueur' : 'Retenue administrative'}</span><strong>${paid ? '+40' : '-40'} F</strong></div><div><span>Caisse cumulée</span><strong>${state.balance} F</strong></div><div><span>Faveur du Président</span><strong>${state.favor > 0 ? '+' : ''}${state.favor}</strong></div>`;
+    $('daily-lines').innerHTML = `<div><span>Décisions conformes</span><strong>${exact} / ${results.length}</strong></div><div><span>${paid ? 'Prime de rigueur' : 'Retenue administrative'}</span><strong>${paid ? '+40' : '-40'} F</strong></div><div><span>Caisse cumulée</span><strong>${state.balance} F</strong></div><div><span>Faveur du Président</span><strong>${state.favor > 0 ? '+' : ''}${state.favor}</strong></div><div><span>Opinion du Président</span><strong>${escapeHTML(presidentOpinion())}</strong></div>`;
     const notes = {
-      1: state.history['002']?.verdict === 'refuse' ? 'Monsieur Rature a déposé une demande de nouveau tampon. Elle sera examinée.' : 'Monsieur Rature affirme que son entrée sans tampon constitue désormais une tradition.',
+      1: `${APPEAL_SCENARIOS[state.appealCaseId].person} a demandé la réouverture de son dossier. La commission statuera demain.`,
       2: 'Le Coupe-cigare du Président reste sur son coussin. Le coussin a demandé une indemnité.',
       3: state.history['008']?.verdict === 'refuse' ? 'Madame Velours prépare trois exemplaires de son état des lieux.' : 'Une note concernant la lame du Coupe-cigare circule sans signature.',
       4: 'Le Comité se réunit pour établir si le Comité a été suffisamment consulté.'
@@ -746,20 +858,25 @@
     else showDayBriefing(current().day);
   }
   function showAppeal() {
-    const earlier = state.history['002'];
-    $('appeal-intro').textContent = earlier?.verdict === 'refuse' ? 'Vous avez refusé sa carte le jour 1. Monsieur Rature conteste le refus et présente aujourd’hui une carte dûment tamponnée.' : earlier?.verdict === 'timeout' ? 'Son dossier est resté sans décision le jour 1. Le Comité exige maintenant de statuer sur cette omission.' : 'Monsieur Rature a été admis le jour 1. Le Comité contrôle maintenant la validité de cette admission.';
-    $('appeal-question').textContent = 'Le nouveau tampon change-t-il la validité de la décision prise le jour 1 ? Jugez les pièces telles qu’elles existaient alors.';
+    const scenario = APPEAL_SCENARIOS[state.appealCaseId], earlier = state.history[state.appealCaseId];
+    $('appeal-kicker').textContent = `COMMISSION D’APPEL · DOSSIER N° ${state.appealCaseId}`;
+    $('appeal-title').textContent = `Le retour de ${scenario.person}`;
+    $('appeal-old').textContent = scenario.old;
+    $('appeal-new').textContent = scenario.newer;
+    $('appeal-new-note').textContent = scenario.note;
+    $('appeal-intro').textContent = earlier?.verdict === 'refuse' ? `${scenario.person} conteste votre refus du jour 1 et présente une nouvelle pièce.` : earlier?.verdict === 'timeout' ? `Le dossier de ${scenario.person} est resté sans décision le jour 1. Le Comité examine cette omission.` : `${scenario.person} a été admis le jour 1. Le Comité contrôle la validité de cette admission.`;
+    $('appeal-question').textContent = 'Cette nouvelle pièce change-t-elle la validité de la décision prise le jour 1 ? Jugez uniquement les pièces qui existaient alors.';
     $('appeal-uphold').textContent = earlier?.verdict === 'refuse' ? 'CONFIRMER LE REFUS' : earlier?.verdict === 'timeout' ? 'CLASSER SANS SUITE' : 'MAINTENIR L’ADMISSION';
     $('appeal-revise').textContent = earlier?.verdict === 'refuse' ? 'ANNULER LE REFUS' : earlier?.verdict === 'timeout' ? 'RECTIFIER L’OMISSION' : 'RECTIFIER L’ADMISSION';
     state.phase = 'appeal'; save(); visible('appeal');
   }
   function decideAppeal(choice) {
     if (state.phase !== 'appeal') return;
-    const admitted = state.history['002']?.verdict !== 'refuse';
+    const admitted = state.history[state.appealCaseId]?.verdict !== 'refuse';
     const correct = admitted ? choice === 'revise' : choice === 'uphold';
     const delta = correct ? 60 : -60;
     state.balance += delta;
-    state.appeal = { choice, correct, delta, corrected: admitted && correct };
+    state.appeal = { choice, correct, delta, corrected: admitted && correct, caseId: state.appealCaseId };
     state.eventType = 'appeal'; state.phase = 'eventResult'; save(); showEventResult();
   }
   function cutterSVG(defect) {
@@ -788,20 +905,31 @@
     $('event-result-stamp').className = `result-stamp ${result.correct ? 'good' : 'bad'}`;
     $('event-result-stamp').textContent = result.correct ? 'CONFORME' : 'OBSERVATION';
     $('event-result-title').textContent = appeal ? result.correct ? 'Appel correctement jugé.' : 'Le Comité infirme votre avis.' : result.correct ? 'Différence consignée.' : 'Inspection contestée.';
-    $('event-result-text').textContent = appeal ? 'La carte du jour 1 était dépourvue de validation. Le tampon obtenu le jour 2 régularise les visites futures, sans modifier le passé.' : `État des lieux : ${result.part === 'none' ? 'aucune différence' : { blade: 'rayure sur la lame', pivot: 'fissure près du pivot', handle: 'entaille sur la poignée' }[result.part]}. Le Président exige un rapport sur la précision de ce rapport.`;
+    $('event-result-text').textContent = appeal ? APPEAL_SCENARIOS[state.appealCaseId].issue : `État des lieux : ${result.part === 'none' ? 'aucune différence' : { blade: 'rayure sur la lame', pivot: 'fissure près du pivot', handle: 'entaille sur la poignée' }[result.part]}. Le Président exige un rapport sur la précision de ce rapport.`;
     $('event-result-ledger').textContent = `${result.delta > 0 ? '+' : ''}${result.delta} F · Caisse du bureau : ${state.balance} F`;
     visible('event-result');
   }
   function eventNext() { if (state.phase === 'eventResult') showDayBriefing(current().day); }
+  function chewedArticle() {
+    const variants = [
+      { id: '01', hint: 'validation de la carte', fake: 'La carte est validée par tout tampon ayant une forme ronde.', hamster: 'La carte est validée par treize tours de roue.' },
+      { id: '02', hint: 'contenu de la fiche du jour', fake: 'Une appréciation peut être remplacée par un haussement de sourcil.', hamster: 'Une fiche sans cigare vaut deux fiches hamster.' },
+      { id: '03', hint: 'preuve du terme « habano »', fake: 'Le terme « habano » exige une voix grave et une belle signature.', hamster: 'Le terme « habano » est accordé aux hamsters nés près d’une carte de Cuba.' },
+      { id: '04', hint: 'emprunt du Coupe-cigare', fake: 'Le Coupe-cigare est empruntable dès la première fiche et un sourire.', hamster: 'Le Coupe-cigare est prêté aux hamsters pour raisons de taille.' },
+      { id: '12', hint: 'concordance avec le registre', fake: 'Une carte peut choisir librement son numéro et son grade.', hamster: 'Le registre des membres est remplacé par le registre des roues.' }
+    ];
+    return variants[seedNumber(`${state.seed || 'LEGACY'}-ARTICLE`) % variants.length];
+  }
   function hamsterEvent(day) {
+    const article = chewedArticle(), rule = RULES.find(entry => entry.id === article.id);
     return {
       1: { title: 'Le faux tampon', copy: 'Le Hamster Riding Pipe Club a mélangé ses cachets à ceux du bureau. Quel cachet atteste réellement la validation du Comité exécutif ?', evidence: 'REGISTRE DES CACHETS · La carte doit porter la validation du Comité exécutif (article 01). Le dessin d’une roue ou une formule ressemblante ne suffit pas.', options: [
         { id: 'real', label: 'VALIDÉ · COMITÉ EXÉCUTIF' }, { id: 'wheel', label: 'APPROUVÉ PAR LA ROUE · 43 TOURS' }, { id: 'almost', label: 'VALIDÉ · COMITÉ DES HAMSTERS EXÉCUTIFS' }
       ], correct: 'real' },
-      2: { title: 'Le règlement grignoté', copy: 'Un hamster a mangé l’article 04. Trois transcriptions circulent. Laquelle correspond à la règle du CRCC ?', evidence: 'ARCHIVE DES ARTICLES · L’article 04 concerne le seuil de fiches archivées pour emprunter le Coupe-cigare du Président.', options: [
-        { id: 'real', label: 'Le Coupe-cigare du Président est empruntable à partir de 3 fiches archivées.' },
-        { id: 'one', label: 'Le Coupe-cigare du Président est empruntable à partir d’une fiche et d’un sourire.' },
-        { id: 'hamster', label: 'Le Coupe-cigare du Président est empruntable aux hamsters pour raisons de taille.' }
+      2: { title: 'Le règlement grignoté', copy: `Un hamster a mangé l’article ${article.id}. Trois transcriptions circulent. Laquelle correspond à la règle du CRCC ?`, evidence: `ARCHIVE DES ARTICLES · L’article ${article.id} concerne ${article.hint}.`, options: [
+        { id: 'real', label: rule.text },
+        { id: 'one', label: article.fake },
+        { id: 'hamster', label: article.hamster }
       ], correct: 'real' },
       3: { title: 'La course au procès-verbal', copy: 'Un hamster file avec une annexe au procès-verbal destinée au prochain dossier. Rattrapez-le au bon moment.', evidence: 'MAIN COURANTE · La zone verte représente le passage devant le guichet. En cas d’échec, l’annexe HRPC manque au prochain dossier ; les trois pièces officielles restent intactes.', options: [] },
       4: { title: 'La délégation officielle', copy: 'Le Hamster Riding Pipe Club réclame un siège au Comité. Son porte-parole tient dans une tasse, mais la demande est rédigée sur papier à en-tête.', evidence: 'DEMANDE HRPC · Carte de membre CRCC : absente. Fiches de dégustation archivées : 0. Attestation de roue : 11 tours. Article 11 : siège réservé à un membre du CRCC, carte validée et 8 fiches archivées.', options: [
@@ -864,7 +992,7 @@
     const day = state.hamsterDay, result = state.hamsterResults[day];
     const descriptions = {
       1: 'Seul « VALIDÉ · COMITÉ EXÉCUTIF » atteste la validation de la carte. Les roues, même très bien tournées, ne signent pas pour le Comité.',
-      2: 'L’article 04 exige 3 fiches archivées pour emprunter le Coupe-cigare. Le hamster a tenté de remplacer ce seuil par un sourire ou sa petite taille.',
+      2: `L’article ${chewedArticle().id} disait : « ${RULES.find(entry => entry.id === chewedArticle().id).text} » Le hamster a essayé d’en rédiger une version à son avantage.`,
       3: result.correct ? 'Annexe récupérée. Le hamster demande que la poursuite soit inscrite à son palmarès.' : 'L’annexe HRPC a disparu. Son absence sera signalée sur le prochain dossier ; elle ne modifie pas les pièces officielles ni le bon motif de décision.',
       4: 'La délégation n’a ni carte CRCC validée ni les 8 fiches requises par l’article 11. La tasse peut rester ; le siège au Comité, non.'
     };
@@ -900,6 +1028,11 @@
     state.balance += delta;
     state.presidentResults ??= {};
     state.presidentResults[state.activeInterruption.id] = { choice, correct, flattery, suspicious, delta };
+    if (state.suspicion >= 3) {
+      state.excludedReason = 'president';
+      tone(100, .32, 'sawtooth');
+      finish(); return;
+    }
     state.phase = 'presidentResult'; save(); showPresidentResult();
     tone(correct ? 470 : suspicious ? 110 : 240, .14);
   }
@@ -952,20 +1085,27 @@
     const expressCount = state.order.filter(id => ALL_CASES.find(item => item.id === id)?.express).length;
     const hamsters = Object.values(state.hamsterResults || {});
     const president = Object.values(state.presidentResults || {});
-    return `CRCC — La Grande Homologation : ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Président : ${president.filter(result => result.correct).length}/${president.length} réponses justes, ${state.suspicion} soupçon${state.suspicion > 1 ? 's' : ''}. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
+    return `CRCC — La Grande Homologation : ${finalScore().total} points, ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. Président : ${state.favor > 0 ? '+' : ''}${state.favor} faveurs, ${state.suspicion} soupçon${state.suspicion > 1 ? 's' : ''} ; ${presidentOpinion()} HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Interrogatoires : ${president.filter(result => result.correct).length}/${president.length} justes. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
+  }
+  function finalScore() {
+    const decisions = state.exact * 100, cash = state.balance, favor = state.favor * 75, suspicion = state.suspicion * -200;
+    return { decisions, cash, favor, suspicion, total: Math.max(0, decisions + cash + favor + suspicion) };
   }
   function finish() {
-    const score = state.exact, total = state.order.length;
-    const rank = score === total ? 'Grand Rat du guichet' : score >= Math.ceil(total * .78) ? 'Rat homologué aux tampons' : score >= Math.ceil(total * .5) ? 'Rat à peu près compétent' : 'Rat de passage surveillé';
+    stopPipa(); stopReggae(); stopAsh(); stopTimer();
+    const score = state.exact, total = state.order.length, points = finalScore();
+    const rank = state.excludedReason === 'president' ? 'Exclu du CRCC' : state.excludedReason === 'pipa' ? 'Submergé par Pipa' : score === total && points.total >= total * 140 ? 'Grand Rat du guichet' : points.total >= total * 110 ? 'Rat homologué aux tampons' : points.total >= total * 65 ? 'Rat à peu près compétent' : 'Rat de passage surveillé';
     $('ending-title').textContent = rank;
-    let story = score === total ? `${total} dossiers, aucun écart. Le Comité envisage de vous confier un second tampon. La décision est reportée.` : score >= Math.ceil(total * .78) ? 'Votre application du règlement est remarquée. Le Comité demande néanmoins un rapport sur cette remarque.' : score >= Math.ceil(total * .5) ? 'Vous avez conservé une certaine dignité administrative. Les erreurs feront l’objet d’un dossier distinct.' : 'Le Comité recommande une lecture lente du règlement, si possible avant de tamponner.';
+    let story = state.excludedReason === 'president' ? 'Trois soupçons : le Président vous exclut sur-le-champ. Il vous tend une ficelle pour ficeler vos fiches, puis vous montre la porte de sortie avec une précision que personne ne lui connaissait.' : state.excludedReason === 'pipa' ? 'Les cœurs de Pipa ont recouvert le guichet. Le Comité classe votre rapport sous « sentiment incontrôlable » et suspend votre service.' : score === total ? `${total} dossiers, aucun écart. Le Comité envisage de vous confier un second tampon. La décision est reportée.` : score >= Math.ceil(total * .78) ? 'Votre application du règlement est remarquée. Le Comité demande néanmoins un rapport sur cette remarque.' : score >= Math.ceil(total * .5) ? 'Vous avez conservé une certaine dignité administrative. Les erreurs feront l’objet d’un dossier distinct.' : 'Le Comité recommande une lecture lente du règlement, si possible avant de tamponner.';
     if (state.history['008']?.verdict === 'approve') story += ' Quant au Coupe-cigare, une expertise de la lame est toujours en cours.';
     if (state.history['007']?.verdict === 'refuse' && state.history['015']?.verdict === 'approve') story += ' Monsieur Crevette vous remercie pour sa promotion, avec une retenue inhabituelle.';
     if (state.favor > 0) story += ' Le Président vous adresse une chaleureuse note sans numéro de référence.';
     if (state.favor < 0) story += ' Le Président respecte votre indépendance avec une froideur protocolaire.';
     if (state.suspicion > 0) story += ' Vos compliments répétés font désormais l’objet d’une enquête du Président lui-même.';
     $('ending-copy').textContent = story;
-    $('ending-stats').innerHTML = `<div><strong>${score}/${state.order.length}</strong><span>Décisions exactes</span></div><div><strong>${state.errors}</strong><span>Observations</span></div><div><strong>${state.balance} F</strong><span>Caisse finale</span></div>`;
+    $('ending-stats').innerHTML = `<div><strong>${points.total}</strong><span>Score final</span></div><div><strong>${score}/${total}</strong><span>Décisions exactes</span></div><div><strong>${state.balance} F</strong><span>Caisse finale</span></div>`;
+    $('score-breakdown').innerHTML = `<h2>Calcul du score</h2><div><span>Décisions exactes · ${score} × 100</span><strong>+${points.decisions}</strong></div><div><span>Caisse finale</span><strong>${points.cash > 0 ? '+' : ''}${points.cash}</strong></div><div><span>Faveur présidentielle · ${state.favor} × 75</span><strong>${points.favor > 0 ? '+' : ''}${points.favor}</strong></div><div><span>Soupçons · ${state.suspicion} × −200</span><strong>${points.suspicion}</strong></div><p>Minimum 0 point. Une exclusion met fin au service immédiatement.</p>`;
+    $('ending-opinion').textContent = `OPINION DU PRÉSIDENT · ${presidentOpinion()}`;
     const hamsters = Object.values(state.hamsterResults || {});
     const president = Object.values(state.presidentResults || {});
     $('ending-special').textContent = `HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Interrogatoires du Président : ${president.filter(result => result.correct).length}/${president.length} justes, ${state.flatteryCount} flatteries, ${state.suspicion} soupçons. Commission d’appel : ${state.appeal?.correct ? 'avis juste' : state.appeal?.skipped ? 'non tenue' : 'avis contesté'}. Coupe-cigare : ${state.cutter?.correct ? 'inspection juste' : state.cutter?.skipped ? 'non inspecté' : 'inspection contestée'}. Questions bonus justes : ${Object.values(state.quizResults || {}).filter(result => result.correct).length}. Cendres détachées : ${(state.ashHistory || []).filter(result => result.status === 'collected').length}. Faveur du Président : ${state.favor > 0 ? '+' : ''}${state.favor}.`;
@@ -1058,6 +1198,15 @@
   $('rush-case').addEventListener('click', () => spend('rush'));
   $('gift-president').addEventListener('click', () => spend('gift'));
   $('raid-hrpc').addEventListener('click', () => spend('raid'));
+  $('purchase-close').addEventListener('click', closePurchase);
+  $('purchase-modal').addEventListener('click', event => { if (event.target === $('purchase-modal')) closePurchase(); });
+  $('purchase-modal').addEventListener('keydown', event => { if (event.key === 'Escape') closePurchase(); if (event.key === 'Tab') { event.preventDefault(); $('purchase-close').focus(); } });
+  $('pipa-hearts').addEventListener('click', event => {
+    const heart = event.target.closest('[data-heart]');
+    if (!heart || state?.phase !== 'play' || state.specialEffect?.kind !== 'pipa') return;
+    state.pipaHearts = state.pipaHearts.filter(entry => entry.id !== Number(heart.dataset.heart));
+    renderPipa(); save(); tone(590, .06);
+  });
   $('rules-open').addEventListener('click', event => openReference('rules', event.currentTarget));
   $('catalog-open').addEventListener('click', event => openReference('catalog', event.currentTarget));
   $('registry-open').addEventListener('click', event => openReference('registry', event.currentTarget));
