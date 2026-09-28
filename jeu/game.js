@@ -106,7 +106,7 @@
     grandrat: { name: 'Le Grand Rat des Archives', color: 'red', day: 3, description: 'Après cinq décisions exactes avec lui : une invocation par partie qui suspend le bureau pendant dix secondes.' }
   };
   const MATERIA_COLORS = { green: 'VERTE · INDICE', yellow: 'JAUNE · COMMANDE', purple: 'VIOLETTE · PASSIF', blue: 'BLEUE · SOUTIEN', red: 'ROUGE · INVOCATION' };
-  function initialMateria() { return { equipped: ['loupe', 'cendrier'], xp: {}, uses: {}, procs: {}, streak: 0, summonUsed: false, activeFrom: null, activeUntil: null, referenceWithinSummon: false, lastNote: '' }; }
+  function initialMateria() { return { introduced: false, equipped: ['loupe', 'cendrier'], xp: {}, uses: {}, procs: {}, streak: 0, summonUsed: false, activeFrom: null, activeUntil: null, referenceWithinSummon: false, lastNote: '' }; }
   // Questions fondées sur les pages officielles de Habanos, S.A.
   const ANATOMY_SOURCE = 'https://www.habanos.com/en/the-anatomy-of-a-habano/';
   const GLOSSARY_SOURCE = 'https://www.habanos.com/en/glossary/';
@@ -175,7 +175,6 @@
     { selector: '#catalog-open', title: 'Le catalogue officiel', copy: 'Ce livre rouge contient les seuls cigares admis sur une fiche. Un nom très plausible peut aussi manquer au catalogue.' },
     { selector: '#rules-open', title: 'Le règlement du guichet', copy: 'Cliquez sur le livre pour lire tous les articles en vigueur. Chaque début de journée présente ses nouvelles règles. Un sabotage du HRPC peut fermer ce livre pour toute une journée.' },
     { selector: '.bureau-shop', title: 'La caisse du bureau', copy: 'Une fois par journée, dépensez 100 F pour décider immédiatement et gagner 50 F nets en plus. Offrez un habano pour 300 F et une faveur, ou lancez un raid sur le HRPC pour 500 F.' },
-    { selector: '#materia-tray', title: 'Vos deux Matérias', copy: 'Vous les équipez au début de chaque journée. Les couleurs indiquent leurs pouvoirs : vert pour un indice, jaune pour une commande, violet pour un bonus, bleu pour soutenir l’autre logement et rouge pour invoquer le Grand Rat. Une décision exacte donne 1 AP aux deux orbes.' },
     { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes à mesure que le cigare raccourcit. Détachez-la avant sa chute pour gagner un bonus.' },
     { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon cliquez sur Refuser et choisissez le bon motif. Aucun autre élément n’est à sélectionner. Le bouton ? permet de revoir ce tutoriel à tout moment.' }
   ];
@@ -244,7 +243,7 @@
           new Set(data.order).size !== data.order.length || !data.order.every(id => ALL_CASES.some(item => item.id === id)) ||
           !Number.isInteger(data.index) || data.index < 0 || data.index > data.order.length ||
           (data.index === data.order.length && !['daily', 'ending'].includes(data.phase)) ||
-          !['briefing', 'play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult', 'hamster', 'hamsterResult', 'president', 'presidentResult', 'special'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
+          !['briefing', 'materiaIntro', 'play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult', 'hamster', 'hamsterResult', 'president', 'presidentResult', 'special'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
       data.hamsterResults ??= {};
       data.presidentResults ??= {};
       data.flatteryCount ??= 0;
@@ -264,6 +263,7 @@
       data.appealCaseId ??= ['002', '003', '019'][seedNumber(`${data.seed || 'LEGACY'}-APPEL`) % 3];
       data.pipaHearts ??= [];
       data.rushDays ??= [];
+      if (data.materia && typeof data.materia.introduced !== 'boolean') data.materia.introduced = true;
       data.materia ??= initialMateria();
       data.materia.equipped ??= ['loupe', 'cendrier'];
       data.materia.xp ??= {}; data.materia.uses ??= {}; data.materia.procs ??= {};
@@ -276,7 +276,7 @@
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (_) { /* Partie jouable sans stockage. */ } }
   function visible(section) {
     if (section !== 'play') { stopTimer(); stopPipa(); }
-    ['intro', 'day-briefing', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'president', 'president-result', 'special', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
+    ['intro', 'day-briefing', 'materia-intro', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'president', 'president-result', 'special', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function tone(frequency, duration, type = 'triangle') {
@@ -468,7 +468,7 @@
   }
   function settleAsh(status, delta) {
     if (state.ash?.status !== 'burning') return;
-    if (status === 'collected' && materiaEquipped('cendrier')) delta += (materiaLevel('cendrier') === 2 ? 20 : 10) + (materiaLinked('cendrier') ? materiaBlueBonus() : 0);
+    if (status === 'collected' && state.materia.introduced && materiaEquipped('cendrier')) delta += (materiaLevel('cendrier') === 2 ? 20 : 10) + (materiaLinked('cendrier') ? materiaBlueBonus() : 0);
     stopAsh(); state.ash.burnProgress = Math.min(1, (Date.now() - state.ash.startedAt) / 14000);
     renderAsh(state.ash.burnProgress); state.ash.status = status; state.ash.delta = delta;
     state.ashHistory ??= [];
@@ -546,20 +546,22 @@
   function materiaUseCount(id, day = current().day) { return state.materia.uses[`${id}:${day}`] || 0; }
   function materiaUseLimit(id) { return (id === 'loupe' && materiaLevel(id) === 2 ? 2 : 1) + (materiaLinked(id) ? materiaLevel('duplicata') : 0); }
   function materiaOrb(id) { return `<span class="materia-orb ${MATERIA[id].color}" aria-hidden="true"></span>`; }
-  function renderBriefingMateria(day) {
-    $('materia-briefing-slots').innerHTML = state.materia.equipped.map((id, index) => `<button type="button" class="materia-slot ${index === materiaSelectedSlot ? 'selected' : ''}" data-materia-slot="${index}" aria-pressed="${index === materiaSelectedSlot}">${materiaOrb(id)}<span>LOGEMENT ${index + 1}<strong>${escapeHTML(MATERIA[id].name)}</strong></span></button>`).join('<span class="materia-link" aria-hidden="true">◆──◆</span>');
-    $('materia-briefing-choices').innerHTML = Object.entries(MATERIA).map(([id, entry]) => entry.day <= day ? `<button type="button" class="materia-choice ${entry.color} ${materiaEquipped(id) ? 'equipped' : ''}" data-equip-materia="${id}">${materiaOrb(id)}<span><strong>${escapeHTML(entry.name)}</strong><small>${MATERIA_COLORS[entry.color]} · NIVEAU ${materiaLevel(id)} · ${Math.min(6, state.materia.xp[id] || 0)}/6 AP</small><span>${escapeHTML(entry.description)}</span></span></button>` : `<div class="materia-choice locked"><span class="materia-orb locked-orb" aria-hidden="true"></span><span><strong>Scellée jusqu’au jour ${entry.day}</strong><small>ARCHIVES CONFIDENTIELLES</small></span></div>`).join('');
-    $('materia-briefing-note').textContent = `Choisissez un logement, puis une orbe. Les deux logements sont reliés : la Matéria bleue améliore l’autre. Une décision exacte donne 1 AP aux Matérias équipées ; le niveau 2 arrive à 6 AP. L’équipement sera figé jusqu’à la prochaine journée.${day === 3 ? ' Nouvelle pièce : la Matéria rouge peut invoquer le Grand Rat après cinq décisions exactes avec elle.' : ''}`;
+  function renderBriefingMateria(day, prefix = 'materia-briefing') {
+    $(`${prefix}-slots`).innerHTML = state.materia.equipped.map((id, index) => `<button type="button" class="materia-slot ${index === materiaSelectedSlot ? 'selected' : ''}" data-materia-slot="${index}" aria-pressed="${index === materiaSelectedSlot}">${materiaOrb(id)}<span>LOGEMENT ${index + 1}<strong>${escapeHTML(MATERIA[id].name)}</strong></span></button>`).join('<span class="materia-link" aria-hidden="true">◆──◆</span>');
+    $(`${prefix}-choices`).innerHTML = Object.entries(MATERIA).map(([id, entry]) => entry.day <= day ? `<button type="button" class="materia-choice ${entry.color} ${materiaEquipped(id) ? 'equipped' : ''}" data-equip-materia="${id}">${materiaOrb(id)}<span><strong>${escapeHTML(entry.name)}</strong><small>${MATERIA_COLORS[entry.color]} · NIVEAU ${materiaLevel(id)} · ${Math.min(6, state.materia.xp[id] || 0)}/6 AP</small><span>${escapeHTML(entry.description)}</span></span></button>` : `<div class="materia-choice locked"><span class="materia-orb locked-orb" aria-hidden="true"></span><span><strong>Scellée jusqu’au jour ${entry.day}</strong><small>ARCHIVES CONFIDENTIELLES</small></span></div>`).join('');
+    $(`${prefix}-note`).textContent = `Les deux logements sont reliés : la Matéria bleue améliore l’autre. Une décision exacte donne 1 AP aux Matérias équipées ; le niveau 2 arrive à 6 AP. L’équipement sera figé jusqu’à la prochaine journée.${day === 3 ? ' Nouvelle pièce : la Matéria rouge peut invoquer le Grand Rat après cinq décisions exactes avec elle.' : ''}`;
   }
   function equipMateria(id) {
-    if (state?.phase !== 'briefing' || !MATERIA[id] || MATERIA[id].day > current().day) return;
+    if (!['briefing', 'materiaIntro'].includes(state?.phase) || !MATERIA[id] || MATERIA[id].day > current().day) return;
     const slots = state.materia.equipped, other = 1 - materiaSelectedSlot;
     if (slots[other] === id) [slots[materiaSelectedSlot], slots[other]] = [slots[other], slots[materiaSelectedSlot]];
     else slots[materiaSelectedSlot] = id;
     state.materia.streak = 0;
-    save(); renderBriefingMateria(current().day);
+    save(); renderBriefingMateria(current().day, state.phase === 'materiaIntro' ? 'materia-intro' : 'materia-briefing');
   }
   function renderPlayMateria() {
+    $('materia-tray').classList.toggle('hidden', !state.materia.introduced);
+    if (!state.materia.introduced) return;
     const day = current().day;
     $('materia-play-slots').innerHTML = state.materia.equipped.map(id => `<div class="materia-mini ${MATERIA[id].color}">${materiaOrb(id)}<span><strong>${escapeHTML(MATERIA[id].name)}</strong><small>NV ${materiaLevel(id)} · ${Math.min(6, state.materia.xp[id] || 0)}/6 AP</small></span></div>`).join('<span class="materia-link" aria-hidden="true">◆</span>');
     const actions = [];
@@ -570,7 +572,7 @@
     $('materia-status').textContent = state.materia.lastNote || 'Les orbes équipées gagnent 1 AP à chaque décision exacte.';
   }
   function useMateria(id) {
-    if (state?.phase !== 'play' || !materiaEquipped(id) || state.referencePausedAt || state.purchasePausedAt || state.tutorialPausedAt || state.materia.activeUntil) return;
+    if (state?.phase !== 'play' || !state.materia.introduced || !materiaEquipped(id) || state.referencePausedAt || state.purchasePausedAt || state.tutorialPausedAt || state.materia.activeUntil) return;
     const day = current().day;
     if (id === 'grandrat') { activateSummon(); return; }
     if (!['loupe', 'montre'].includes(id) || materiaUseCount(id, day) >= materiaUseLimit(id)) return;
@@ -588,6 +590,7 @@
     save(); renderPlayMateria(); tone(id === 'loupe' ? 570 : 680, .12);
   }
   function gainMateriaXP(exact) {
+    if (!state.materia.introduced) return '';
     if (!exact) { state.materia.streak = 0; return ''; }
     const notes = [];
     for (const id of state.materia.equipped) {
@@ -599,6 +602,7 @@
     return notes.join(' · ');
   }
   function materiaDecisionBonus(exact, day) {
+    if (!state.materia.introduced) return 0;
     state.materia.streak = exact && materiaEquipped('caisse') ? state.materia.streak + 1 : 0;
     if (state.materia.streak < 3 || state.materia.procs[`caisse:${day}`]) return 0;
     state.materia.procs[`caisse:${day}`] = true;
@@ -663,9 +667,20 @@
     $('briefing-story').classList.toggle('hidden', day !== 1);
     $('briefing-story').textContent = day === 1 ? 'Le Hamster Riding Pipe Club (HRPC) est un club rival de rongeurs à pipe. Ses membres surgissent au guichet, falsifient des cachets, grignotent des articles et sabotent parfois le bureau. Leurs incidents sont distincts des dossiers à tamponner : gardez votre calme et vos fiches.' : ''; 
     $('briefing-rules').innerHTML = RULES.filter(rule => rule.day === day).map(rule => `<div class="rule"><b>${rule.id}</b><span>${escapeHTML(rule.text)}</span></div>`).join('');
-    renderBriefingMateria(day);
+    $('materia-day-picker').classList.toggle('hidden', !state.materia.introduced);
+    if (state.materia.introduced) renderBriefingMateria(day);
     $('briefing-note').textContent = day === state.hrpcBlockDay && !state.hrpcDisabled ? '🐹 Sabotage du HRPC : le règlement sera indisponible pendant toute cette journée. Prenez connaissance de ces règles maintenant ; un raid peut ensuite rétablir l’accès.' : state.hrpcDisabled ? 'Le HRPC est hors service. Le règlement restera accessible.' : 'Le règlement, le catalogue et le registre sont consultables depuis le bureau.';
     visible('day-briefing');
+  }
+  function showMateriaIntro() {
+    state.phase = 'materiaIntro'; materiaSelectedSlot = 0; save();
+    renderBriefingMateria(current().day, 'materia-intro');
+    visible('materia-intro');
+  }
+  function continueMateriaIntro() {
+    if (state?.phase !== 'materiaIntro') return;
+    state.materia.introduced = true; save();
+    showNextCaseEvents();
   }
   function presidentOpinion() {
     if (state.suspicion >= 3) return 'Exclu : le Président vous a rayé de son carnet avec application.';
@@ -948,11 +963,13 @@
     const lastDay = current().day;
     state.index++;
     if (state.index === state.order.length || current().day !== lastDay) closeDay(lastDay);
-    else {
-      state.pendingEvents = (state.interruptions?.[state.index] || []).filter(event => event.type === 'hamster' ? !state.hrpcDisabled && !state.hamsterResults?.[event.day] : event.type === 'special' ? !state.specialPlayed && (event.kind !== 'blackout' || !state.hrpcDisabled) : !state.presidentResults?.[event.id]);
-      state.pendingEventIndex = 0;
-      showScheduledEvent();
-    }
+    else if (state.index === 3 && !state.materia.introduced) showMateriaIntro();
+    else showNextCaseEvents();
+  }
+  function showNextCaseEvents() {
+    state.pendingEvents = (state.interruptions?.[state.index] || []).filter(event => event.type === 'hamster' ? !state.hrpcDisabled && !state.hamsterResults?.[event.day] : event.type === 'special' ? !state.specialPlayed && (event.kind !== 'blackout' || !state.hrpcDisabled) : !state.presidentResults?.[event.id]);
+    state.pendingEventIndex = 0;
+    showScheduledEvent();
   }
   function showScheduledEvent() {
     const event = state.pendingEvents?.[state.pendingEventIndex];
@@ -1169,7 +1186,7 @@
     if (flattery) state.flatteryCount++;
     const suspicious = flattery && state.flatteryCount >= 3;
     let materiaBonus = 0;
-    if (correct && materiaEquipped('oreille') && !state.materia.procs[`oreille:${state.activeInterruption.day}`]) {
+    if (correct && state.materia.introduced && materiaEquipped('oreille') && !state.materia.procs[`oreille:${state.activeInterruption.day}`]) {
       state.materia.procs[`oreille:${state.activeInterruption.day}`] = true;
       materiaBonus = (materiaLevel('oreille') === 2 ? 25 : 15) + (materiaLinked('oreille') ? materiaBlueBonus() : 0);
     }
@@ -1294,6 +1311,7 @@
   $('resume-button').addEventListener('click', () => {
     state = stored(); if (!state) return;
     if (state.phase === 'briefing') showDayBriefing(current().day);
+    else if (state.phase === 'materiaIntro') showMateriaIntro();
     else if (state.phase === 'play') showCase();
     else if (state.phase === 'result') showResult();
     else if (state.phase === 'daily') showDaily(state.index === state.order.length ? 4 : current().day - 1);
@@ -1346,8 +1364,11 @@
   $('president-answers').addEventListener('click', event => { const button = event.target.closest('[data-president-choice]'); if (button) decidePresident(button.dataset.presidentChoice); });
   $('president-next').addEventListener('click', presidentNext);
   $('briefing-next').addEventListener('click', () => { if (state?.phase === 'briefing') showCase(); });
-  $('materia-briefing-slots').addEventListener('click', event => { const button = event.target.closest('[data-materia-slot]'); if (button) { materiaSelectedSlot = Number(button.dataset.materiaSlot); renderBriefingMateria(current().day); } });
-  $('materia-briefing-choices').addEventListener('click', event => { const button = event.target.closest('[data-equip-materia]'); if (button) equipMateria(button.dataset.equipMateria); });
+  $('materia-intro-next').addEventListener('click', continueMateriaIntro);
+  for (const prefix of ['materia-briefing', 'materia-intro']) {
+    $(`${prefix}-slots`).addEventListener('click', event => { const button = event.target.closest('[data-materia-slot]'); if (button) { materiaSelectedSlot = Number(button.dataset.materiaSlot); renderBriefingMateria(current().day, prefix); } });
+    $(`${prefix}-choices`).addEventListener('click', event => { const button = event.target.closest('[data-equip-materia]'); if (button) equipMateria(button.dataset.equipMateria); });
+  }
   $('materia-actions').addEventListener('click', event => { const button = event.target.closest('[data-use-materia]'); if (button) useMateria(button.dataset.useMateria); });
   $('rush-case').addEventListener('click', () => spend('rush'));
   $('gift-president').addEventListener('click', () => spend('gift'));
