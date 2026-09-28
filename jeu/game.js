@@ -63,7 +63,7 @@
     { id: '015', day: 4, name: 'Monsieur Crevette', avatar: 'C', quote: '', card: { number: '0007', grade: 'Rat de passage', archived: 1, valid: true }, sheet: { memberNumber: '0007', cigar: 'Flor de Oliva', observation: 'Bois sec', appreciation: 'Honnête' }, request: { action: 'Proposition d’un nouveau membre', note: '' }, reason: 'parrain', explanation: '' },
     { id: '016', day: 4, name: 'Madame Index', avatar: 'I', quote: '« Ce numéro ressemble au mien à un chiffre près. »', card: { number: '0081', grade: 'Rat homologué', archived: 7, valid: true }, sheet: { memberNumber: '0018', cigar: 'Flor de Oliva', observation: 'Cèdre net', appreciation: 'Apprécié' }, request: { action: 'Accès à la séance', note: 'La fiche aurait été recopiée très vite.' }, reason: 'numero', explanation: 'La carte porte le n° 0081, la fiche le n° 0018. Le Comité exige une correspondance exacte.' },
     { id: '017', day: 4, name: 'Monsieur Miroir', avatar: 'M', quote: '« Mon nœud papillon penche de 0,5 degré. Je sollicite une dérogation. »', card: { number: '0044', grade: 'Rat homologué', archived: 9, valid: true }, sheet: { memberNumber: '0044', cigar: 'Don Tomás Clásico', observation: 'Fumée généreuse', appreciation: 'Bien' }, request: { action: 'Dérogation : nœud papillon incliné de 0,5°', note: 'Miroir et rapporteur apportés pour mesurer la déviation.' }, reason: null, explanation: 'Les numéros correspondent. Aucun article ne réglemente l’angle du nœud papillon.' },
-    { id: '018', day: 4, name: 'Colonel Poussière', avatar: 'P', quote: '« La bague a voyagé. Le cigare, beaucoup moins. »', card: { number: '0066', grade: 'Rat homologué', archived: 8, valid: true }, sheet: { memberNumber: '0066', cigar: 'Habano — origine cubaine', observation: 'Poivre doux', appreciation: 'Très satisfaisant' }, request: { action: 'Accès à la séance', note: 'Pièce jointe : facture indiquant une origine dominicaine.' }, reason: 'habano', explanation: 'La facture établit une origine dominicaine. La mention « habano » n’est donc pas justifiée.' },
+    { id: '018', day: 4, name: 'Colonel Poussière', avatar: 'P', quote: '« Cette facture paraît trop propre ? Le cigare, lui, est impeccable. »', card: { number: '0066', grade: 'Rat homologué', archived: 8, valid: true }, sheet: { memberNumber: '0066', cigar: 'Habano — origine cubaine', observation: 'Poivre doux', appreciation: 'Très satisfaisant' }, request: { action: 'Accès à la séance', note: 'Facture cubaine jointe et lisible. Le Colonel a ajouté un sceau personnel sans valeur réglementaire.' }, reason: null, explanation: 'La facture atteste l’origine cubaine. Le sceau décoratif ne rend pas cette preuve invalide.' },
     { id: '019', day: 1, name: 'Monsieur Chausson', avatar: 'C', quote: '« Il est roulé à la main. Dans mon imagination. »', card: { number: '0092', grade: 'Rat de passage', archived: 1, valid: true }, sheet: { cigar: 'Le Chausson Diplomatique Grand Panetela', observation: 'Arôme de réunion annulée', appreciation: 'Inoubliable' }, request: { action: 'Soumission de fiche de dégustation', note: 'Étiquette imprimée sur l’imprimante des archives. Aucun achat consigné.' }, reason: 'fictif', explanation: 'Le Chausson Diplomatique ne figure pas au catalogue homologué : ce cigare a été inventé.' },
     // Questions vérifiées dans l’anatomie officielle du Habano : https://www.habanos.com/en/the-anatomy-of-a-habano/
     { id: '020', day: 2, name: 'Professeur Volute', avatar: 'V', quote: '« Une question technique. Je n’accepte pas “ça dépend du vent”. »', card: { number: '0028', grade: 'Rat homologué', archived: 5, valid: true }, sheet: { cigar: 'Don Tomás Clásico', observation: 'Tirage droit', appreciation: 'Fin' }, request: { action: 'Question sur les cigares', note: 'Quelle feuille de la tripe apporte de la force et brûle lentement ?' }, quiz: { options: ['Volado', 'Ligero', 'Capote'], answer: 1, explanation: 'Le ligero apporte de la force et brûle lentement.' }, reason: null, explanation: 'La question est recevable et les pièces sont conformes. Le questionnaire est un bonus distinct de la décision.' },
@@ -81,7 +81,7 @@
     { id: '032', day: 4, name: 'Monsieur Autopromotion', avatar: 'A', quote: '« Mon grade est calligraphié. Cela devrait compter. »', card: { number: '0152', grade: 'Grand Rat', archived: 9, valid: true }, sheet: { memberNumber: '0152', cigar: 'San Pedro de Macorís', observation: 'Tirage franc', appreciation: 'Approuvé' }, request: { action: 'Accès à la séance', note: 'Suggère que sa carte fasse foi, surtout pour le grade.' }, reason: 'registre_grade', explanation: 'Sa carte indique Grand Rat, mais le registre indique Rat homologué. La calligraphie ne vaut pas promotion.' },
     { id: '033', day: 2, name: 'Señor Cedro', avatar: 'C', quote: '« Son nom a l’air assez noble pour être dans le livre. »', card: { number: '0161', grade: 'Rat homologué', archived: 4, valid: true }, sheet: { cigar: 'Valle de Cedro Reserva', observation: 'Cèdre doux', appreciation: 'Distingué' }, request: { action: 'Soumission de fiche de dégustation', note: 'Bague sobre et facture jointe ; aucune référence au catalogue du CRCC.' }, reason: 'fictif', explanation: 'Valle de Cedro Reserva paraît crédible, mais ne figure pas au catalogue homologué du CRCC.' },
     { id: '034', day: 3, name: 'Madame Havane', avatar: 'H', quote: '« Regardez cette belle boîte. Elle fait très officiel. »', card: { number: '0162', grade: 'Rat homologué', archived: 5, valid: true }, sheet: { cigar: 'Casa del Monte Robusto', observation: 'Noix et cacao', appreciation: 'Excellent' }, request: { action: 'Soumission de fiche de dégustation', note: 'Boîte élégante avec étiquette de la maison ; pas d’homologation au Club.' }, reason: 'fictif', explanation: 'Casa del Monte Robusto n’est pas dans le catalogue homologué du CRCC, quelle que soit la qualité de sa boîte.' },
-    { id: '035', day: 4, name: 'Comte Torpedo', avatar: 'T', quote: '« Finca, Sol, Torpedo. Trois mots sérieux. »', card: { number: '0163', grade: 'Rat homologué', archived: 9, valid: true }, sheet: { memberNumber: '0163', cigar: 'Finca del Sol Torpedo', observation: 'Terre et bois', appreciation: 'Remarquable' }, request: { action: 'Soumission de fiche de dégustation', note: 'Demande de classement au catalogue, non encore approuvée.' }, reason: 'fictif', explanation: 'Finca del Sol Torpedo n’a pas été homologué par le CRCC : une demande de classement ne vaut pas inscription.' },
+    { id: '035', day: 4, name: 'Comte Torpedo', avatar: 'T', quote: '« Mon Torpedo attend encore son homologation. J’ai donc fumé autre chose. »', card: { number: '0163', grade: 'Rat homologué', archived: 9, valid: true }, sheet: { memberNumber: '0163', cigar: 'Hoyo de Monterrey Epicure No. 2', observation: 'Terre et bois', appreciation: 'Remarquable' }, request: { action: 'Soumission de fiche de dégustation', note: 'Une demande distincte d’homologation du « Finca del Sol Torpedo » reste en attente. La fiche du jour concerne uniquement le Hoyo de Monterrey.' }, reason: null, explanation: 'Le cigare inscrit sur la fiche est homologué. La demande séparée concernant le Finca del Sol ne change pas la validité de cette fiche.' },
     { id: '036', day: 1, name: 'Madame Chaveta', avatar: 'C', quote: '« Je classe mes fiches par humeur, pas par alphabet. »', card: { number: '0170', grade: 'Rat de passage', archived: 1, valid: true }, sheet: { cigar: 'Montecristo No. 4', observation: 'Cacao et bois', appreciation: 'Excellent' }, request: { action: 'Soumission de fiche de dégustation', note: 'Fiche complète. Le classement par humeur n’est pas demandé.' }, reason: null, explanation: 'Le Montecristo No. 4 est au catalogue et la fiche est complète.' },
     { id: '037', day: 1, name: 'Monsieur Reliure', avatar: 'R', quote: '« J’ai oublié mon impression. Elle était pourtant forte. »', card: { number: '0171', grade: 'Rat de passage', archived: 2, valid: true }, sheet: { cigar: 'Partagás Serie D No. 4', observation: 'Bois et poivre', appreciation: '' }, request: { action: 'Soumission de fiche de dégustation', note: 'La case appréciation attend son auteur.' }, reason: 'fiche', explanation: 'Le cigare figure au catalogue, mais l’appréciation manque.' },
     { id: '038', day: 2, name: 'Baron Bouton', avatar: 'B', quote: '« Les boutons de ma veste ne sont pas une annexe. »', card: { number: '0172', grade: 'Rat homologué', archived: 5, valid: true }, sheet: { cigar: 'Romeo y Julieta Short Churchills', observation: 'Cèdre souple', appreciation: 'Très plaisant' }, request: { action: 'Accès à la séance', note: 'Carte et fiche régulières ; veste curieusement boutonnée.' }, reason: null, explanation: 'La tenue du Baron n’est pas un motif de refus.' },
@@ -104,7 +104,7 @@
     caisse: { name: 'Caisse à double fond', color: 'purple', day: 1, price: 100, description: '+25 F après trois décisions exactes de suite, une fois par jour. +40 F au niveau 2.' },
     montre: { name: 'Montre du secrétaire', color: 'yellow', day: 2, price: 130, description: '+5 secondes sur un dossier chronométré, une fois par jour. +8 secondes au niveau 2.' },
     duplicata: { name: 'Duplicata certifié', color: 'blue', day: 2, price: 180, description: 'Renforce la Matéria dans le logement relié. Seul, ce duplicata ne certifie rien.' },
-    oreille: { name: 'Oreille présidentielle', color: 'purple', day: 3, price: 120, description: '+15 F sur la première bonne réponse au Président du jour. +25 F au niveau 2.' },
+    oreille: { name: 'Oreille présidentielle', color: 'purple', day: 3, price: 60, description: '+15 F sur la première bonne réponse au Président du jour. +25 F au niveau 2.' },
     grandrat: { name: 'Le Grand Rat des Archives', color: 'red', day: 3, price: 300, description: 'Après cinq décisions exactes avec lui : une invocation par partie qui suspend le bureau pendant dix secondes.' }
   };
   const MATERIA_COLORS = { green: 'VERTE · INDICE', yellow: 'JAUNE · COMMANDE', purple: 'VIOLETTE · PASSIF', blue: 'BLEUE · SOUTIEN', red: 'ROUGE · INVOCATION' };
@@ -284,6 +284,7 @@
       data.presidentResults ??= {};
       data.flatteryCount ??= 0;
       data.suspicion ??= 0;
+      data.purchaseRelievedSuspicion ??= false;
       data.interruptions ??= interruptionSchedule(data.seed, data.order);
       if (!Object.values(data.interruptions).flat().some(event => event.type === 'special')) {
         const addition = Object.entries(interruptionSchedule(data.seed, data.order))
@@ -340,7 +341,7 @@
       order, interruptions: interruptionSchedule(seed, order), pendingEvents: [], pendingEventIndex: 0, activeInterruption: null,
       index: 0, balance: 0, errors: 0, exact: 0, favor: 0, hrpcBlockDay: 2 + seedNumber(`${seed}-BLOC`) % 3, hrpcDisabled: false, hrpcBlockShownDays: [], appeal: null, appealCaseId: ['002', '003', '019'][seedNumber(`${seed}-APPEL`) % 3], cutter: null,
       timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], rushDays: [], quizResults: {}, ash: null, ashHistory: [], hamsterResults: {}, hamsterRaceStart: null, hamsterMissingCaseId: null,
-      presidentResults: {}, flatteryCount: 0, suspicion: 0, specialPlayed: false, specialEffect: null, pipaHearts: [], referencePausedAt: null, purchasePausedAt: null, purchaseKind: null, materia: initialMateria(), tutorialDone: tutorialSeen(), phase: 'play' };
+      presidentResults: {}, flatteryCount: 0, suspicion: 0, specialPlayed: false, specialEffect: null, pipaHearts: [], referencePausedAt: null, purchasePausedAt: null, purchaseKind: null, purchaseRelievedSuspicion: false, materia: initialMateria(), tutorialDone: tutorialSeen(), phase: 'play' };
     showDayBriefing(1);
   }
   function current() {
@@ -820,7 +821,7 @@
     $('raid-hrpc').disabled = summonActive() || state.balance < 300 || state.hrpcDisabled;
     if (state.hrpcDisabled) $('shop-status').textContent = 'Le HRPC est hors service jusqu’à la fin de la partie. Le règlement est accessible.';
     else if (blocked) $('shop-status').textContent = 'Le HRPC a bloqué le règlement aujourd’hui. Un raid à 300 F rétablit son accès et neutralise le Club.';
-    else $('shop-status').textContent = '100 F : décision juste et prime de 150 F (gain net +50 F, une fois par jour) · 300 F : +1 faveur · 300 F : neutraliser le HRPC.';
+    else $('shop-status').textContent = '100 F : décision juste et prime de 150 F (gain net +50 F, une fois par jour) · 300 F : +1 faveur et efface un soupçon · 300 F : neutraliser le HRPC.';
     $('shop-status').textContent += ` Faveur : ${state.favor > 0 ? '+' : ''}${state.favor} · Soupçons : ${state.suspicion}/3.`;
     $('president-opinion').textContent = `AVIS DU PRÉSIDENT · ${presidentOpinion()}`;
   }
@@ -830,7 +831,7 @@
     if (!cost || state.balance < cost || (kind === 'raid' && state.hrpcDisabled) || (kind === 'rush' && state.rushDays.includes(current().day))) return;
     if (kind === 'rush') { const item = current(); decide(item.reason ? 'refuse' : 'approve', item.reason, true); return; }
     state.balance -= cost;
-    if (kind === 'gift') state.favor += 1;
+    if (kind === 'gift') { state.purchaseRelievedSuspicion = state.suspicion > 0; state.favor += 1; if (state.purchaseRelievedSuspicion) state.suspicion--; }
     if (kind === 'raid') { state.hrpcDisabled = true; if (state.specialEffect?.kind === 'blackout') clearSpecialEffect(); }
     $('balance-label').textContent = `${state.balance} F`;
     save(); updateShop(); tone(kind === 'raid' ? 530 : 420, .13); openPurchase(kind);
@@ -841,8 +842,8 @@
     state.purchaseKind = kind; renderPipa(); save();
     $('purchase-kicker').textContent = kind === 'gift' ? 'REÇU DU SERVICE DES ATTENTIONS' : 'RAPPORT D’OPÉRATION ANTIRONGEURS';
     $('purchase-title').textContent = kind === 'gift' ? 'Le Président a reçu son habano.' : 'Le HRPC connaît une journée difficile.';
-    $('purchase-copy').textContent = kind === 'gift' ? 'Il l’a humé longuement, puis a demandé à son secrétaire de consigner que ce geste venait spontanément de vous. Sa gratitude tiendra au moins jusqu’à la prochaine circulaire.' : 'Une escouade de contrôleurs a investi la roue, saisi trois pipes et réquisitionné le petit casque du chef. Les hamsters se déclarent en séminaire de reconstruction pour le reste de la partie.';
-    $('purchase-ledger').textContent = `${kind === 'gift' ? '−300 F · +1 faveur présidentielle' : '−300 F · HRPC hors service'} · Caisse : ${state.balance} F`;
+    $('purchase-copy').textContent = kind === 'gift' ? `Il l’a humé longuement, puis a demandé à son secrétaire de consigner que ce geste venait spontanément de vous. ${state.purchaseRelievedSuspicion ? 'Il raye aussi un soupçon de son carnet, après avoir longuement hésité sur la qualité du papier.' : 'Sa gratitude tiendra au moins jusqu’à la prochaine circulaire.'}` : 'Une escouade de contrôleurs a investi la roue, saisi trois pipes et réquisitionné le petit casque du chef. Les hamsters se déclarent en séminaire de reconstruction pour le reste de la partie.';
+    $('purchase-ledger').textContent = `${kind === 'gift' ? `−300 F · +1 faveur présidentielle${state.purchaseRelievedSuspicion ? ' · −1 soupçon' : ''}` : '−300 F · HRPC hors service'} · Caisse : ${state.balance} F`;
     $('purchase-modal').classList.remove('hidden'); $('purchase-close').focus();
   }
   function closePurchase() {
@@ -853,7 +854,7 @@
     if (state.ash?.status === 'burning' && state.ash.caseId === current().id) state.ash.startedAt += elapsed;
     if (state.pipaNextAt) state.pipaNextAt += elapsed;
     const kind = state.purchaseKind;
-    state.purchaseKind = null; state.purchasePausedAt = null; save();
+    state.purchaseKind = null; state.purchaseRelievedSuspicion = false; state.purchasePausedAt = null; save();
     $(kind === 'gift' ? 'gift-president' : 'raid-hrpc').focus();
     startTimer(current()); startAsh(current()); startPipa();
   }
@@ -1053,7 +1054,8 @@
     const exact = Boolean(correctVerdict && correctReason);
     const progression = gainMateriaXP(exact);
     const materiaBonus = materiaDecisionBonus(exact, item.day);
-    const delta = (verdict === 'timeout' ? -40 : exact ? (verdict === 'refuse' ? 75 : 50) : correctVerdict ? -30 : -80) + (fast ? 50 : 0) + materiaBonus;
+    const baseDelta = verdict === 'timeout' ? -40 : exact ? (verdict === 'refuse' ? 75 : 50) : correctVerdict ? -30 : -80;
+    const delta = baseDelta + (fast ? 150 - 100 : 0) + materiaBonus;
     state.balance += delta;
     if (fast) state.rushDays.push(item.day);
     if (exact) state.exact++; else state.errors++;
@@ -1313,10 +1315,12 @@
       materiaBonus = (materiaLevel('oreille') === 2 ? 25 : 15) + (materiaLinked('oreille') ? materiaBlueBonus() : 0);
     }
     const delta = (correct ? 35 : suspicious ? -50 : flattery ? -15 : -30) + materiaBonus;
-    if (flattery) { if (suspicious) { state.suspicion++; state.favor -= 2; } else state.favor++; }
+    const favorDelta = flattery ? suspicious ? -2 : state.flatteryCount === 1 ? 1 : 0 : 0;
+    if (suspicious) state.suspicion++;
+    state.favor += favorDelta;
     state.balance += delta;
     state.presidentResults ??= {};
-    state.presidentResults[state.activeInterruption.id] = { choice, correct, flattery, suspicious, delta, materiaBonus };
+    state.presidentResults[state.activeInterruption.id] = { choice, correct, flattery, suspicious, delta, materiaBonus, favorDelta };
     if (state.suspicion >= 3) {
       state.excludedReason = 'president';
       tone(100, .32, 'sawtooth');
@@ -1330,7 +1334,7 @@
     $('president-result-stamp').className = `result-stamp ${result.correct ? 'good' : 'bad'}`;
     $('president-result-stamp').textContent = result.correct ? 'SAVOIR RECONNU' : result.suspicious ? 'SOUPÇON PRÉSIDENTIEL' : result.flattery ? 'ÉLOGE CONSIGNÉ' : 'RÉPONSE CONTESTÉE';
     $('president-result-title').textContent = result.correct ? 'Le Président acquiesce.' : result.suspicious ? 'Il n’y croit plus.' : result.flattery ? 'Il rougit. Un peu.' : 'La question vous échappe.';
-    const reaction = result.suspicious ? 'Troisième flatterie ou davantage : le Président soupçonne une manœuvre et retire deux points de faveur.' : result.flattery ? 'La flatterie lui plaît : un point de faveur, malgré la mauvaise réponse.' : '';
+    const reaction = result.suspicious ? 'Troisième flatterie ou davantage : le Président soupçonne une manœuvre et retire deux points de faveur.' : result.flattery && (result.favorDelta ?? (!result.suspicious ? 1 : -2)) > 0 ? 'Cette première flatterie lui plaît : un point de faveur, malgré la mauvaise réponse.' : result.flattery ? 'Il vous remercie poliment, mais une deuxième flatterie ne rapporte plus de faveur.' : '';
     $('president-result-text').textContent = `${question.detail} ${reaction}`.trim();
     $('president-source').href = question.source;
     $('president-result-ledger').textContent = `${result.delta > 0 ? '+' : ''}${result.delta} F${result.materiaBonus ? ` (Oreille présidentielle +${result.materiaBonus} F)` : ''} · Faveur ${state.favor > 0 ? '+' : ''}${state.favor} · Soupçons ${state.suspicion} · Caisse ${state.balance} F`;
@@ -1374,11 +1378,11 @@
     const expressCount = state.order.filter(id => ALL_CASES.find(item => item.id === id)?.express).length;
     const hamsters = Object.values(state.hamsterResults || {});
     const president = Object.values(state.presidentResults || {});
-    return `CRCC — La Grande Homologation : ${finalScore().total} points, ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. Président : ${state.favor > 0 ? '+' : ''}${state.favor} faveurs, ${state.suspicion} soupçon${state.suspicion > 1 ? 's' : ''} ; ${presidentOpinion()} Matérias : ${state.materia.equipped.filter(Boolean).map(id => `${MATERIA[id].name} niv. ${materiaLevel(id)}`).join(' + ')}${state.materia.summonUsed ? ' ; Grand Rat invoqué' : ''}. HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Interrogatoires : ${president.filter(result => result.correct).length}/${president.length} justes. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
+    return `CRCC — La Grande Homologation : ${finalScore().total} points, ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. Président : ${state.favor > 0 ? '+' : ''}${state.favor} faveurs, ${state.suspicion} soupçon${state.suspicion > 1 ? 's' : ''} ; ${presidentOpinion()} Matérias : ${state.materia.equipped.filter(Boolean).map(id => `${MATERIA[id].name} niv. ${materiaLevel(id)}`).join(' + ')}${state.materia.summonUsed ? ' ; Grand Rat invoqué' : ''}. HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Interrogatoires : ${president.filter(result => result.correct).length}/${president.length} justes. Grade : ${rank}. ${state.timed ? `Mode chrono : 30 s par dossier ; bonus +${finalScore().timedBonus} points.` : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
   }
   function finalScore() {
-    const decisions = state.exact * 100, cash = state.balance, favor = state.favor * 75, suspicion = state.suspicion * -200;
-    return { decisions, cash, favor, suspicion, total: Math.max(0, decisions + cash + favor + suspicion) };
+    const decisions = state.exact * 100, timedBonus = state.timed ? state.exact * 10 : 0, cash = state.balance, favor = state.favor * 75, suspicion = state.suspicion * -200;
+    return { decisions, timedBonus, cash, favor, suspicion, total: Math.max(0, decisions + timedBonus + cash + favor + suspicion) };
   }
   function finish() {
     stopPipa(); stopReggae(); stopAsh(); stopTimer(); stopSummon();
@@ -1393,7 +1397,7 @@
     if (state.suspicion > 0) story += ' Vos compliments répétés font désormais l’objet d’une enquête du Président lui-même.';
     $('ending-copy').textContent = story;
     $('ending-stats').innerHTML = `<div><strong>${points.total}</strong><span>Score final</span></div><div><strong>${score}/${total}</strong><span>Décisions exactes</span></div><div><strong>${state.balance} F</strong><span>Caisse finale</span></div>`;
-    $('score-breakdown').innerHTML = `<h2>Calcul du score</h2><div><span>Décisions exactes · ${score} × 100</span><strong>+${points.decisions}</strong></div><div><span>Caisse finale</span><strong>${points.cash > 0 ? '+' : ''}${points.cash}</strong></div><div><span>Faveur présidentielle · ${state.favor} × 75</span><strong>${points.favor > 0 ? '+' : ''}${points.favor}</strong></div><div><span>Soupçons · ${state.suspicion} × −200</span><strong>${points.suspicion}</strong></div><p>Minimum 0 point. Une exclusion met fin au service immédiatement.</p>`;
+    $('score-breakdown').innerHTML = `<h2>Calcul du score</h2><div><span>Décisions exactes · ${score} × 100</span><strong>+${points.decisions}</strong></div>${state.timed ? `<div><span>Bonus chrono · ${score} × 10</span><strong>+${points.timedBonus}</strong></div>` : ''}<div><span>Caisse finale</span><strong>${points.cash > 0 ? '+' : ''}${points.cash}</strong></div><div><span>Faveur présidentielle · ${state.favor} × 75</span><strong>${points.favor > 0 ? '+' : ''}${points.favor}</strong></div><div><span>Soupçons · ${state.suspicion} × −200</span><strong>${points.suspicion}</strong></div><p>Minimum 0 point. Une exclusion met fin au service immédiatement.</p>`;
     $('ending-opinion').textContent = `OPINION DU PRÉSIDENT · ${presidentOpinion()}`;
     $('materia-summary').textContent = `MATÉRIAS ÉQUIPÉES · ${state.materia.equipped.filter(Boolean).map(id => `${MATERIA[id].name} (niv. ${materiaLevel(id)}, ${state.materia.xp[id] || 0} AP)`).join(' + ') || 'aucune'}. ${state.materia.summonUsed ? 'Le Grand Rat a suspendu la réalité.' : 'Aucune invocation consignée.'}`;
     const hamsters = Object.values(state.hamsterResults || {});
