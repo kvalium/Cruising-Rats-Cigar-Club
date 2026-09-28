@@ -92,6 +92,8 @@
     { id: '043', day: 4, name: 'Capitaine Boutonnière', avatar: 'B', quote: '« Sept fiches et une ambition de huit. »', card: { number: '0177', grade: 'Rat homologué', archived: 7, valid: true }, sheet: { memberNumber: '0177', cigar: 'H. Upmann Magnum 46', observation: 'Bois doux', appreciation: 'Convenable' }, request: { action: 'Promotion au grade de Grand Rat', note: 'Carte validée ; demande signée, sept fiches au registre.' }, reason: 'promotion', explanation: 'L’article 10 exige huit fiches archivées pour une promotion. Il en manque une.' }
   ];
 
+  EXTRA_CASES.push({ id: '044', day: 4, name: 'Monsieur Carton', avatar: 'C', quote: '« Je suis un humain parfaitement réglementaire. Mes oreilles ? Une erreur de découpe. »', card: { number: '0188', grade: 'Grand Rat', archived: 9, valid: true }, sheet: { memberNumber: '0188', cigar: 'Flor de Oliva', observation: 'Bois et copeaux de carton', appreciation: 'Très humain' }, request: { action: 'Proposition d’un siège au Comité', note: 'Candidature personnelle. Photo d’identité découpée dans une boîte de céréales ; le porteur refuse d’ôter son masque.' }, reason: 'registre_absent', explanation: 'Aucun Monsieur Carton au registre. Derrière le masque de carton : un hamster espion du HRPC. La carte n’a aucune inscription officielle.' });
+
   const ALL_CASES = [...CASES, ...EXTRA_CASES];
   const REASON_RULE = { carte: '01', fiche: '02', habano: '03', coupe_grade: '04', parrain: '05', inspection: '06', numero: '07', fictif: '08', exclusion: '09', promotion: '10', registre_absent: '12', registre_numero: '12', registre_grade: '12' };
   REASONS.numero = 'Numéro de membre différent sur la fiche';
@@ -134,6 +136,20 @@
     { q: 'Quel accessoire convient mal pour couper la pointe d’un figurado ?', answer: 'L’emporte-pièce.', wrong: ['La guillotine.', 'Les ciseaux adaptés.'], flattering: 'Tout outil non béni par la main du Président convient mal.', detail: 'Un emporte-pièce ne permet pas de couper une extrémité pointue.', source: CUT_SOURCE },
     { q: 'Comment appelle-t-on les décorations en papier des boîtes de Habanos ?', answer: 'Habilitaciones.', wrong: ['Despalilladas.', 'Chaveteadas.'], flattering: 'Les rubans d’investiture du Président, copiés ensuite par tous les fabricants.', detail: 'Les habilitaciones sont les ornements en papier appliqués sur les boîtes.', source: 'https://www.habanos.com/en/dressing-the-box/' }
   ];
+  const PRESIDENT_INTROS = [
+    'Le Président reçoit une délégation japonaise et souhaite votre avis avant que les interprètes ne trouvent le mot « volado ». ',
+    'En partant faire un 18 trous, le Président veut lever une ambiguïté cigaresque qui retarde sa voiturette.',
+    'Le Président a interrompu une réunion pour trancher un débat. Trois vice-présidents attendent derrière la porte.',
+    'Une caisse mystérieuse est arrivée au salon. Le Président vous convoque avant d’oser ouvrir le couvercle.',
+    'Le Président dicte une circulaire à son perroquet et exige une précision que l’oiseau refuse de répéter.',
+    'À l’heure du thé, le Président prétend avoir un doute purement académique et fait appeler le guichet.',
+    'Le portrait du fondateur semble désapprouver une fiche. Le Président réclame votre expertise.',
+    'Le Président a parié une boîte de cigares avec le trésorier. Il vous charge de vérifier sa réponse.',
+    'Un ambassadeur a prononcé un terme de tabac. Le Président demande discrètement ce que cela signifie.',
+    'Avant la photo officielle, le Président veut régler une querelle de vocabulaire entre deux humidors.',
+    'Le Président vient de trouver une note dans sa poche de veston. Elle contient une question, sans auteur.',
+    'La cloche du salon sonne : le Président souhaite transformer une hypothèse en vérité réglementaire.'
+  ];
   const SAVE_KEY = 'crcc-homologation-v3';
   const DIRECTIVES = {
     '005': 'Note orale du Président : « Le Vicomte du Terroir est un ami. Évitons de vérifier sa provenance aujourd’hui. »',
@@ -175,7 +191,7 @@
     { selector: '#catalog-open', title: 'Le catalogue officiel', copy: 'Ce livre rouge contient les seuls cigares admis sur une fiche. Un nom très plausible peut aussi manquer au catalogue.' },
     { selector: '#rules-open', title: 'Le règlement du guichet', copy: 'Cliquez sur le livre pour lire tous les articles en vigueur. Chaque début de journée présente ses nouvelles règles. Un sabotage du HRPC peut fermer ce livre pour toute une journée.' },
     { selector: '.bureau-shop', title: 'La caisse du bureau', copy: 'Une fois par journée, dépensez 100 F pour décider immédiatement et gagner 50 F nets en plus. Offrez un habano pour 300 F et une faveur, ou lancez un raid sur le HRPC pour 500 F.' },
-    { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes à mesure que le cigare raccourcit. Détachez-la avant sa chute pour gagner un bonus.' },
+    { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, la cendre s’allonge à un rythme imprévisible pendant que le cigare raccourcit. Détachez-la avant sa chute pour gagner un bonus.' },
     { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon cliquez sur Refuser et choisissez le bon motif. Aucun autre élément n’est à sélectionner. Le bouton ? permet de revoir ce tutoriel à tout moment.' }
   ];
   function tutorialSeen() {
@@ -239,11 +255,11 @@
           cutter: nextDay > 3 ? { skipped: true } : null, timerCaseId: null, timerDeadline: null };
       }
       if (incomingSeed && data?.seed !== incomingSeed) return null;
-      if (data?.version !== 3 || !Array.isArray(data.order) || ![18, 26, 29, 32, 35, ALL_CASES.length].includes(data.order.length) ||
+      if (data?.version !== 3 || !Array.isArray(data.order) || ![18, 26, 29, 32, 35, 43, ALL_CASES.length].includes(data.order.length) ||
           new Set(data.order).size !== data.order.length || !data.order.every(id => ALL_CASES.some(item => item.id === id)) ||
           !Number.isInteger(data.index) || data.index < 0 || data.index > data.order.length ||
           (data.index === data.order.length && !['daily', 'ending'].includes(data.phase)) ||
-          !['briefing', 'materiaIntro', 'play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult', 'hamster', 'hamsterResult', 'president', 'presidentResult', 'special'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
+          !['briefing', 'hrpcBlock', 'materiaIntro', 'play', 'result', 'daily', 'ending', 'appeal', 'cutter', 'eventResult', 'hamster', 'hamsterResult', 'president', 'presidentResult', 'special'].includes(data.phase) || !data.history || typeof data.history !== 'object') return null;
       data.hamsterResults ??= {};
       data.presidentResults ??= {};
       data.flatteryCount ??= 0;
@@ -257,7 +273,7 @@
       data.pendingEvents ??= [];
       data.pendingEventIndex ??= 0;
       data.hrpcBlockDay ??= 2 + seedNumber(`${data.seed || 'LEGACY'}-BLOC`) % 3;
-      data.hrpcDisabled ??= false;
+      data.hrpcDisabled ??= false; data.hrpcBlockShownDays ??= [];
       data.specialPlayed ??= false;
       data.specialEffect ??= null;
       data.appealCaseId ??= ['002', '003', '019'][seedNumber(`${data.seed || 'LEGACY'}-APPEL`) % 3];
@@ -282,7 +298,7 @@
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (_) { /* Partie jouable sans stockage. */ } }
   function visible(section) {
     if (section !== 'play') { stopTimer(); stopPipa(); }
-    ['intro', 'day-briefing', 'materia-intro', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'president', 'president-result', 'special', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
+    ['intro', 'day-briefing', 'hrpc-block', 'materia-intro', 'play', 'result', 'daily', 'appeal', 'cutter', 'hamster', 'hamster-result', 'president', 'president-result', 'special', 'event-result', 'ending'].forEach(id => $(id).classList.toggle('hidden', id !== section));
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function tone(frequency, duration, type = 'triangle') {
@@ -302,7 +318,7 @@
     const order = [1, 2, 3, 4].flatMap(day => shuffle(ALL_CASES.filter(item => item.day === day), random).map(item => item.id));
     state = { version: 3, seed, timed: $('timed-mode').checked,
       order, interruptions: interruptionSchedule(seed, order), pendingEvents: [], pendingEventIndex: 0, activeInterruption: null,
-      index: 0, balance: 0, errors: 0, exact: 0, favor: 0, hrpcBlockDay: 2 + seedNumber(`${seed}-BLOC`) % 3, hrpcDisabled: false, appeal: null, appealCaseId: ['002', '003', '019'][seedNumber(`${seed}-APPEL`) % 3], cutter: null,
+      index: 0, balance: 0, errors: 0, exact: 0, favor: 0, hrpcBlockDay: 2 + seedNumber(`${seed}-BLOC`) % 3, hrpcDisabled: false, hrpcBlockShownDays: [], appeal: null, appealCaseId: ['002', '003', '019'][seedNumber(`${seed}-APPEL`) % 3], cutter: null,
       timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], rushDays: [], quizResults: {}, ash: null, ashHistory: [], hamsterResults: {}, hamsterRaceStart: null, hamsterMissingCaseId: null,
       presidentResults: {}, flatteryCount: 0, suspicion: 0, specialPlayed: false, specialEffect: null, pipaHearts: [], referencePausedAt: null, purchasePausedAt: null, purchaseKind: null, materia: initialMateria(), tutorialDone: tutorialSeen(), phase: 'play' };
     showDayBriefing(1);
@@ -341,19 +357,51 @@
   function documentCard(code, title, rows, note, noteKey, stamp, stampKey, annex = '') {
     return `<article class="document"><div class="document-head"><span>CRCC / ${escapeHTML(code)}</span><span>PIÈCE OFFICIELLE</span></div><h3>${escapeHTML(title)}</h3>${code === 'REQ' ? '<p class="request-help">L’objet indique ce que la personne vient demander au Club. La mention donne le détail ou la pièce jointe.</p>' : ''}${rows}${note ? `<div class="doc-note">${escapeHTML(note)}</div>` : ''}${stamp ? `<span class="doc-stamp ${stamp === 'VALIDATION ABSENTE' ? 'bad' : ''}">${escapeHTML(stamp)}</span>` : ''}${annex}</article>`;
   }
+  const PORTRAITS = {
+    'Madame Braise': 'WOMAN_001.jpg',
+    'Madame Minuit': 'WOMAN_002.jpg',
+    'Madame Velours': 'WOMAN_003.jpg',
+    'Madame Sans-Gêne': 'WOMAN_004.jpg',
+    'Madame Tampon': 'WOMAN_005.jpg',
+    'Madame Index': 'WOMAN_006.jpg',
+    'Madame Retour': 'WOMAN_007.jpg',
+    'Madame Sursis': 'WOMAN_008.jpg',
+    'Baronne Agrafe': 'WOMAN_009.jpg',
+    'Madame Expresso': 'WOMAN_010.jpg',
+    'Madame Double': 'WOMAN_011.jpg',
+    'Madame Transposition': 'WOMAN_012.jpg',
+    'Madame Havane': 'WOMAN_013.jpg',
+    'Madame Chaveta': 'WOMAN_014.jpg',
+    'Madame Sillage': 'WOMAN_015.jpg',
+    'Comtesse Soupir': 'WOMAN_016.jpg',
+    'Madame Basane': 'WOMAN_017.jpg',
+    'Monsieur Rature': 'MAN_001.jpg',
+    'Capitaine Cendre': 'MAN_002.jpg',
+    'Le Vicomte du Terroir': 'MAN_003.jpg',
+    'Monsieur Tremblote': 'MAN_004.jpg',
+    'Monsieur Crevette': 'MAN_005.jpg',
+    'Docteur Moustache': 'MAN_006.jpg',
+    'Signor Cacao': 'MAN_007.jpg',
+    'Monsieur Miroir': 'MAN_008.jpg',
+    'Colonel Poussière': 'MAN_009.jpg',
+    'Monsieur Chausson': 'MAN_010.jpg',
+    'Professeur Volute': 'MAN_011.jpg',
+    'Docteur Capote': 'MAN_012.jpg',
+    'Général Bonbon': 'MAN_013.jpg',
+    'Monsieur Rideau': 'MAN_014.jpg',
+    'Monsieur Post-it': 'MAN_015.jpg',
+    'Monsieur Hors-Registre': 'MAN_016.jpg',
+    'Monsieur Autopromotion': 'MAN_017.jpg',
+    'Señor Cedro': 'MAN_018.jpg',
+    'Comte Torpedo': 'MAN_019.jpg',
+    'Monsieur Reliure': 'MAN_020.jpg',
+    'Baron Bouton': 'MAN_021.jpg',
+    'Monsieur Paraphe': 'MAN_022.jpg',
+    'Capitaine Boutonnière': 'MAN_023.jpg',
+    'Monsieur Carton': 'MAN_024.jpg',
+  };
   function portrait(item) {
-    const hash = seedNumber(item.name), coats = ['#735146', '#3a6159', '#745a78', '#8a5744', '#4c5878'];
-    const skins = ['#d9a579', '#b97959', '#e6bd94', '#9f6856'], hair = ['#33241f', '#6b4335', '#d5c1a0', '#4b4243'];
-    const accessory = item.name.includes('Moustache') || item.name.includes('Cendre') || item.name.includes('Poussière') ? 'moustache' : item.name.includes('Vicomte') || item.name.includes('Index') || item.name.includes('Capote') ? 'monocle' : item.name.includes('Minuit') || item.name.includes('Tampon') || item.name.includes('Agrafe') ? 'hat' : item.name.includes('Crevette') || item.name.includes('Velours') ? 'scarf' : hash % 2 ? 'glasses' : 'bow';
-    const extras = {
-      moustache: '<path d="M31 54q8-8 14 0 7-8 15 0-9 8-15 2-8 6-14-2Z" fill="#34241e"/>',
-      monocle: '<circle cx="54" cy="43" r="10" fill="none" stroke="#d9bd85" stroke-width="2"/><path d="M63 49q7 17-4 22" fill="none" stroke="#d9bd85" stroke-width="2"/>',
-      hat: '<path d="M20 27h50M29 26l4-20h24l5 20" fill="#392922" stroke="#d1ad78" stroke-width="2"/>',
-      scarf: '<path d="M27 68q19 9 36 0l-3 10-11-3-7 11-7-13Z" fill="#bd6659"/>',
-      glasses: '<path d="M26 43h39M27 43q0 18 15 6V43m8 0q0 18 15 6V43" fill="none" stroke="#342c29" stroke-width="2"/>',
-      bow: '<path d="M37 75l-12-7v14Zm15 0 12-7v14Z" fill="#c49a63"/>'
-    };
-    return `<svg viewBox="0 0 90 96" aria-hidden="true"><rect width="90" height="96" fill="#b39470"/><circle cx="${hash % 2 ? 10 : 75}" cy="12" r="25" fill="#d4b88d" opacity=".35"/><path d="M5 96q4-29 39-30 36 0 41 30" fill="${coats[hash % coats.length]}"/><path d="M27 25q3-20 20-20 21 0 18 25v20H27Z" fill="${hair[hash % hair.length]}"/><ellipse cx="45" cy="45" rx="22" ry="27" fill="${skins[hash % skins.length]}"/><path d="M23 32q2-23 23-22 17-1 22 23-12-15-24-10-14 5-21 9" fill="${hair[hash % hair.length]}"/><circle cx="36" cy="43" r="2" fill="#302821"/><circle cx="55" cy="43" r="2" fill="#302821"/><path d="M43 51q3 3 6 0M37 60q9 6 17 0" stroke="#704738" stroke-width="1.5" fill="none"/>${extras[accessory]}<path d="M36 69l9 9 9-9" fill="#eee0c9"/></svg>`;
+    return `<img src="portraits/${PORTRAITS[item.name]}" alt="Portrait de ${escapeHTML(item.name)}" width="90" height="96" loading="eager">`;
   }
   function showQuiz(item) {
     const panel = $('quiz-panel');
@@ -372,7 +420,7 @@
     save(); showQuiz(item); updateShop(); tone(correct ? 500 : 170, .12);
   }
   function registerEntry(item) {
-    if (item.id === '030') return null;
+    if (item.id === '030' || item.id === '044') return null;
     return { name: item.name, number: item.id === '031' ? '0143' : item.card.number,
       grade: item.id === '032' ? 'Rat homologué' : item.card.grade, archived: item.card.archived };
   }
@@ -458,24 +506,32 @@
     tickTimer();
   }
   function stopAsh() { if (ashTimer) clearInterval(ashTimer); ashTimer = null; }
+  function ashProfile(day) {
+    const random = seededRandom(`${state.seed || 'LEGACY'}-CENDRE-${day}`);
+    return { durationMs: Math.round(8500 + random() * 13500), maxLength: Math.round(48 + random() * 62), burnSpan: Math.round(68 + random() * 42), burnExponent: .65 + random() * 1.15 };
+  }
+  function ashProgress() {
+    const ash = state.ash;
+    return Math.min(1, Math.pow(Math.max(0, (Date.now() - ash.startedAt) / ash.durationMs), ash.burnExponent));
+  }
   function renderAsh(progress) {
-    const consumed = Math.round(Math.max(0, Math.min(1, progress)) * 80);
+    const consumed = Math.round(Math.max(0, Math.min(1, progress)) * state.ash.burnSpan);
     $('ash-body').style.width = `${216 - consumed}px`;
     $('ash-ember').style.left = `${214 - consumed}px`;
     $('ash-length').style.left = `${224 - consumed}px`;
-    $('ash-length').style.width = `${consumed}px`;
+    $('ash-length').style.width = `${Math.round(progress * state.ash.maxLength)}px`;
   }
   function tickAsh() {
     if (state?.phase !== 'play' || state.ash?.status !== 'burning' || summonActive()) return;
-    const progress = Math.min(1, (Date.now() - state.ash.startedAt) / 14000);
+    const progress = ashProgress();
     renderAsh(progress);
     $('ash-meter').textContent = progress < .25 ? 'CENDRE COURTE' : progress < .55 ? 'CENDRE MOYENNE' : progress < .8 ? 'CENDRE LONGUE' : 'CENDRE FRAGILE';
-    if (progress >= 1) settleAsh('fallen', -30);
+    if (Date.now() - state.ash.startedAt >= state.ash.durationMs) settleAsh('fallen', -30);
   }
   function settleAsh(status, delta) {
     if (state.ash?.status !== 'burning') return;
     if (status === 'collected' && state.materia.introduced && materiaEquipped('cendrier')) delta += (materiaLevel('cendrier') === 2 ? 20 : 10) + (materiaLinked('cendrier') ? materiaBlueBonus() : 0);
-    stopAsh(); state.ash.burnProgress = Math.min(1, (Date.now() - state.ash.startedAt) / 14000);
+    stopAsh(); state.ash.burnProgress = ashProgress();
     renderAsh(state.ash.burnProgress); state.ash.status = status; state.ash.delta = delta;
     state.ashHistory ??= [];
     if (status !== 'skipped') { state.balance += delta; state.ashHistory.push({ caseId: state.ash.caseId, status, delta }); }
@@ -491,19 +547,20 @@
     const firstOfDay = state.order.find(id => { const entry = ALL_CASES.find(candidate => candidate.id === id); return entry.day === item.day && !entry.express; }) === item.id;
     $('ash-panel').classList.toggle('hidden', !firstOfDay);
     if (!firstOfDay) return;
-    if (state.ash?.caseId !== item.id) state.ash = { caseId: item.id, startedAt: Date.now(), status: 'burning', delta: 0 };
+    if (state.ash?.caseId !== item.id) state.ash = { caseId: item.id, startedAt: Date.now(), status: 'burning', delta: 0, ...ashProfile(item.day) };
+    state.ash.durationMs ??= 14000; state.ash.maxLength ??= 80; state.ash.burnSpan ??= 80; state.ash.burnExponent ??= 1;
     $('ash-button').disabled = state.ash.status !== 'burning' || summonActive();
     $('ash-skip').disabled = state.ash.status !== 'burning' || summonActive();
     $('ash-message').textContent = state.ash.status === 'fallen' ? 'Patatras. La cendre est tombée : −30 F.' : state.ash.status === 'collected' ? `Cendre déposée : +${state.ash.delta} F.` : state.ash.status === 'skipped' ? 'Cigare classé sans suite. Aucun bonus ni malus.' : '';
-    renderAsh(state.ash.status === 'burning' ? Math.min(1, (Date.now() - state.ash.startedAt) / 14000) : state.ash.burnProgress || 0);
+    renderAsh(state.ash.status === 'burning' ? ashProgress() : state.ash.burnProgress || 0);
     $('ash-meter').textContent = state.ash.status === 'collected' ? 'DÉTACHÉE' : state.ash.status === 'fallen' ? 'TOMBÉE' : state.ash.status === 'skipped' ? 'CLASSÉ' : 'CENDRE COURTE';
     if (state.ash.status === 'burning' && !summonActive() && !((state.index === 0 && !state.tutorialDone) || state.tutorialPausedAt)) { ashTimer = setInterval(tickAsh, 100); tickAsh(); }
     save();
   }
   function collectAsh() {
     if (state?.phase !== 'play' || state.ash?.status !== 'burning' || summonActive()) return;
-    const progress = Math.min(1, (Date.now() - state.ash.startedAt) / 14000);
-    if (progress >= 1) settleAsh('fallen', -30);
+    const progress = ashProgress();
+    if (Date.now() - state.ash.startedAt >= state.ash.durationMs) settleAsh('fallen', -30);
     else settleAsh('collected', Math.max(5, Math.round(progress * 60)));
   }
   function updateTutorialSpotlight() {
@@ -565,7 +622,7 @@
     if (prefix === 'materia-intro') $('materia-intro-next').disabled = !state.materia.freeChoice;
   }
   function equipMateria(id) {
-    if (!['briefing', 'materiaIntro'].includes(state?.phase) || !MATERIA[id] || MATERIA[id].day > current().day) return;
+    if (!['briefing', 'hrpcBlock', 'materiaIntro'].includes(state?.phase) || !MATERIA[id] || MATERIA[id].day > current().day) return;
     if (!state.materia.owned.includes(id)) {
       if (!state.materia.freeChoice) state.materia.freeChoice = id;
       else {
@@ -690,8 +747,20 @@
     $('briefing-rules').innerHTML = RULES.filter(rule => rule.day === day).map(rule => `<div class="rule"><b>${rule.id}</b><span>${escapeHTML(rule.text)}</span></div>`).join('');
     $('materia-day-picker').classList.toggle('hidden', !state.materia.introduced);
     if (state.materia.introduced) renderBriefingMateria(day);
-    $('briefing-note').textContent = day === state.hrpcBlockDay && !state.hrpcDisabled ? '🐹 Sabotage du HRPC : le règlement sera indisponible pendant toute cette journée. Prenez connaissance de ces règles maintenant ; un raid peut ensuite rétablir l’accès.' : state.hrpcDisabled ? 'Le HRPC est hors service. Le règlement restera accessible.' : 'Le règlement, le catalogue et le registre sont consultables depuis le bureau.';
+    $('briefing-note').textContent = state.hrpcDisabled ? 'Le HRPC est hors service. Le règlement restera accessible.' : 'Le règlement, le catalogue et le registre sont consultables depuis le bureau.';
     visible('day-briefing');
+  }
+  function continueDayBriefing() {
+    if (state?.phase !== 'briefing') return;
+    if (rulesBlocked() && !state.hrpcBlockShownDays.includes(current().day)) return showHrpcBlock();
+    showCase();
+  }
+  function showHrpcBlock() {
+    state.phase = 'hrpcBlock'; save(); visible('hrpc-block');
+  }
+  function closeHrpcBlock() {
+    if (state?.phase !== 'hrpcBlock') return;
+    state.hrpcBlockShownDays.push(current().day); save(); showCase();
   }
   function showMateriaIntro() {
     state.phase = 'materiaIntro'; materiaSelectedSlot = 0; save();
@@ -1190,6 +1259,7 @@
   function showPresident() {
     const event = state.activeInterruption, question = PRESIDENT_QUESTIONS[event.question];
     $('president-kicker').textContent = `CONVOCATION DU PRÉSIDENT · JOUR ${String(event.day).padStart(2, '0')} / 04`;
+    $('president-intro').textContent = PRESIDENT_INTROS[seedNumber(`${state.seed || 'LEGACY'}-${event.id}-INTRO`) % PRESIDENT_INTROS.length];
     $('president-question').textContent = question.q;
     $('president-meter').textContent = `Faveur : ${state.favor > 0 ? '+' : ''}${state.favor} · Flatteries : ${state.flatteryCount} · Soupçons : ${state.suspicion}`;
     const options = [
@@ -1332,6 +1402,7 @@
   $('resume-button').addEventListener('click', () => {
     state = stored(); if (!state) return;
     if (state.phase === 'briefing') showDayBriefing(current().day);
+    else if (state.phase === 'hrpcBlock') showHrpcBlock();
     else if (state.phase === 'materiaIntro') showMateriaIntro();
     else if (state.phase === 'play') showCase();
     else if (state.phase === 'result') showResult();
@@ -1384,7 +1455,8 @@
   $('lighter-button').addEventListener('click', lightLighter);
   $('president-answers').addEventListener('click', event => { const button = event.target.closest('[data-president-choice]'); if (button) decidePresident(button.dataset.presidentChoice); });
   $('president-next').addEventListener('click', presidentNext);
-  $('briefing-next').addEventListener('click', () => { if (state?.phase === 'briefing') showCase(); });
+  $('briefing-next').addEventListener('click', continueDayBriefing);
+  $('hrpc-block-next').addEventListener('click', closeHrpcBlock);
   $('materia-intro-next').addEventListener('click', continueMateriaIntro);
   for (const prefix of ['materia-briefing', 'materia-intro']) {
     $(`${prefix}-slots`).addEventListener('click', event => { const button = event.target.closest('[data-materia-slot]'); if (button) { materiaSelectedSlot = Number(button.dataset.materiaSlot); renderBriefingMateria(current().day, prefix); } });
