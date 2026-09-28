@@ -42,3 +42,17 @@
 .materia-choice .materia-price{display:inline-block;width:max-content;max-width:100%;margin-top:4px;padding:4px 7px;background:#345343;color:#fff4db;font:700 10px 'DM Sans',Arial,sans-serif;letter-spacing:.5px}.materia-choice:not(.equipped):disabled{opacity:.56}.materia-choice .materia-price{overflow-wrap:anywhere}.materia-mini.empty{opacity:.65}.materia-slot .locked-orb{background:#9b9180}
 
 .visitor-avatar img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 30%}.hrpc-block-card{border-top:9px solid #8a4f35}.hrpc-block-emblem{float:right;font-size:72px;line-height:1;transform:rotate(-12deg);filter:drop-shadow(4px 5px 0 #d3b48a)}.hrpc-block-card .committee-note{padding:15px 18px;background:#ead4b2;border-left:5px solid #9a392e}.president-intro{background:#e9d8b9;border-left:4px solid #9e543b;padding:12px 17px;font-style:italic;margin:14px 0 20px}.president-card #president-question{font-weight:bold;font-size:20px}
+
+/* Portraits de guichet : une vraie place au personnage, même sur petit écran. */
+.visitor-strip{min-height:194px;gap:22px;padding:14px 18px}
+.visitor-avatar{width:144px;height:166px;box-shadow:4px 4px 0 #0f0b0a}
+.visitor-strip>div:nth-child(2){min-width:0;flex:1}
+.visitor-strip h2{font-size:clamp(23px,2.3vw,31px)}
+.visitor-strip p{line-height:1.45}
+.queue-number{flex:none}
+@media(max-width:480px){
+  .visitor-strip{min-height:132px;gap:12px;padding:10px;align-items:flex-start}
+  .visitor-avatar{width:94px;height:112px}
+  .visitor-strip h2{font-size:20px}
+  .visitor-strip p{font-size:12px}
+}
