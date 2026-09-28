@@ -96,6 +96,17 @@
   const REASON_RULE = { carte: '01', fiche: '02', habano: '03', coupe_grade: '04', parrain: '05', inspection: '06', numero: '07', fictif: '08', exclusion: '09', promotion: '10', registre_absent: '12', registre_numero: '12', registre_grade: '12' };
   REASONS.numero = 'Numéro de membre différent sur la fiche';
   const CATALOG = ['Flor de Oliva', 'San Pedro de Macorís', 'Don Tomás Clásico', 'Habano — origine cubaine', 'Montecristo No. 4', 'Partagás Serie D No. 4', 'Romeo y Julieta Short Churchills', 'Cohiba Siglo VI', 'H. Upmann Magnum 46', 'Hoyo de Monterrey Epicure No. 2'];
+  const MATERIA = {
+    loupe: { name: 'Loupe du Greffier', color: 'green', day: 1, description: 'Un indice sur la règle à vérifier, une fois par jour. Deux fois au niveau 2.' },
+    cendrier: { name: 'Cendrier de Schrödinger', color: 'purple', day: 1, description: '+10 F sur une cendre détachée, +20 F au niveau 2.' },
+    caisse: { name: 'Caisse à double fond', color: 'purple', day: 1, description: '+25 F après trois décisions exactes de suite, une fois par jour. +40 F au niveau 2.' },
+    montre: { name: 'Montre du secrétaire', color: 'yellow', day: 2, description: '+5 secondes sur un dossier chronométré, une fois par jour. +8 secondes au niveau 2.' },
+    duplicata: { name: 'Duplicata certifié', color: 'blue', day: 2, description: 'Renforce la Matéria dans le logement relié. Seul, ce duplicata ne certifie rien.' },
+    oreille: { name: 'Oreille présidentielle', color: 'purple', day: 3, description: '+15 F sur la première bonne réponse au Président du jour. +25 F au niveau 2.' },
+    grandrat: { name: 'Le Grand Rat des Archives', color: 'red', day: 3, description: 'Après cinq décisions exactes avec lui : une invocation par partie qui suspend le bureau pendant dix secondes.' }
+  };
+  const MATERIA_COLORS = { green: 'VERTE · INDICE', yellow: 'JAUNE · COMMANDE', purple: 'VIOLETTE · PASSIF', blue: 'BLEUE · SOUTIEN', red: 'ROUGE · INVOCATION' };
+  function initialMateria() { return { equipped: ['loupe', 'cendrier'], xp: {}, uses: {}, procs: {}, streak: 0, summonUsed: false, activeFrom: null, activeUntil: null, referenceWithinSummon: false, lastNote: '' }; }
   // Questions fondées sur les pages officielles de Habanos, S.A.
   const ANATOMY_SOURCE = 'https://www.habanos.com/en/the-anatomy-of-a-habano/';
   const GLOSSARY_SOURCE = 'https://www.habanos.com/en/glossary/';
@@ -147,6 +158,8 @@
   let lighterTimer = null;
   let reggaeTimer = null;
   let pipaTimer = null;
+  let summonTimer = null;
+  let materiaSelectedSlot = 0;
   let invertedReplay = false;
   let lastPointerType = null;
   let tutorialStep = 0;
@@ -162,6 +175,7 @@
     { selector: '#catalog-open', title: 'Le catalogue officiel', copy: 'Ce livre rouge contient les seuls cigares admis sur une fiche. Un nom très plausible peut aussi manquer au catalogue.' },
     { selector: '#rules-open', title: 'Le règlement du guichet', copy: 'Cliquez sur le livre pour lire tous les articles en vigueur. Chaque début de journée présente ses nouvelles règles. Un sabotage du HRPC peut fermer ce livre pour toute une journée.' },
     { selector: '.bureau-shop', title: 'La caisse du bureau', copy: 'Une fois par journée, dépensez 100 F pour décider immédiatement et gagner 50 F nets en plus. Offrez un habano pour 300 F et une faveur, ou lancez un raid sur le HRPC pour 500 F.' },
+    { selector: '#materia-tray', title: 'Vos deux Matérias', copy: 'Vous les équipez au début de chaque journée. Les couleurs indiquent leurs pouvoirs : vert pour un indice, jaune pour une commande, violet pour un bonus, bleu pour soutenir l’autre logement et rouge pour invoquer le Grand Rat. Une décision exacte donne 1 AP aux deux orbes.' },
     { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, sa cendre s’allonge pendant 14 secondes à mesure que le cigare raccourcit. Détachez-la avant sa chute pour gagner un bonus.' },
     { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon cliquez sur Refuser et choisissez le bon motif. Aucun autre élément n’est à sélectionner. Le bouton ? permet de revoir ce tutoriel à tout moment.' }
   ];
@@ -250,6 +264,11 @@
       data.appealCaseId ??= ['002', '003', '019'][seedNumber(`${data.seed || 'LEGACY'}-APPEL`) % 3];
       data.pipaHearts ??= [];
       data.rushDays ??= [];
+      data.materia ??= initialMateria();
+      data.materia.equipped ??= ['loupe', 'cendrier'];
+      data.materia.xp ??= {}; data.materia.uses ??= {}; data.materia.procs ??= {};
+      data.materia.streak ??= 0;
+      data.materia.summonUsed ??= false;
       if (tutorialSeen() && !data.tutorialPausedAt) data.tutorialDone = true;
       return data;
     } catch (_) { return null; }
@@ -279,7 +298,7 @@
       order, interruptions: interruptionSchedule(seed, order), pendingEvents: [], pendingEventIndex: 0, activeInterruption: null,
       index: 0, balance: 0, errors: 0, exact: 0, favor: 0, hrpcBlockDay: 2 + seedNumber(`${seed}-BLOC`) % 3, hrpcDisabled: false, appeal: null, appealCaseId: ['002', '003', '019'][seedNumber(`${seed}-APPEL`) % 3], cutter: null,
       timerCaseId: null, timerDeadline: null, history: {}, paidDays: [], rushDays: [], quizResults: {}, ash: null, ashHistory: [], hamsterResults: {}, hamsterRaceStart: null, hamsterMissingCaseId: null,
-      presidentResults: {}, flatteryCount: 0, suspicion: 0, specialPlayed: false, specialEffect: null, pipaHearts: [], referencePausedAt: null, purchasePausedAt: null, purchaseKind: null, tutorialDone: tutorialSeen(), phase: 'play' };
+      presidentResults: {}, flatteryCount: 0, suspicion: 0, specialPlayed: false, specialEffect: null, pipaHearts: [], referencePausedAt: null, purchasePausedAt: null, purchaseKind: null, materia: initialMateria(), tutorialDone: tutorialSeen(), phase: 'play' };
     showDayBriefing(1);
   }
   function current() {
@@ -376,7 +395,9 @@
   function openReference(kind, opener) {
     if (state?.phase !== 'play' || !$('reference-modal').classList.contains('hidden') || (kind === 'rules' && rulesBlocked())) return;
     referenceKind = kind; referenceOpener = opener;
-    state.referencePausedAt = Date.now(); stopTimer(); stopAsh(); stopPipa(); renderPipa(); save();
+    state.referencePausedAt = Date.now();
+    if (summonActive()) { state.materia.referenceWithinSummon = true; stopSummon(); }
+    stopTimer(); stopAsh(); stopPipa(); renderPipa(); save();
     $('reference-kicker').textContent = kind === 'rules' ? 'CRCC / R-01 · TEXTE EN VIGUEUR' : kind === 'catalog' ? 'CRCC / C-08 · OUVRAGE HOMOLOGUÉ' : 'CRCC / M-12 · INSCRIPTIONS OFFICIELLES';
     $('reference-title').textContent = kind === 'rules' ? 'Règlement du guichet' : kind === 'catalog' ? 'Catalogue des cigares' : 'Registre des membres';
     $('rules-content').classList.toggle('hidden', kind !== 'rules');
@@ -395,14 +416,15 @@
     if (state.timerDeadline) state.timerDeadline += elapsed;
     if (state.ash?.status === 'burning' && state.ash.caseId === current().id) state.ash.startedAt += elapsed;
     if (state.pipaNextAt) state.pipaNextAt += elapsed;
+    if (state.materia.referenceWithinSummon) { state.materia.activeFrom += elapsed; state.materia.activeUntil += elapsed; state.materia.referenceWithinSummon = false; }
     state.referencePausedAt = null; save();
     referenceKind = null; referenceOpener?.focus(); referenceOpener = null;
-    startTimer(current()); startAsh(current()); startPipa();
+    startTimer(current()); startAsh(current()); startPipa(); startSummon();
   }
   function stopTimer() { if (timer) clearInterval(timer); timer = null; }
   function caseLimit(item) { return item.express ? 20 : state.timed ? 30 : 0; }
   function tickTimer() {
-    if (!state || state.phase !== 'play' || !caseLimit(current())) return;
+    if (!state || state.phase !== 'play' || !caseLimit(current()) || summonActive()) return;
     const seconds = Math.max(0, Math.ceil((state.timerDeadline - Date.now()) / 1000));
     $('timer-label').textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
     $('timer-box').classList.toggle('urgent', seconds <= (current().express ? 5 : 10));
@@ -422,7 +444,10 @@
       state.timerDeadline = Date.now() + limit * 1000;
       save();
     }
-    if ((state.index === 0 && !state.tutorialDone) || state.tutorialPausedAt) return;
+    if ((state.index === 0 && !state.tutorialDone) || state.tutorialPausedAt || summonActive()) {
+      if (summonActive()) $('timer-label').textContent = `0:${String(Math.max(0, Math.ceil((state.timerDeadline - state.materia.activeFrom) / 1000))).padStart(2, '0')}`;
+      return;
+    }
     timer = setInterval(tickTimer, 250);
     tickTimer();
   }
@@ -435,7 +460,7 @@
     $('ash-length').style.width = `${consumed}px`;
   }
   function tickAsh() {
-    if (state?.phase !== 'play' || state.ash?.status !== 'burning') return;
+    if (state?.phase !== 'play' || state.ash?.status !== 'burning' || summonActive()) return;
     const progress = Math.min(1, (Date.now() - state.ash.startedAt) / 14000);
     renderAsh(progress);
     $('ash-meter').textContent = progress < .25 ? 'CENDRE COURTE' : progress < .55 ? 'CENDRE MOYENNE' : progress < .8 ? 'CENDRE LONGUE' : 'CENDRE FRAGILE';
@@ -443,6 +468,7 @@
   }
   function settleAsh(status, delta) {
     if (state.ash?.status !== 'burning') return;
+    if (status === 'collected' && materiaEquipped('cendrier')) delta += (materiaLevel('cendrier') === 2 ? 20 : 10) + (materiaLinked('cendrier') ? materiaBlueBonus() : 0);
     stopAsh(); state.ash.burnProgress = Math.min(1, (Date.now() - state.ash.startedAt) / 14000);
     renderAsh(state.ash.burnProgress); state.ash.status = status; state.ash.delta = delta;
     state.ashHistory ??= [];
@@ -460,16 +486,16 @@
     $('ash-panel').classList.toggle('hidden', !firstOfDay);
     if (!firstOfDay) return;
     if (state.ash?.caseId !== item.id) state.ash = { caseId: item.id, startedAt: Date.now(), status: 'burning', delta: 0 };
-    $('ash-button').disabled = state.ash.status !== 'burning';
-    $('ash-skip').disabled = state.ash.status !== 'burning';
+    $('ash-button').disabled = state.ash.status !== 'burning' || summonActive();
+    $('ash-skip').disabled = state.ash.status !== 'burning' || summonActive();
     $('ash-message').textContent = state.ash.status === 'fallen' ? 'Patatras. La cendre est tombée : −30 F.' : state.ash.status === 'collected' ? `Cendre déposée : +${state.ash.delta} F.` : state.ash.status === 'skipped' ? 'Cigare classé sans suite. Aucun bonus ni malus.' : '';
     renderAsh(state.ash.status === 'burning' ? Math.min(1, (Date.now() - state.ash.startedAt) / 14000) : state.ash.burnProgress || 0);
     $('ash-meter').textContent = state.ash.status === 'collected' ? 'DÉTACHÉE' : state.ash.status === 'fallen' ? 'TOMBÉE' : state.ash.status === 'skipped' ? 'CLASSÉ' : 'CENDRE COURTE';
-    if (state.ash.status === 'burning' && !((state.index === 0 && !state.tutorialDone) || state.tutorialPausedAt)) { ashTimer = setInterval(tickAsh, 100); tickAsh(); }
+    if (state.ash.status === 'burning' && !summonActive() && !((state.index === 0 && !state.tutorialDone) || state.tutorialPausedAt)) { ashTimer = setInterval(tickAsh, 100); tickAsh(); }
     save();
   }
   function collectAsh() {
-    if (state?.phase !== 'play' || state.ash?.status !== 'burning') return;
+    if (state?.phase !== 'play' || state.ash?.status !== 'burning' || summonActive()) return;
     const progress = Math.min(1, (Date.now() - state.ash.startedAt) / 14000);
     if (progress >= 1) settleAsh('fallen', -30);
     else settleAsh('collected', Math.max(5, Math.round(progress * 60)));
@@ -508,18 +534,128 @@
     updateTutorialSpotlight(); $('tutorial-next').focus();
   }
   function openTutorial() {
-    if (state?.phase !== 'play' || !$('tutorial-overlay').classList.contains('hidden')) return;
+    if (state?.phase !== 'play' || summonActive() || !$('tutorial-overlay').classList.contains('hidden')) return;
     stopTimer(); stopAsh(); stopPipa(); tutorialPausedAt = state.tutorialPausedAt || Date.now(); state.tutorialPausedAt = tutorialPausedAt; renderPipa(); save(); tutorialStep = 0;
     $('tutorial-overlay').classList.remove('hidden'); document.body.classList.add('tutorial-active');
     showTutorialStep();
   }
-  function rulesBlocked() { return !state.hrpcDisabled && current().day === state.hrpcBlockDay; }
+  function materiaLevel(id) { return (state.materia.xp[id] || 0) >= 6 ? 2 : 1; }
+  function materiaEquipped(id) { return state.materia.equipped.includes(id); }
+  function materiaLinked(id) { return id !== 'duplicata' && materiaEquipped('duplicata') && materiaEquipped(id); }
+  function materiaBlueBonus() { return materiaLevel('duplicata') === 2 ? 20 : 10; }
+  function materiaUseCount(id, day = current().day) { return state.materia.uses[`${id}:${day}`] || 0; }
+  function materiaUseLimit(id) { return (id === 'loupe' && materiaLevel(id) === 2 ? 2 : 1) + (materiaLinked(id) ? materiaLevel('duplicata') : 0); }
+  function materiaOrb(id) { return `<span class="materia-orb ${MATERIA[id].color}" aria-hidden="true"></span>`; }
+  function renderBriefingMateria(day) {
+    $('materia-briefing-slots').innerHTML = state.materia.equipped.map((id, index) => `<button type="button" class="materia-slot ${index === materiaSelectedSlot ? 'selected' : ''}" data-materia-slot="${index}" aria-pressed="${index === materiaSelectedSlot}">${materiaOrb(id)}<span>LOGEMENT ${index + 1}<strong>${escapeHTML(MATERIA[id].name)}</strong></span></button>`).join('<span class="materia-link" aria-hidden="true">◆──◆</span>');
+    $('materia-briefing-choices').innerHTML = Object.entries(MATERIA).map(([id, entry]) => entry.day <= day ? `<button type="button" class="materia-choice ${entry.color} ${materiaEquipped(id) ? 'equipped' : ''}" data-equip-materia="${id}">${materiaOrb(id)}<span><strong>${escapeHTML(entry.name)}</strong><small>${MATERIA_COLORS[entry.color]} · NIVEAU ${materiaLevel(id)} · ${Math.min(6, state.materia.xp[id] || 0)}/6 AP</small><span>${escapeHTML(entry.description)}</span></span></button>` : `<div class="materia-choice locked"><span class="materia-orb locked-orb" aria-hidden="true"></span><span><strong>Scellée jusqu’au jour ${entry.day}</strong><small>ARCHIVES CONFIDENTIELLES</small></span></div>`).join('');
+    $('materia-briefing-note').textContent = `Choisissez un logement, puis une orbe. Les deux logements sont reliés : la Matéria bleue améliore l’autre. Une décision exacte donne 1 AP aux Matérias équipées ; le niveau 2 arrive à 6 AP. L’équipement sera figé jusqu’à la prochaine journée.${day === 3 ? ' Nouvelle pièce : la Matéria rouge peut invoquer le Grand Rat après cinq décisions exactes avec elle.' : ''}`;
+  }
+  function equipMateria(id) {
+    if (state?.phase !== 'briefing' || !MATERIA[id] || MATERIA[id].day > current().day) return;
+    const slots = state.materia.equipped, other = 1 - materiaSelectedSlot;
+    if (slots[other] === id) [slots[materiaSelectedSlot], slots[other]] = [slots[other], slots[materiaSelectedSlot]];
+    else slots[materiaSelectedSlot] = id;
+    state.materia.streak = 0;
+    save(); renderBriefingMateria(current().day);
+  }
+  function renderPlayMateria() {
+    const day = current().day;
+    $('materia-play-slots').innerHTML = state.materia.equipped.map(id => `<div class="materia-mini ${MATERIA[id].color}">${materiaOrb(id)}<span><strong>${escapeHTML(MATERIA[id].name)}</strong><small>NV ${materiaLevel(id)} · ${Math.min(6, state.materia.xp[id] || 0)}/6 AP</small></span></div>`).join('<span class="materia-link" aria-hidden="true">◆</span>');
+    const actions = [];
+    if (materiaEquipped('loupe')) actions.push(`<button type="button" data-use-materia="loupe" ${materiaUseCount('loupe', day) >= materiaUseLimit('loupe') ? 'disabled' : ''}>🟢 INDICE · ${Math.max(0, materiaUseLimit('loupe') - materiaUseCount('loupe', day))} RESTANT(S)</button>`);
+    if (materiaEquipped('montre')) actions.push(`<button type="button" data-use-materia="montre" ${!caseLimit(current()) || materiaUseCount('montre', day) >= materiaUseLimit('montre') ? 'disabled' : ''}>🟡 +${materiaLevel('montre') === 2 ? 8 : 5} S · ${Math.max(0, materiaUseLimit('montre') - materiaUseCount('montre', day))} RESTANT(S)</button>`);
+    if (materiaEquipped('grandrat')) actions.push(`<button type="button" class="materia-summon-button" data-use-materia="grandrat" ${(state.materia.xp.grandrat || 0) < 5 || state.materia.summonUsed ? 'disabled' : ''}>🔴 ${state.materia.summonUsed ? 'INVOCATION UTILISÉE' : (state.materia.xp.grandrat || 0) < 5 ? `CHARGE ${state.materia.xp.grandrat || 0}/5 AP` : 'INVOQUER LE GRAND RAT'}</button>`);
+    $('materia-actions').innerHTML = actions.join('');
+    $('materia-status').textContent = state.materia.lastNote || 'Les orbes équipées gagnent 1 AP à chaque décision exacte.';
+  }
+  function useMateria(id) {
+    if (state?.phase !== 'play' || !materiaEquipped(id) || state.referencePausedAt || state.purchasePausedAt || state.tutorialPausedAt || state.materia.activeUntil) return;
+    const day = current().day;
+    if (id === 'grandrat') { activateSummon(); return; }
+    if (!['loupe', 'montre'].includes(id) || materiaUseCount(id, day) >= materiaUseLimit(id)) return;
+    if (id === 'montre' && !caseLimit(current())) return;
+    state.materia.uses[`${id}:${day}`] = materiaUseCount(id, day) + 1;
+    if (id === 'loupe') {
+      const reason = current().reason;
+      state.materia.lastNote = reason ? `Loupe du Greffier · Piste : relisez l’article ${REASON_RULE[reason]}. Le motif exact reste à trouver.` : 'Loupe du Greffier · Aucune irrégularité manifeste. Vérifiez tout de même les pièces avant de tamponner.';
+    } else {
+      const seconds = materiaLevel('montre') === 2 ? 8 : 5;
+      state.timerDeadline += seconds * 1000;
+      state.materia.lastNote = `Montre du secrétaire · +${seconds} secondes sur ce dossier. Le Comité prétend que l’horloge a toujours affiché cette heure.`;
+      tickTimer();
+    }
+    save(); renderPlayMateria(); tone(id === 'loupe' ? 570 : 680, .12);
+  }
+  function gainMateriaXP(exact) {
+    if (!exact) { state.materia.streak = 0; return ''; }
+    const notes = [];
+    for (const id of state.materia.equipped) {
+      const before = state.materia.xp[id] || 0;
+      state.materia.xp[id] = Math.min(6, before + 1);
+      if (before === 5) notes.push(`${MATERIA[id].name} atteint le niveau 2`);
+      if (id === 'grandrat' && before === 4) notes.push('invocation du Grand Rat chargée');
+    }
+    return notes.join(' · ');
+  }
+  function materiaDecisionBonus(exact, day) {
+    state.materia.streak = exact && materiaEquipped('caisse') ? state.materia.streak + 1 : 0;
+    if (state.materia.streak < 3 || state.materia.procs[`caisse:${day}`]) return 0;
+    state.materia.procs[`caisse:${day}`] = true;
+    return (materiaLevel('caisse') === 2 ? 40 : 25) + (materiaLinked('caisse') ? materiaBlueBonus() : 0);
+  }
+  function summonActive() { return Boolean(state?.materia?.activeUntil && Date.now() < state.materia.activeUntil); }
+  function stopSummon() { if (summonTimer) clearInterval(summonTimer); summonTimer = null; }
+  function renderSummon() {
+    const active = summonActive() && state.phase === 'play';
+    $('play').classList.toggle('summon-truce', active);
+    $('summon-count').classList.toggle('hidden', !active);
+    $('summon-vision').classList.toggle('hidden', !active || Date.now() - state.materia.activeFrom > 2700);
+    if (active) {
+      $('summon-count').textContent = `GRAND RAT · ${Math.max(1, Math.ceil((state.materia.activeUntil - Date.now()) / 1000))} S · BUREAU SUSPENDU`;
+      $('blackout-shade').classList.add('lit');
+    } else if (state?.specialEffect?.kind === 'blackout' && !lighterTimer) $('blackout-shade').classList.remove('lit');
+    $('inverted-cursor').classList.add('hidden');
+    $('help-button').disabled = active;
+    if (state?.ash?.status === 'burning') { $('ash-button').disabled = active; $('ash-skip').disabled = active; }
+  }
+  function settleSummon(restart = true) {
+    if (!state?.materia?.activeUntil) return;
+    const elapsed = Math.max(0, Math.min(Date.now(), state.materia.activeUntil) - state.materia.activeFrom);
+    if (state.timerDeadline) state.timerDeadline += elapsed;
+    if (state.ash?.status === 'burning') state.ash.startedAt += elapsed;
+    if (state.pipaNextAt) state.pipaNextAt += elapsed;
+    state.materia.activeFrom = null; state.materia.activeUntil = null; state.materia.referenceWithinSummon = false;
+    stopSummon(); renderSummon(); save(); updateShop();
+    if (restart && state.phase === 'play') { startTimer(current()); startAsh(current()); startPipa(); }
+  }
+  function startSummon() {
+    stopSummon(); renderSummon();
+    if (!summonActive() || state.referencePausedAt) return;
+    summonTimer = setInterval(() => {
+      if (Date.now() >= state.materia.activeUntil) settleSummon();
+      else renderSummon();
+    }, 120);
+  }
+  function activateSummon() {
+    if (!materiaEquipped('grandrat') || (state.materia.xp.grandrat || 0) < 5 || state.materia.summonUsed) return;
+    state.materia.summonUsed = true;
+    state.materia.activeFrom = Date.now();
+    const seconds = 10 + (materiaLevel('grandrat') === 2 ? 5 : 0) + (materiaLinked('grandrat') ? materiaLevel('duplicata') === 2 ? 8 : 5 : 0);
+    state.materia.activeUntil = state.materia.activeFrom + seconds * 1000;
+    state.materia.lastNote = `Grand Rat des Archives · ${seconds} secondes de suspension provisoire de la réalité.`;
+    state.pipaHearts = []; stopPipa(); stopTimer(); stopAsh(); renderPipa();
+    save(); updateShop(); renderPlayMateria(); startSummon(); tone(110, .35, 'sawtooth');
+  }
+  function rulesBlocked() { return !state.hrpcDisabled && current().day === state.hrpcBlockDay && !summonActive(); }
   function renderRules(day) {
     return [1, 2, 3, 4].filter(number => number <= day).map(number =>
       `<div class="rule-group"><h3>${number === 1 ? 'DISPOSITIONS PERMANENTES' : `CIRCULAIRE DU JOUR ${number}`}</h3>${RULES.filter(rule => rule.day === number).map(rule => `<div class="rule"><b>${rule.id}</b><span>${escapeHTML(rule.text)}</span></div>`).join('')}</div>`
     ).join('');
   }
   function showDayBriefing(day) {
+    if (state.materia.day !== day) { state.materia.day = day; state.materia.streak = 0; }
+    materiaSelectedSlot = 0;
     state.phase = 'briefing'; save();
     $('briefing-kicker').textContent = `CRCC / OUVERTURE DU JOUR ${String(day).padStart(2, '0')}`;
     $('briefing-title').textContent = day === 1 ? 'Votre stage au guichet commence' : `Nouvelles règles · jour ${day}`;
@@ -527,6 +663,7 @@
     $('briefing-story').classList.toggle('hidden', day !== 1);
     $('briefing-story').textContent = day === 1 ? 'Le Hamster Riding Pipe Club (HRPC) est un club rival de rongeurs à pipe. Ses membres surgissent au guichet, falsifient des cachets, grignotent des articles et sabotent parfois le bureau. Leurs incidents sont distincts des dossiers à tamponner : gardez votre calme et vos fiches.' : ''; 
     $('briefing-rules').innerHTML = RULES.filter(rule => rule.day === day).map(rule => `<div class="rule"><b>${rule.id}</b><span>${escapeHTML(rule.text)}</span></div>`).join('');
+    renderBriefingMateria(day);
     $('briefing-note').textContent = day === state.hrpcBlockDay && !state.hrpcDisabled ? '🐹 Sabotage du HRPC : le règlement sera indisponible pendant toute cette journée. Prenez connaissance de ces règles maintenant ; un raid peut ensuite rétablir l’accès.' : state.hrpcDisabled ? 'Le HRPC est hors service. Le règlement restera accessible.' : 'Le règlement, le catalogue et le registre sont consultables depuis le bureau.';
     visible('day-briefing');
   }
@@ -544,9 +681,9 @@
     const blocked = rulesBlocked();
     $('rules-open').disabled = blocked;
     $('rules-lock').classList.toggle('hidden', !blocked);
-    $('rush-case').disabled = state.balance < 100 || state.rushDays.includes(current().day);
-    $('gift-president').disabled = state.balance < 300;
-    $('raid-hrpc').disabled = state.balance < 500 || state.hrpcDisabled;
+    $('rush-case').disabled = summonActive() || state.balance < 100 || state.rushDays.includes(current().day);
+    $('gift-president').disabled = summonActive() || state.balance < 300;
+    $('raid-hrpc').disabled = summonActive() || state.balance < 500 || state.hrpcDisabled;
     if (state.hrpcDisabled) $('shop-status').textContent = 'Le HRPC est hors service jusqu’à la fin de la partie. Le règlement est accessible.';
     else if (blocked) $('shop-status').textContent = 'Le HRPC a bloqué le règlement aujourd’hui. Un raid à 500 F rétablit son accès et neutralise le Club.';
     else $('shop-status').textContent = '100 F : décision juste et prime de 150 F (gain net +50 F, une fois par jour) · 300 F : +1 faveur · 500 F : neutraliser le HRPC.';
@@ -554,7 +691,7 @@
     $('president-opinion').textContent = `AVIS DU PRÉSIDENT · ${presidentOpinion()}`;
   }
   function spend(kind) {
-    if (state?.phase !== 'play' || !$('purchase-modal').classList.contains('hidden')) return;
+    if (state?.phase !== 'play' || summonActive() || !$('purchase-modal').classList.contains('hidden')) return;
     const cost = { rush: 100, gift: 300, raid: 500 }[kind];
     if (!cost || state.balance < cost || (kind === 'raid' && state.hrpcDisabled) || (kind === 'rush' && state.rushDays.includes(current().day))) return;
     if (kind === 'rush') { const item = current(); decide(item.reason ? 'refuse' : 'approve', item.reason, true); return; }
@@ -609,7 +746,7 @@
   function stopReggae() { if (reggaeTimer) clearInterval(reggaeTimer); reggaeTimer = null; }
   function stopPipa() { if (pipaTimer) clearInterval(pipaTimer); pipaTimer = null; }
   function renderPipa() {
-    const active = state?.phase === 'play' && state.specialEffect?.kind === 'pipa' && !state.referencePausedAt && !state.tutorialPausedAt && !state.purchasePausedAt;
+    const active = state?.phase === 'play' && state.specialEffect?.kind === 'pipa' && !state.referencePausedAt && !state.tutorialPausedAt && !state.purchasePausedAt && !summonActive();
     $('pipa-hearts').classList.toggle('hidden', !active);
     $('pipa-counter').classList.toggle('hidden', !active);
     if (!active) return;
@@ -617,7 +754,7 @@
     $('pipa-counter').textContent = `Cœurs de Pipa : ${state.pipaHearts.length} / 24 · Cliquez pour les chasser`;
   }
   function tickPipa() {
-    if (state?.phase !== 'play' || state.specialEffect?.kind !== 'pipa' || state.referencePausedAt || state.tutorialPausedAt || state.purchasePausedAt) return;
+    if (state?.phase !== 'play' || state.specialEffect?.kind !== 'pipa' || state.referencePausedAt || state.tutorialPausedAt || state.purchasePausedAt || summonActive()) return;
     if (Date.now() < state.pipaNextAt) return;
     const id = (state.pipaSequence || 0) + 1;
     state.pipaSequence = id;
@@ -629,7 +766,7 @@
   }
   function startPipa() {
     stopPipa(); renderPipa();
-    if (state?.phase !== 'play' || state.specialEffect?.kind !== 'pipa' || state.referencePausedAt || state.tutorialPausedAt || state.purchasePausedAt) return;
+    if (state?.phase !== 'play' || state.specialEffect?.kind !== 'pipa' || state.referencePausedAt || state.tutorialPausedAt || state.purchasePausedAt || summonActive()) return;
     state.pipaHearts ??= [];
     state.pipaNextAt ||= Date.now() + 1200;
     pipaTimer = setInterval(tickPipa, 180); tickPipa();
@@ -704,14 +841,14 @@
   }
   // Pendant le délire de Cédric, les deux tampons échangent leurs zones de clic à la souris.
   function invertedPointer(event) {
-    if (state?.phase !== 'play' || state.specialEffect?.kind !== 'cedric' || event.pointerType !== 'mouse') return;
+    if (state?.phase !== 'play' || state.specialEffect?.kind !== 'cedric' || summonActive() || event.pointerType !== 'mouse') return;
     const bounds = $('actions').getBoundingClientRect(), cursor = $('inverted-cursor');
     cursor.style.left = `${bounds.left + bounds.right - event.clientX}px`;
     cursor.style.top = `${event.clientY}px`;
     cursor.classList.remove('hidden');
   }
   function invertedClick(event) {
-    if (invertedReplay || state?.phase !== 'play' || state.specialEffect?.kind !== 'cedric' || event.detail === 0 || lastPointerType !== 'mouse') return;
+    if (invertedReplay || state?.phase !== 'play' || state.specialEffect?.kind !== 'cedric' || summonActive() || event.detail === 0 || lastPointerType !== 'mouse') return;
     event.preventDefault(); event.stopImmediatePropagation();
     const buttons = [...$('actions').querySelectorAll('button')], target = event.target.closest('button');
     if (!target || buttons.length !== 2) return;
@@ -722,6 +859,7 @@
   }
   function showCase() {
     const item = current(), card = item.card, sheet = item.sheet, request = item.request;
+    if (state.materia.lastCaseId !== item.id) { state.materia.lastCaseId = item.id; state.materia.lastNote = ''; }
     if (state.purchasePausedAt) {
       const elapsed = Math.max(0, Date.now() - state.purchasePausedAt);
       if (state.timerDeadline) state.timerDeadline += elapsed;
@@ -734,8 +872,10 @@
       if (state.timerDeadline) state.timerDeadline += elapsed;
       if (state.ash?.status === 'burning' && state.ash.caseId === item.id) state.ash.startedAt += elapsed;
       if (state.pipaNextAt) state.pipaNextAt += elapsed;
+      if (state.materia.referenceWithinSummon) { state.materia.activeFrom += elapsed; state.materia.activeUntil += elapsed; state.materia.referenceWithinSummon = false; }
       state.referencePausedAt = null;
     }
+    if (state.materia.activeUntil && !summonActive()) settleSummon(false);
     $('reference-modal').classList.add('hidden');
     $('registry-result').innerHTML = '';
     $('day-label').textContent = `${String(item.day).padStart(2, '0')} / 04`;
@@ -761,7 +901,7 @@
     $('reason-select').innerHTML = '<option value="">Choisir le motif…</option>' + Object.entries(REASONS).filter(([key]) => activeRules.some(rule => rule.id === REASON_RULE[key])).map(([key, label]) => `<option value="${key}">${escapeHTML(label)}</option>`).join('');
     $('reason-select').value = '';
     $('reason-picker').classList.add('hidden'); $('actions').classList.remove('hidden');
-    $('confirm-refusal').disabled = true; state.phase = 'play'; save(); visible('play'); updateShop(); startTimer(item); startAsh(item);
+    $('confirm-refusal').disabled = true; state.phase = 'play'; save(); visible('play'); updateShop(); startTimer(item); startAsh(item); renderPlayMateria(); startSummon();
     if (state.purchaseKind) openPurchase(state.purchaseKind);
     else startPipa();
     if (effect === 'cedric') startReggae();
@@ -770,18 +910,21 @@
   function decide(verdict, reason = null, fast = false) {
     if (state.phase !== 'play' || (verdict === 'refuse' && !reason) || (fast && (state.balance < 100 || state.rushDays.includes(current().day)))) return;
     const item = current();
+    if (state.materia.activeUntil) settleSummon(false);
     if (state.specialEffect?.caseId === item.id) clearSpecialEffect();
     if (state.ash?.caseId === item.id && state.ash.status === 'burning') settleAsh('skipped', 0);
     stopAsh();
     const correctVerdict = verdict !== 'timeout' && (verdict === 'refuse') === Boolean(item.reason);
     const correctReason = verdict === 'approve' || reason === item.reason;
     const exact = Boolean(correctVerdict && correctReason);
-    const delta = (verdict === 'timeout' ? -40 : exact ? (verdict === 'refuse' ? 75 : 50) : correctVerdict ? -30 : -80) + (fast ? 50 : 0);
+    const progression = gainMateriaXP(exact);
+    const materiaBonus = materiaDecisionBonus(exact, item.day);
+    const delta = (verdict === 'timeout' ? -40 : exact ? (verdict === 'refuse' ? 75 : 50) : correctVerdict ? -30 : -80) + (fast ? 50 : 0) + materiaBonus;
     state.balance += delta;
     if (fast) state.rushDays.push(item.day);
     if (exact) state.exact++; else state.errors++;
     if (DIRECTIVES[item.id] && verdict !== 'timeout') state.favor += verdict === 'approve' ? 1 : -1;
-    state.history[item.id] = { verdict, reason, fast, exact, delta, day: item.day };
+    state.history[item.id] = { verdict, reason, fast, exact, delta, day: item.day, materiaBonus, progression };
     stopTimer(); state.timerCaseId = null; state.timerLimit = null; state.timerDeadline = null;
     state.phase = 'result'; save(); showResult();
     tone(exact ? 330 : 130, .13, exact ? 'triangle' : 'sawtooth');
@@ -795,7 +938,7 @@
     $('result-title').textContent = outcome.verdict === 'timeout' ? 'Délai expiré.' : outcome.exact ? (outcome.verdict === 'approve' ? 'Demande validée.' : 'Refus motivé.') : 'Le Comité relève une anomalie.';
     const pressure = DIRECTIVES[item.id] && outcome.verdict !== 'timeout' ? (outcome.verdict === 'approve' ? ' Le Président apprécie votre docilité. Le règlement, moins.' : ' Le Président prend personnellement note de votre indépendance.') : '';
     $('result-text').textContent = (outcome.verdict === 'timeout' ? `Le dossier a été renvoyé sans décision. ${item.explanation}` : item.explanation) + pressure;
-    $('result-ledger').textContent = `${outcome.fast ? 'Traitement immédiat : −100 F + prime 150 F · ' : ''}${outcome.delta > 0 ? '+' : ''}${outcome.delta} F · Caisse du bureau : ${state.balance} F`;
+    $('result-ledger').textContent = `${outcome.fast ? 'Traitement immédiat : −100 F + prime 150 F · ' : ''}${outcome.delta > 0 ? '+' : ''}${outcome.delta} F${outcome.materiaBonus ? ` (Matéria +${outcome.materiaBonus} F)` : ''}${outcome.progression ? ` · ${outcome.progression}` : ''} · Caisse du bureau : ${state.balance} F`;
     const lastOfDay = state.index === state.order.length - 1 || ALL_CASES.find(entry => entry.id === state.order[state.index + 1]).day !== item.day;
     $('next-button').innerHTML = lastOfDay ? 'CLÔTURER LA JOURNÉE <span>→</span>' : 'DOSSIER SUIVANT <span>→</span>';
     visible('result');
@@ -1025,11 +1168,16 @@
     const correct = choice === 'correct', flattery = choice === 'flattery';
     if (flattery) state.flatteryCount++;
     const suspicious = flattery && state.flatteryCount >= 3;
-    const delta = correct ? 35 : suspicious ? -50 : flattery ? -15 : -30;
+    let materiaBonus = 0;
+    if (correct && materiaEquipped('oreille') && !state.materia.procs[`oreille:${state.activeInterruption.day}`]) {
+      state.materia.procs[`oreille:${state.activeInterruption.day}`] = true;
+      materiaBonus = (materiaLevel('oreille') === 2 ? 25 : 15) + (materiaLinked('oreille') ? materiaBlueBonus() : 0);
+    }
+    const delta = (correct ? 35 : suspicious ? -50 : flattery ? -15 : -30) + materiaBonus;
     if (flattery) { if (suspicious) { state.suspicion++; state.favor -= 2; } else state.favor++; }
     state.balance += delta;
     state.presidentResults ??= {};
-    state.presidentResults[state.activeInterruption.id] = { choice, correct, flattery, suspicious, delta };
+    state.presidentResults[state.activeInterruption.id] = { choice, correct, flattery, suspicious, delta, materiaBonus };
     if (state.suspicion >= 3) {
       state.excludedReason = 'president';
       tone(100, .32, 'sawtooth');
@@ -1046,7 +1194,7 @@
     const reaction = result.suspicious ? 'Troisième flatterie ou davantage : le Président soupçonne une manœuvre et retire deux points de faveur.' : result.flattery ? 'La flatterie lui plaît : un point de faveur, malgré la mauvaise réponse.' : '';
     $('president-result-text').textContent = `${question.detail} ${reaction}`.trim();
     $('president-source').href = question.source;
-    $('president-result-ledger').textContent = `${result.delta > 0 ? '+' : ''}${result.delta} F · Faveur ${state.favor > 0 ? '+' : ''}${state.favor} · Soupçons ${state.suspicion} · Caisse ${state.balance} F`;
+    $('president-result-ledger').textContent = `${result.delta > 0 ? '+' : ''}${result.delta} F${result.materiaBonus ? ` (Oreille présidentielle +${result.materiaBonus} F)` : ''} · Faveur ${state.favor > 0 ? '+' : ''}${state.favor} · Soupçons ${state.suspicion} · Caisse ${state.balance} F`;
     visible('president-result');
   }
   function presidentNext() { if (state.phase === 'presidentResult') finishScheduledEvent(); }
@@ -1087,14 +1235,14 @@
     const expressCount = state.order.filter(id => ALL_CASES.find(item => item.id === id)?.express).length;
     const hamsters = Object.values(state.hamsterResults || {});
     const president = Object.values(state.presidentResults || {});
-    return `CRCC — La Grande Homologation : ${finalScore().total} points, ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. Président : ${state.favor > 0 ? '+' : ''}${state.favor} faveurs, ${state.suspicion} soupçon${state.suspicion > 1 ? 's' : ''} ; ${presidentOpinion()} HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Interrogatoires : ${president.filter(result => result.correct).length}/${president.length} justes. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
+    return `CRCC — La Grande Homologation : ${finalScore().total} points, ${state.exact}/${state.order.length} décisions exactes, ${state.errors} observations, ${state.balance} F en caisse. Président : ${state.favor > 0 ? '+' : ''}${state.favor} faveurs, ${state.suspicion} soupçon${state.suspicion > 1 ? 's' : ''} ; ${presidentOpinion()} Matérias : ${state.materia.equipped.map(id => `${MATERIA[id].name} niv. ${materiaLevel(id)}`).join(' + ')}${state.materia.summonUsed ? ' ; Grand Rat invoqué' : ''}. HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Interrogatoires : ${president.filter(result => result.correct).length}/${president.length} justes. Grade : ${rank}. ${state.timed ? 'Mode chrono : 30 s par dossier.' : 'Mode tranquille.'}${expressCount ? ` ${expressCount} dossiers express à 20 s.` : ''} Même défi : ${challengeURL()} On pipe rien, mais on a des fiches.`;
   }
   function finalScore() {
     const decisions = state.exact * 100, cash = state.balance, favor = state.favor * 75, suspicion = state.suspicion * -200;
     return { decisions, cash, favor, suspicion, total: Math.max(0, decisions + cash + favor + suspicion) };
   }
   function finish() {
-    stopPipa(); stopReggae(); stopAsh(); stopTimer();
+    stopPipa(); stopReggae(); stopAsh(); stopTimer(); stopSummon();
     const score = state.exact, total = state.order.length, points = finalScore();
     const rank = state.excludedReason === 'president' ? 'Exclu du CRCC' : state.excludedReason === 'pipa' ? 'Submergé par Pipa' : score === total && points.total >= total * 140 ? 'Grand Rat du guichet' : points.total >= total * 110 ? 'Rat homologué aux tampons' : points.total >= total * 65 ? 'Rat à peu près compétent' : 'Rat de passage surveillé';
     $('ending-title').textContent = rank;
@@ -1108,6 +1256,7 @@
     $('ending-stats').innerHTML = `<div><strong>${points.total}</strong><span>Score final</span></div><div><strong>${score}/${total}</strong><span>Décisions exactes</span></div><div><strong>${state.balance} F</strong><span>Caisse finale</span></div>`;
     $('score-breakdown').innerHTML = `<h2>Calcul du score</h2><div><span>Décisions exactes · ${score} × 100</span><strong>+${points.decisions}</strong></div><div><span>Caisse finale</span><strong>${points.cash > 0 ? '+' : ''}${points.cash}</strong></div><div><span>Faveur présidentielle · ${state.favor} × 75</span><strong>${points.favor > 0 ? '+' : ''}${points.favor}</strong></div><div><span>Soupçons · ${state.suspicion} × −200</span><strong>${points.suspicion}</strong></div><p>Minimum 0 point. Une exclusion met fin au service immédiatement.</p>`;
     $('ending-opinion').textContent = `OPINION DU PRÉSIDENT · ${presidentOpinion()}`;
+    $('materia-summary').textContent = `MATÉRIAS ÉQUIPÉES · ${state.materia.equipped.map(id => `${MATERIA[id].name} (niv. ${materiaLevel(id)}, ${state.materia.xp[id] || 0} AP)`).join(' + ')}. ${state.materia.summonUsed ? 'Le Grand Rat a suspendu la réalité.' : 'Aucune invocation consignée.'}`;
     const hamsters = Object.values(state.hamsterResults || {});
     const president = Object.values(state.presidentResults || {});
     $('ending-special').textContent = `HRPC : ${hamsters.filter(result => result.correct).length}/${hamsters.length} incidents maîtrisés. Interrogatoires du Président : ${president.filter(result => result.correct).length}/${president.length} justes, ${state.flatteryCount} flatteries, ${state.suspicion} soupçons. Commission d’appel : ${state.appeal?.correct ? 'avis juste' : state.appeal?.skipped ? 'non tenue' : 'avis contesté'}. Coupe-cigare : ${state.cutter?.correct ? 'inspection juste' : state.cutter?.skipped ? 'non inspecté' : 'inspection contestée'}. Questions bonus justes : ${Object.values(state.quizResults || {}).filter(result => result.correct).length}. Cendres détachées : ${(state.ashHistory || []).filter(result => result.status === 'collected').length}. Faveur du Président : ${state.favor > 0 ? '+' : ''}${state.favor}.`;
@@ -1197,6 +1346,9 @@
   $('president-answers').addEventListener('click', event => { const button = event.target.closest('[data-president-choice]'); if (button) decidePresident(button.dataset.presidentChoice); });
   $('president-next').addEventListener('click', presidentNext);
   $('briefing-next').addEventListener('click', () => { if (state?.phase === 'briefing') showCase(); });
+  $('materia-briefing-slots').addEventListener('click', event => { const button = event.target.closest('[data-materia-slot]'); if (button) { materiaSelectedSlot = Number(button.dataset.materiaSlot); renderBriefingMateria(current().day); } });
+  $('materia-briefing-choices').addEventListener('click', event => { const button = event.target.closest('[data-equip-materia]'); if (button) equipMateria(button.dataset.equipMateria); });
+  $('materia-actions').addEventListener('click', event => { const button = event.target.closest('[data-use-materia]'); if (button) useMateria(button.dataset.useMateria); });
   $('rush-case').addEventListener('click', () => spend('rush'));
   $('gift-president').addEventListener('click', () => spend('gift'));
   $('raid-hrpc').addEventListener('click', () => spend('raid'));
