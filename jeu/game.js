@@ -114,6 +114,7 @@
   const GLOSSARY_SOURCE = 'https://www.habanos.com/en/glossary/';
   const AGEING_SOURCE = 'https://www.habanos.com/en/ageing-habanos/';
   const CUT_SOURCE = 'https://www.habanos.com/en/choosing-cutting-lighting-and-smoking/';
+  const CRAFT_SOURCE = 'https://www.habanos.com/en/the-craft-of-the-torcedor/';
   const PRESIDENT_QUESTIONS = [
     { q: 'Quelle feuille de tripe, dite Fortaleza 1, est surtout recherchée pour la combustion ?', answer: 'Le volado.', wrong: ['Le seco.', 'Le medio tiempo.'], flattering: 'La feuille que Votre Excellence désigne : le feu obéit au Président.', detail: 'Le volado, Fortaleza 1, favorise la combustibilité.', source: ANATOMY_SOURCE },
     { q: 'Quelle feuille de tripe contribue le plus à l’arôme et correspond à Fortaleza 2 ?', answer: 'Le seco.', wrong: ['Le ligero.', 'Le capote.'], flattering: 'L’arôme présidentiel, Fortaleza Suprême, évidemment.', detail: 'Le seco apporte surtout l’arôme ; il correspond à Fortaleza 2.', source: ANATOMY_SOURCE },
@@ -134,7 +135,26 @@
     { q: 'Quelle opération retire la nervure centrale d’une feuille de tabac ?', answer: 'Le despalillo.', wrong: ['La escogida.', 'La galera.'], flattering: 'Le geste dont le Président a breveté la délicatesse.', detail: 'Le despalillo retire la nervure centrale.', source: GLOSSARY_SOURCE },
     { q: 'Où pratiquer la coupe sur la tête d’un Habano à tête ronde ?', answer: 'Juste au-dessus de la ligne qui joint la coiffe à la cape.', wrong: ['Au milieu du cigare.', 'Sur la bague imprimée.'], flattering: 'Là où le Président daigne poser son regard, au millimètre près.', detail: 'La coupe se fait juste au-dessus de la ligne entre coiffe et cape.', source: CUT_SOURCE },
     { q: 'Quel accessoire convient mal pour couper la pointe d’un figurado ?', answer: 'L’emporte-pièce.', wrong: ['La guillotine.', 'Les ciseaux adaptés.'], flattering: 'Tout outil non béni par la main du Président convient mal.', detail: 'Un emporte-pièce ne permet pas de couper une extrémité pointue.', source: CUT_SOURCE },
-    { q: 'Comment appelle-t-on les décorations en papier des boîtes de Habanos ?', answer: 'Habilitaciones.', wrong: ['Despalilladas.', 'Chaveteadas.'], flattering: 'Les rubans d’investiture du Président, copiés ensuite par tous les fabricants.', detail: 'Les habilitaciones sont les ornements en papier appliqués sur les boîtes.', source: 'https://www.habanos.com/en/dressing-the-box/' }
+    { q: 'Comment appelle-t-on les décorations en papier des boîtes de Habanos ?', answer: 'Habilitaciones.', wrong: ['Despalilladas.', 'Chaveteadas.'], flattering: 'Les rubans d’investiture du Président, copiés ensuite par tous les fabricants.', detail: 'Les habilitaciones sont les ornements en papier appliqués sur les boîtes.', source: 'https://www.habanos.com/en/dressing-the-box/' },
+    { q: 'Quel outil cylindrique découpe le petit disque de cape destiné à finir la tête du Habano ?', answer: 'Le casquillo.', wrong: ['La chaveta.', 'Le cepo.'], flattering: 'Le poinçon personnel de Votre Présidence, dont le cercle n’ose être imparfait.', detail: 'Le casquillo découpe le petit disque de cape pour la tête.', source: CRAFT_SOURCE },
+    { q: 'Dans l’atelier, que lit traditionnellement le lector aux rouleurs pendant leur travail ?', answer: 'Le journal et des romans.', wrong: ['Le registre des humidors.', 'Le rapport des cendres.'], flattering: 'Vos discours complets, Monsieur le Président, sans une seule pause.', detail: 'Le lector lit le journal et des romans choisis par vote.', source: CRAFT_SOURCE },
+    { q: 'Où place-t-on les feuilles de ligero et medio tiempo dans la tripe lors du roulage ?', answer: 'Au centre.', wrong: ['Contre la cape.', 'À l’extérieur de la bague.'], flattering: 'Autour de votre portrait, centre naturel de toute composition.', detail: 'Les feuilles plus fortes et lentes à brûler sont placées au centre.', source: CRAFT_SOURCE },
+    { q: 'Combien de temps au moins le bonche est-il pressé dans un moule de bois ?', answer: 'Trente minutes.', wrong: ['Trois minutes.', 'Toute une nuit.'], flattering: 'Le temps nécessaire pour admirer votre signature, donc une éternité.', detail: 'Le bonche reste au moins trente minutes dans le moule.', source: CRAFT_SOURCE },
+    { q: 'Pourquoi le torcedor laisse-t-il la face la plus lisse de la cape vers l’extérieur ?', answer: 'Pour que cette face soit visible sur le cigare fini.', wrong: ['Pour masquer la bague.', 'Pour accélérer la fermentation.'], flattering: 'Pour refléter la perfection du Président comme un miroir.', detail: 'La face la plus lisse de la cape reste visible sur le cigare fini.', source: CRAFT_SOURCE },
+    { q: 'Quelle flamme recommande Habanos pour allumer un cigare sans y apporter d’odeur ?', answer: 'La flamme d’un briquet au butane.', wrong: ['La flamme d’une bougie parfumée.', 'La flamme d’un briquet à essence.'], flattering: 'La flamme de votre génie, Monsieur le Président.', detail: 'Habanos recommande une flamme sans odeur, notamment un briquet au butane.', source: CUT_SOURCE },
+    { q: 'Que faut-il vérifier en soufflant doucement sur le pied du cigare après l’allumage ?', answer: 'Qu’il est allumé uniformément.', wrong: ['Que la bague tient encore.', 'Que la cape a foncé.'], flattering: 'Que le cigare acclame votre arrivée par une fumée parfaite.', detail: 'Souffler doucement sur le pied permet de vérifier un allumage uniforme.', source: CUT_SOURCE },
+    { q: 'Que conseille Habanos si un cigare s’éteint avant de le rallumer ?', answer: 'Ôter d’abord les cendres libres.', wrong: ['Tremper le pied dans l’eau.', 'Retirer toute la cape.'], flattering: 'Demander l’autorisation à Votre Excellence avant de le ressusciter.', detail: 'Les cendres libres doivent être retirées avant le rallumage.', source: CUT_SOURCE }
+  ];
+  const QUIZ_CASE_IDS = ['036', '004', '038'];
+  const QUIZ_VARIANTS = [
+    { q: 'Comment s’appelle le lecteur qui accompagne traditionnellement les torcedores dans l’atelier ?', options: ['Lector', 'Catador', 'Cepo'], answer: 0, explanation: 'Le lector lit le journal et des romans pendant le roulage.', source: CRAFT_SOURCE },
+    { q: 'Quel outil découpe le petit disque de cape posé à la fin sur la tête du cigare ?', options: ['Chaveta', 'Casquillo', 'Cepo'], answer: 1, explanation: 'Le casquillo découpe ce disque de finition.', source: CRAFT_SOURCE },
+    { q: 'Où place-t-on les feuilles de ligero et de medio tiempo dans la tripe ?', options: ['Sous la bague', 'Au pied uniquement', 'Au centre'], answer: 2, explanation: 'Ces feuilles plus fortes et plus lentes à brûler sont placées au centre.', source: CRAFT_SOURCE },
+    { q: 'Combien de temps au minimum le bonche reste-t-il pressé dans son moule de bois ?', options: ['30 minutes', '3 minutes', '12 heures'], answer: 0, explanation: 'Le moule de bois presse le bonche pendant au moins 30 minutes.', source: CRAFT_SOURCE },
+    { q: 'Quelle face de la cape doit rester visible sur le cigare terminé ?', options: ['La plus nervurée', 'La plus lisse', 'Celle portant la bague'], answer: 1, explanation: 'La face la plus lisse de la cape est tournée vers l’extérieur.', source: CRAFT_SOURCE },
+    { q: 'Pourquoi faut-il éviter la flamme d’une bougie pour allumer un Habano ?', options: ['Elle raccourcit la bague', 'Elle durcit le capote', 'Son odeur peut imprégner le cigare'], answer: 2, explanation: 'Habanos recommande une flamme sans odeur, comme celle du butane.', source: CUT_SOURCE },
+    { q: 'Après avoir allumé le pied, pourquoi souffle-t-on doucement dessus ?', options: ['Vérifier une combustion uniforme', 'Refroidir la bague', 'Décoller la cape'], answer: 0, explanation: 'Le souffle révèle si le pied est allumé uniformément.', source: CUT_SOURCE },
+    { q: 'Avant de rallumer un Habano éteint, que faut-il enlever ?', options: ['La bague', 'Les cendres libres', 'La sous-cape'], answer: 1, explanation: 'Habanos recommande d’ôter les cendres libres avant le rallumage.', source: CUT_SOURCE }
   ];
   const PRESIDENT_INTROS = [
     'Le Président reçoit une délégation japonaise et souhaite votre avis avant que les interprètes ne trouvent le mot « volado ». ',
@@ -190,7 +210,7 @@
     { selector: '#registry-open', title: 'Le registre des membres', copy: 'Cherchez le numéro de la carte, puis éventuellement le nom. Vous y trouverez le vrai grade, le numéro officiel et les fiches archivées.' },
     { selector: '#catalog-open', title: 'Le catalogue officiel', copy: 'Ce livre rouge contient les seuls cigares admis sur une fiche. Un nom très plausible peut aussi manquer au catalogue.' },
     { selector: '#rules-open', title: 'Le règlement du guichet', copy: 'Cliquez sur le livre pour lire tous les articles en vigueur. Chaque début de journée présente ses nouvelles règles. Un sabotage du HRPC peut fermer ce livre pour toute une journée.' },
-    { selector: '.bureau-shop', title: 'La caisse du bureau', copy: 'Une fois par journée, dépensez 100 F pour décider immédiatement et gagner 50 F nets en plus. Offrez un habano pour 300 F et une faveur, ou lancez un raid sur le HRPC pour 500 F.' },
+    { selector: '.bureau-shop', title: 'La caisse du bureau', copy: 'Une fois par journée, dépensez 100 F pour décider immédiatement et gagner 50 F nets en plus. Offrez un habano pour 300 F et une faveur, ou lancez un raid sur le HRPC pour 300 F.' },
     { selector: '#ash-panel', title: 'Le cigare sur le bureau', copy: 'Une fois par journée, la cendre s’allonge à un rythme imprévisible pendant que le cigare raccourcit. Détachez-la avant sa chute pour gagner un bonus.' },
     { selector: '.decision-area', title: 'À vous de tamponner', copy: 'Si tout est conforme, validez. Sinon cliquez sur Refuser et choisissez le bon motif. Aucun autre élément n’est à sélectionner. Le bouton ? permet de revoir ce tutoriel à tout moment.' }
   ];
@@ -349,6 +369,15 @@
       item.reason = refused ? null : 'parrain';
       item.explanation = refused ? 'Monsieur Crevette a désormais 3 fiches archivées et peut proposer ce candidat.' : 'Une seule fiche archivée : le parrainage reste irrecevable.';
     }
+    if (QUIZ_CASE_IDS.includes(item.id)) {
+      const order = shuffle(QUIZ_VARIANTS, seededRandom(`${state.seed || 'LEGACY'}-GUICHET-QUESTIONS`));
+      const question = order[QUIZ_CASE_IDS.indexOf(item.id)];
+      item.request.action = 'Question sur les cigares';
+      item.request.note = question.q;
+      item.quiz = { options: question.options, answer: question.answer, explanation: question.explanation, source: question.source };
+      item.quote = '« Une réponse précise, si possible avant la prochaine circulaire. »';
+      item.explanation = 'La question est recevable et les pièces sont conformes. Le quiz donne un bonus distinct de la décision.';
+    }
     return item;
   }
   function row(key, label, value) {
@@ -408,7 +437,7 @@
     panel.classList.toggle('hidden', !item.quiz);
     if (!item.quiz) return;
     const result = state.quizResults?.[item.id];
-    panel.innerHTML = `<p class="eyebrow">QUESTION DE DOCTRINE · BONUS FACULTATIF</p><h3>${escapeHTML(item.request.note)}</h3><div class="quiz-options">${item.quiz.options.map((option, index) => `<button type="button" data-quiz-choice="${index}" ${result ? 'disabled' : ''}>${escapeHTML(option)}</button>`).join('')}</div><p class="quiz-feedback">${result ? escapeHTML(`${result.correct ? '+25 F' : '−10 F'} · ${item.quiz.explanation}`) : 'Répondez pour un bonus, puis traitez la demande normalement. Une mauvaise réponse n’invalide pas le dossier.'}</p>${result ? '<a href="https://www.habanos.com/en/the-anatomy-of-a-habano/" target="_blank" rel="noopener noreferrer">Source : Habanos, S.A.</a>' : ''}`;
+    panel.innerHTML = `<p class="eyebrow">QUESTION DE DOCTRINE · BONUS FACULTATIF</p><h3>${escapeHTML(item.request.note)}</h3><div class="quiz-options">${item.quiz.options.map((option, index) => `<button type="button" data-quiz-choice="${index}" ${result ? 'disabled' : ''}>${escapeHTML(option)}</button>`).join('')}</div><p class="quiz-feedback">${result ? escapeHTML(`${result.correct ? '+25 F' : '−10 F'} · ${item.quiz.explanation}`) : 'Répondez pour un bonus, puis traitez la demande normalement. Une mauvaise réponse n’invalide pas le dossier.'}</p>${result ? '<a href="${escapeHTML(item.quiz.source || ANATOMY_SOURCE)}" target="_blank" rel="noopener noreferrer">Source : Habanos, S.A.</a>' : ''}`;
   }
   function answerQuiz(choice) {
     const item = current();
@@ -788,16 +817,16 @@
     $('rules-lock').classList.toggle('hidden', !blocked);
     $('rush-case').disabled = summonActive() || state.balance < 100 || state.rushDays.includes(current().day);
     $('gift-president').disabled = summonActive() || state.balance < 300;
-    $('raid-hrpc').disabled = summonActive() || state.balance < 500 || state.hrpcDisabled;
+    $('raid-hrpc').disabled = summonActive() || state.balance < 300 || state.hrpcDisabled;
     if (state.hrpcDisabled) $('shop-status').textContent = 'Le HRPC est hors service jusqu’à la fin de la partie. Le règlement est accessible.';
-    else if (blocked) $('shop-status').textContent = 'Le HRPC a bloqué le règlement aujourd’hui. Un raid à 500 F rétablit son accès et neutralise le Club.';
-    else $('shop-status').textContent = '100 F : décision juste et prime de 150 F (gain net +50 F, une fois par jour) · 300 F : +1 faveur · 500 F : neutraliser le HRPC.';
+    else if (blocked) $('shop-status').textContent = 'Le HRPC a bloqué le règlement aujourd’hui. Un raid à 300 F rétablit son accès et neutralise le Club.';
+    else $('shop-status').textContent = '100 F : décision juste et prime de 150 F (gain net +50 F, une fois par jour) · 300 F : +1 faveur · 300 F : neutraliser le HRPC.';
     $('shop-status').textContent += ` Faveur : ${state.favor > 0 ? '+' : ''}${state.favor} · Soupçons : ${state.suspicion}/3.`;
     $('president-opinion').textContent = `AVIS DU PRÉSIDENT · ${presidentOpinion()}`;
   }
   function spend(kind) {
     if (state?.phase !== 'play' || summonActive() || !$('purchase-modal').classList.contains('hidden')) return;
-    const cost = { rush: 100, gift: 300, raid: 500 }[kind];
+    const cost = { rush: 100, gift: 300, raid: 300 }[kind];
     if (!cost || state.balance < cost || (kind === 'raid' && state.hrpcDisabled) || (kind === 'rush' && state.rushDays.includes(current().day))) return;
     if (kind === 'rush') { const item = current(); decide(item.reason ? 'refuse' : 'approve', item.reason, true); return; }
     state.balance -= cost;
@@ -813,7 +842,7 @@
     $('purchase-kicker').textContent = kind === 'gift' ? 'REÇU DU SERVICE DES ATTENTIONS' : 'RAPPORT D’OPÉRATION ANTIRONGEURS';
     $('purchase-title').textContent = kind === 'gift' ? 'Le Président a reçu son habano.' : 'Le HRPC connaît une journée difficile.';
     $('purchase-copy').textContent = kind === 'gift' ? 'Il l’a humé longuement, puis a demandé à son secrétaire de consigner que ce geste venait spontanément de vous. Sa gratitude tiendra au moins jusqu’à la prochaine circulaire.' : 'Une escouade de contrôleurs a investi la roue, saisi trois pipes et réquisitionné le petit casque du chef. Les hamsters se déclarent en séminaire de reconstruction pour le reste de la partie.';
-    $('purchase-ledger').textContent = `${kind === 'gift' ? '−300 F · +1 faveur présidentielle' : '−500 F · HRPC hors service'} · Caisse : ${state.balance} F`;
+    $('purchase-ledger').textContent = `${kind === 'gift' ? '−300 F · +1 faveur présidentielle' : '−300 F · HRPC hors service'} · Caisse : ${state.balance} F`;
     $('purchase-modal').classList.remove('hidden'); $('purchase-close').focus();
   }
   function closePurchase() {
