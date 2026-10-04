@@ -16,7 +16,8 @@ Toute information publiée ici est réputée sérieuse jusqu’à preuve du cont
 
 ## Organisation
 
-- `index.html` — portail officiel du Club
+- `index.html` — portail officiel du Club, portrait des quatre membres fondateurs et chronique apocryphe des origines
+- `images/membres-fondateurs-crcc.png` — portrait des fondateurs généré pour les archives fictives du Club
 - `jeu/` — La Grande Homologation, jeu de contrôle des dossiers (HTML, CSS et JavaScript)
 - `activites.html` — activités et procédures approuvées
 - `degustation.html` — méthode officielle pour déguster un cigare

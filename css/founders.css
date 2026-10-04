@@ -1,0 +1,13 @@
+.founders{scroll-margin-top:24px}
+.founders>h2{margin-top:20px}
+.founders-portrait{margin:24px 0 28px}
+.founders-portrait a{display:block}
+.founders-portrait img{display:block;width:100%;height:auto;border:1px solid var(--line)}
+.founders-portrait figcaption{padding:12px 14px;background:var(--paper-alt);border:1px solid var(--line);border-top:0;color:var(--muted);font-size:13px;line-height:1.6}
+.founders-history h3{margin-top:14px}
+.founders-history p:last-of-type{margin-bottom:0}
+.founders-history blockquote{margin-bottom:0}
+.founders-grid .card{margin-bottom:0}
+.founders-grid h3{margin-top:10px}
+.founders-grid p{margin-bottom:0}
+.founders-grid{margin-bottom:36px}
