@@ -60,3 +60,18 @@ Version en vigueur sous réserve des modifications décidées ultérieurement pa
 Toute contestation devra être formulée par écrit, sur support suffisamment sérieux, puis soumise au service compétent.
 
 Le service compétent n’a pas encore été identifié.
+
+
+## Archives de dégustation
+
+La section `fiches-degustation/` est accessible depuis le guide et le pied de page de l’accueil, sans entrée au menu principal. Pages statiques, consultables sans JavaScript ; les filtres membre/marque ajoutent une aide facultative.
+
+Source : `data/degustations.json` et fragments HTML de comptes rendus dans `data/comptes-rendus/`. Régénérer avec `python3 scripts/build-degustations.py`, puis vérifier avec `python3 scripts/test-degustations.py`. Les pages générées sont versionnées pour GitHub Pages ; aucune dépendance ni compilation côté hébergeur.
+
+Chaque séance possède un identifiant stable, une date de dégustation, un contexte, des participants (avec leur grade historique), les cigares et une liste de fiches. `minutes_pdf` vaut `null` ou le chemin relatif d’un unique PDF commun, placé par exemple dans `documents/seances/<id>/minutes.pdf`. Il ne faut pas dupliquer les minutes par membre.
+
+Chaque fiche possède un identifiant stable, un `member_id` figurant dans les participants, un numéro unique par membre, un titre, un PDF (par exemple `documents/<membre>/fiche-<numero>.pdf`), un compte rendu HTML, les notes et les dates de publication/révision. `cigar_score` est sur 10 (ou null) ; les critères du Comité totalisent 100, avec une note calculée par somme. Le générateur refuse les références manquantes, les doublons et les notes invalides.
+
+Lorsqu’une séance contient des minutes, chaque fiche doit renseigner `minutes_contribution` : apport attribué au membre et critères réévalués, ou absence d’apport individuel. Mettre à jour les critères concernés, `evaluation_basis` et `revised` ; aucune prime automatique ni pénalité pour absence de minutes. Les propos sans auteur restent un contexte commun. `appreciation` et `mention` contiennent la conclusion éditoriale. Le barème initial est proposé, sans valeur de règlement préexistant.
+
+Pour ajouter un membre à une séance existante, ajouter son entrée à `participants`, puis sa fiche à `sheets`. Pour une dégustation solitaire, conserver la même structure avec un participant. Plusieurs cigares et plusieurs fiches d’un même membre sont possibles. L’index trie les séances par date décroissante ; chaque fiche conserve son titre « Membre - Fiche N - Titre - Date ». Les liens entre séance, minutes et fiches sont générés automatiquement.

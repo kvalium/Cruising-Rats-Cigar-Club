@@ -1,0 +1,49 @@
+{
+  "sessions": [
+    {
+      "id": "2026-08-12-un-classique-sous-observation",
+      "date": "2026-08-12",
+      "title": "Un classique sous observation",
+      "context": "Première dégustation documentée du Rat de Passage Louis. Le lieu et les conditions ambiantes ne sont pas précisés dans la fiche.",
+      "participants": [{"id": "louis", "name": "Louis", "grade": "Rat de Passage"}],
+      "cigars": ["Romeo y Julieta — Robusto, cepo 50 (selon la fiche)"],
+      "minutes_pdf": null,
+      "sheets": [
+        {
+          "id": "louis-fiche-1",
+          "member_id": "louis",
+          "number": 1,
+          "title": "Un classique sous observation",
+          "first": true,
+          "brand": "Romeo y Julieta",
+          "cigar": "Romeo y Julieta — Robusto, cepo 50 (référence exacte non précisée)",
+          "duration": "1 heure",
+          "pairing": "Rosé",
+          "price": "9 € déclarés",
+          "pdf": "documents/louis/fiche-1.pdf",
+          "report": "data/comptes-rendus/louis-fiche-1.html",
+          "cigar_score": 6.7,
+          "cigar_score_note": "Note manuscrite lue à 6,7/10.",
+          "published": "2026-10-23",
+          "revised": "2026-10-23",
+          "evaluation_basis": "Fiche de dégustation seule. Aucune minute jointe à cette séance.",
+          "minutes_contribution": null,
+          "criteria": [
+            {"label": "Identification et renseignements généraux", "score": 11, "max": 15, "comment": "Informations principales présentes ; référence exacte et identification du dégustateur sur la fiche à compléter."},
+            {"label": "Préparation et observations techniques", "score": 14, "max": 20, "comment": "Examen tactile et coupe renseignés ; tirage et suivi de combustion insuffisamment documentés."},
+            {"label": "Description et évolution aromatiques", "score": 24, "max": 30, "comment": "Progression foin, floral, terre bien repérée ; quelques qualificatifs encore généraux."},
+            {"label": "Cohérence et nuance du jugement", "score": 17, "max": 20, "comment": "Appréciation mesurée ; distinction entre douceur et caractère corsé à préciser."},
+            {"label": "Soin et exploitation de la fiche", "score": 12, "max": 15, "comment": "Écriture globalement lisible, trois tiers suivis ; quelques cases vides et une note masquée par le tampon."}
+          ],
+          "appreciation": [
+            "Louis remet une première fiche appliquée, suffisamment détaillée pour restituer le déroulement de sa dégustation. Son principal mérite réside dans l’observation d’une évolution : le cigare ne reçoit pas une description unique étendue artificiellement sur une heure.",
+            "Les progrès attendus concernent surtout la précision documentaire et la distinction des sensations. Pour sa prochaine fiche, Louis gagnera à renseigner systématiquement le tirage, à identifier exactement le cigare et à expliquer les termes généraux tels que « riche », « large » ou « corsé ». Il pourra également consigner la longueur maximale de cendre et les éventuels incidents de combustion, au besoin dans les marges.",
+            "Le Comité n’attend pas qu’il découvre davantage d’arômes pour remplir davantage de lignes. Une sensation simple, décrite avec justesse, suffit. L’absence d’un arôme reste préférable à l’invention d’une noisette sous pression administrative.",
+            "Cette contribution constitue un premier repère utile dans le parcours du Rat de Passage Louis. Elle ne préjuge d’aucune évolution de grade. Le Comité relève néanmoins qu’un cigare a été observé, qu’une fiche a été remplie et que les deux ont pu être rapprochés sans ouverture d’enquête."
+          ],
+          "mention": "Première fiche encourageante — sens de l’observation établi, précision en cours d’affinage."
+        }
+      ]
+    }
+  ]
+}
