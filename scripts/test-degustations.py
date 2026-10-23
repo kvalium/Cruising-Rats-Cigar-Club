@@ -78,7 +78,7 @@ scores = {f['member_id']:archives.score(f) for f in october['sheets']}
 assert scores=={'julien':82,'louis':79}
 julien = next(f for f in october['sheets'] if f['member_id']=='julien')
 assert julien['cigar_score']==7.3 and julien['duration_minutes'] is None
-assert sum(f['member_id']=='louis' for s in data['sessions'] for f in s['sheets'])==2
+assert sum(f['member_id']=='louis' for s in data['sessions'] for f in s['sheets'])==3
 session_page = (archives.ROOT / 'fiches-degustation/seance-2026-08-12-un-classique-sous-observation.html').read_text()
 assert 'Première fiche</span>' not in session_page, 'First-sheet badge must be absent from session cards'
 assert 'Consulter la fiche et le compte rendu' in session_page
@@ -147,3 +147,15 @@ with tempfile.TemporaryDirectory() as tmp:
         raise AssertionError('Shared minutes require an individual evaluation explanation')
     archives.ROOT = previous_root
 print('Archive checks passed: links, scores, sorting, multi-member sessions, shared minutes, individual attribution.')
+
+new_session = next(s for s in data['sessions'] if s['date']=='2026-10-21')
+assert {f['member_id']:archives.score(f) for f in new_session['sheets']} == {'julien':81,'louis':73}
+assert {f['member_id']:f['cigar_score'] for f in new_session['sheets']} == {'julien':8.7,'louis':8.2}
+assert new_session['sheets'][0]['duration_minutes'] is None
+assert new_session['sheets'][1]['duration_minutes'] == 90
+assert len(new_session['prospects']) == 2 and len(new_session['participants']) == 2
+new_page = (archives.ROOT / 'fiches-degustation' / archives.session_url(new_session)).read_text()
+assert new_page.index('Minutes de la séance') < new_page.index('Fiches et comptes rendus')
+assert '20 h 17' in new_page and '140 mm' in new_page
+assert 'fiche-julien-fiche-2.html' in new_page and 'fiche-louis-fiche-3.html' in new_page
+assert 'sous-cape' in (archives.ROOT / 'fiches-degustation/fiche-louis-fiche-3.html').read_text()

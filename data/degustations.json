@@ -542,6 +542,342 @@
           }
         ]
       }
+    },
+    {
+      "id": "2026-10-21-don-tomas-clasico-robusto",
+      "date": "2026-10-21",
+      "title": "Don Tomás Clásico Robusto — La cendre tient, les fiches aussi",
+      "context": "Dégustation en plein air sur un patio privatif à Langon, le mercredi 21 octobre 2026, de 19 h 15 à la clôture des fiches à 20 h 47.",
+      "participants": [
+        {
+          "id": "julien",
+          "name": "Julien",
+          "grade": "Rat de Passage"
+        },
+        {
+          "id": "louis",
+          "name": "Louis",
+          "grade": "Rat de Passage"
+        }
+      ],
+      "prospects": [
+        {
+          "name": "L. Monchany"
+        },
+        {
+          "name": "S. Hoummadi"
+        }
+      ],
+      "cigars": [
+        "Don Tomás Clásico Robusto (module confirmé lors du dépôt)"
+      ],
+      "minutes_pdf": "documents/seances/2026-10-21-don-tomas-clasico-robusto/minutes.pdf",
+      "sheets": [
+        {
+          "id": "julien-fiche-2",
+          "member_id": "julien",
+          "number": 2,
+          "title": "Du cacao torréfié à la vieille pierre",
+          "first": false,
+          "brand": "Don Tomás",
+          "cigar": "Don Tomás Clásico Robusto (module confirmé au dépôt)",
+          "duration": "Non renseignée",
+          "duration_minutes": null,
+          "pairing": "Rhum Planteray Sealander, puis verveine maison citronnée 2026",
+          "price": "Non renseigné",
+          "pdf": "documents/seances/2026-10-21-don-tomas-clasico-robusto/fiche-julien-2.pdf",
+          "report": "data/comptes-rendus/julien-fiche-2.html",
+          "published": "2026-10-23",
+          "evaluation_basis": "Fiche individuelle, deux pages de minutes communes, confirmation du module par le déposant et références de gamme consultées le 23 octobre 2026.",
+          "criteria": [
+            {
+              "label": "Identification et renseignements généraux",
+              "score": 8,
+              "max": 15,
+              "comment": "Gamme et origine présentes, conservation renseignée ; module et référence remplacés par des réponses non exploitables. Robusto confirmé seulement au dépôt."
+            },
+            {
+              "label": "Préparation et observations techniques",
+              "score": 15,
+              "max": 20,
+              "comment": "Coupe droite, tirage à froid et échelles suivis ; examen visuel/tactile presque vide et rallumage connu surtout par les minutes."
+            },
+            {
+              "label": "Description et évolution aromatiques",
+              "score": 27,
+              "max": 30,
+              "comment": "Noisettes, cacao, bois tendre et pierre : évolution abondamment décrite, finale encore peu localisée dans le temps."
+            },
+            {
+              "label": "Cohérence et nuance du jugement",
+              "score": 18,
+              "max": 20,
+              "comment": "Métamorphose, intensité et verdict sont distingués ; fin regrettable et rachat affirmé cohérents, raison précise de l’arrêt à expliciter."
+            },
+            {
+              "label": "Soin et exploitation de la fiche",
+              "score": 13,
+              "max": 15,
+              "comment": "Deux pages lisibles, bague jointe et bilan complet ; identification inadaptée déjà comptée dans son critère."
+            }
+          ],
+          "rubric_id": "crcc-propose-2026-v1",
+          "rubric_label": "Barème proposé du Comité — 2026",
+          "origin": "Honduras (déclarée)",
+          "module": "Robusto (confirmé au dépôt)",
+          "reference_exact": "Don Tomás Clásico Robusto",
+          "ash_max_cm": null,
+          "technique": {
+            "draw": null,
+            "relights": 1,
+            "touchups": null
+          },
+          "cigar_score": 8.7,
+          "cigar_score_note": "Note manuscrite personnelle 87/100, normalisée à 8,7/10 ; distincte de la note documentaire du Comité.",
+          "minutes_contribution": "Julien acquiesce à la douceur initiale, semble rejoindre la comparaison des marrons chauds, évoque le granit et une palette plus variée en plein air. Le rallumage commun à 19 h 53 concerne les deux cigares ; aucune faute technique individuelle n’en est déduite.",
+          "aromas": [
+            "Bois",
+            "Cacao",
+            "Pomme caramélisée",
+            "Maté",
+            "Noisette",
+            "Marron chaud",
+            "Minéral"
+          ],
+          "strength_score": null,
+          "richness_score": null,
+          "appreciation": [
+            "Julien signe une deuxième contribution plus développée sur l’évolution aromatique : les noisettes grillées et le cacao torréfié cèdent la place au bois tendre, puis à la vieille pierre. Les minutes complètent cette trajectoire par le granit et une variété accrue ressentie en plein air.",
+            "Cette richesse ne dispense pas d’identifier le cigare. « Oui » n’est pas une vitole et l’absence revendiquée de référence ne devient pas une qualité par répétition. Le Robusto est confirmé lors du dépôt ; la bague et les renseignements de conservation sont utiles, mais les champs du formulaire restent insuffisants.",
+            "L’évaluation atteint 81/100 : l’analyse sensorielle progresse, l’identification et l’examen de construction restent moins complets que le récit. La légère baisse face aux 82/100 de la première fiche illustre ces compromis, sans mesurer une baisse du plaisir.",
+            "Les 87/100 manuscrits sont conservés comme note personnelle du cigare, soit 8,7/10. Le Comité maintient le grade documenté de Rat de Passage ; la métamorphose concerne le cigare."
+          ],
+          "mention": "Recevable avec réserves — belle progression sensorielle, identité du spécimen à mieux renseigner.",
+          "next_steps": [
+            "Inscrire marque, gamme, module et dimensions avant l’allumage.",
+            "Compléter uniformité, texture, construction et fermeté.",
+            "Reporter les horaires et interventions techniques sur la fiche.",
+            "Relier la fin regrettable à une raison précise."
+          ],
+          "revised": "2026-10-23"
+        },
+        {
+          "id": "louis-fiche-3",
+          "member_id": "louis",
+          "number": 3,
+          "title": "Une cendre remarquable, une sous-cape à rétablir",
+          "first": false,
+          "brand": "Don Tomás",
+          "cigar": "Don Tomás Clásico Robusto (module confirmé au dépôt)",
+          "duration": "1 h 30 déclarée sur la fiche",
+          "duration_minutes": 90,
+          "pairing": "Rhum Planteray Sealander, puis verveine maison citronnée 2026",
+          "price": "8 € déclarés",
+          "pdf": "documents/seances/2026-10-21-don-tomas-clasico-robusto/fiche-louis-3.pdf",
+          "report": "data/comptes-rendus/louis-fiche-3.html",
+          "published": "2026-10-23",
+          "evaluation_basis": "Fiche individuelle, deux pages de minutes communes, confirmation du module par le déposant et références de gamme consultées le 23 octobre 2026.",
+          "criteria": [
+            {
+              "label": "Identification et renseignements généraux",
+              "score": 6,
+              "max": 15,
+              "comment": "Gamme et Honduras utiles ; module et dimensions non exploitables, sous-cape dite inexistante en contradiction avec la référence, tripe non identifiée."
+            },
+            {
+              "label": "Préparation et observations techniques",
+              "score": 15,
+              "max": 20,
+              "comment": "Coupe en V, allumette et cendre suivis ; tirage à froid laissé vide, rallumage commun documenté par les minutes."
+            },
+            {
+              "label": "Description et évolution aromatiques",
+              "score": 22,
+              "max": 30,
+              "comment": "Nez et cru évocateurs ; marrons chauds et silex dans les minutes, mais les tiers privilégient des qualificatifs laudatifs aux arômes."
+            },
+            {
+              "label": "Cohérence et nuance du jugement",
+              "score": 17,
+              "max": 20,
+              "comment": "Fort puis doux et bilan 5/10 recevables ; richesse finale et note 8,2/10 insuffisamment justifiées par les descripteurs écrits."
+            },
+            {
+              "label": "Soin et exploitation de la fiche",
+              "score": 13,
+              "max": 15,
+              "comment": "Troisième fiche lisible et bilan chiffré exploitable ; mesures et rubriques techniques à mieux distinguer des plaisanteries."
+            }
+          ],
+          "rubric_id": "crcc-propose-2026-v1",
+          "rubric_label": "Barème proposé du Comité — 2026",
+          "origin": "Honduras (déclarée)",
+          "module": "Robusto (confirmé au dépôt)",
+          "reference_exact": "Don Tomás Clásico Robusto",
+          "ash_max_cm": null,
+          "technique": {
+            "draw": null,
+            "relights": 1,
+            "touchups": null
+          },
+          "cigar_score": 8.2,
+          "cigar_score_note": "Note personnelle du cigare 8,2/10 ; richesse aromatique également 8,2/10, donnée distincte.",
+          "strength_score": 5,
+          "richness_score": 8.2,
+          "minutes_contribution": "Louis remarque la douceur initiale, décrit des marrons chauds puis un silex argileux, surveille la tenue de sa cendre et signale une température élevée. Le rallumage commun à 19 h 53 complète le suivi. La cendre prétendument maltraitée reste sans auteur identifié et ne lui est pas imputée.",
+          "aromas": [
+            "Bois",
+            "Mousse",
+            "Épices",
+            "Marron chaud",
+            "Minéral"
+          ],
+          "appreciation": [
+            "La troisième fiche de Louis documente un départ fort, un adoucissement et un dernier tiers riche et large. Le bois humide, la mousse et le meuble ancien donnent un vrai point de départ ; les minutes ajoutent les marrons chauds, le silex argileux et une température jugée élevée.",
+            "L’identification reste la faiblesse majeure. La mention « admis » ne nomme pas le module, les dimensions ne permettent aucune mesure, et « inexistante » est incompatible avec la sous-cape décrite dans la référence de gamme. La couleur de cape et la compacité de la tripe ne renseignent pas leur composition. Ces défauts pèsent dans les 6/15 d’identification, sans double pénalité.",
+            "La cendre fait l’objet d’un suivi précis ; l’enthousiasme pour les trois tiers est moins démontré par des arômes. « Divin », « exceptionnel » et « glorieux » donnent un verdict, pas les étapes de sa construction. Les minutes sauvent plusieurs repères que la fiche gagnerait à porter elle-même.",
+            "Le Comité attribue 73/100, contre 79/100 à la fiche précédente : le dossier gagne en contexte sensoriel, mais perd nettement en identification et justifie encore trop peu sa richesse annoncée. Les 8,2/10 personnels, les 8,2/10 de richesse et les 8,5/10 de rapport qualité-prix sont conservés séparément."
+          ],
+          "mention": "Recevable avec réserves — cendre bien suivie, composition erronée et description des tiers à préciser.",
+          "next_steps": [
+            "Renseigner le module Robusto et des dimensions mesurables.",
+            "Inscrire l’origine connue des feuilles ou « non renseigné » ; rétablir la présence d’une sous-cape.",
+            "Cocher le tirage à froid et dater les rallumages.",
+            "Nommer au moins un arôme ou une sensation précise par tiers."
+          ],
+          "revised": "2026-10-23"
+        }
+      ],
+      "library_directory": "/Cruising Rats Cigar Club/Fiches de dégustation/2026-10-21 - Don Tomás Clásico",
+      "source_confirmations": {
+        "confirmed_on": "2026-10-23",
+        "participants": "Mêmes membres et prospects que le 19 octobre, confirmé par le déposant.",
+        "cigar_reference": "Don Tomás Clásico Robusto, confirmé par le déposant ; absent des champs utiles des fiches.",
+        "julien_sheet_number": "Numéro 2 attribué selon la succession des archives ; champ laissé vide sur le document.",
+        "personal_scores": "87/100 de Julien traité comme note personnelle, selon la distinction déjà demandée ; Louis indique 8,2/10."
+      },
+      "introduction": {
+        "lead": "Deux Rats, un Don Tomás et une cendre qui tient assez longtemps pour ouvrir un débat. Sur le patio, les impressions gagnent en variété ; les rubriques d’identification attendent encore leur tour.",
+        "facts": [
+          {
+            "label": "Date de séance",
+            "value": "Mercredi 21 octobre 2026"
+          },
+          {
+            "label": "Lieu",
+            "value": "Patio privatif — terrasse à Langon"
+          },
+          {
+            "label": "Ouverture",
+            "value": "19 h 15"
+          },
+          {
+            "label": "Clôture des fiches",
+            "value": "20 h 47"
+          },
+          {
+            "label": "Accompagnement",
+            "value": "Rhum Planteray Sealander, puis verveine maison citronnée 2026 à 20 h 17"
+          },
+          {
+            "label": "Fond sonore",
+            "value": "Ulver — Neverland, puis Clubroot — Clubroot à 19 h 56"
+          }
+        ],
+        "note": "Julien et Louis, Rats de Passage, en présence de L. Monchany et S. Hoummadi, prospects. Les 1 h 32 entre les horaires des minutes ne constituent pas une durée individuelle : Louis déclare 1 h 30 ; Julien ne précise pas son temps de fumage."
+      },
+      "cigar_summary": {
+        "title": "Don Tomás Clásico Robusto",
+        "description": "Un cigare hondurien au format Robusto, annoncé à 5½ pouces × calibre 50 dans le catalogue Meier & Dutch, soit environ 140 mm. General Cigar présente une cape et une sous-cape honduriennes, avec une tripe dominicaine et hondurienne, et des repères de fruits à coque, cacao et café.",
+        "caution": "Le module a été confirmé au dépôt. La composition publiée décrit une référence de gamme ; elle ne certifie pas le lot dégusté. Les sensations personnelles restent développées dans les fiches.",
+        "sources": [
+          {
+            "label": "Cigar World — Don Tomás Clásico (General Cigar)",
+            "url": "https://www.cigarworld.com/cigars/don-tomas/clasico/"
+          },
+          {
+            "label": "Meier & Dutch — catalogue Don Tomas Clasico",
+            "url": "https://www.meierdutch.com/product/don-tomas-clasico/JIA-PM.html"
+          }
+        ]
+      },
+      "cigar_verification": {
+        "title": "Don Tomás Clásico Robusto : référence et observations",
+        "checked": "2026-10-23",
+        "members": [
+          {
+            "id": "julien",
+            "name": "Julien"
+          },
+          {
+            "id": "louis",
+            "name": "Louis"
+          }
+        ],
+        "sources": [
+          {
+            "label": "Cigar World — Don Tomás Clásico (General Cigar)",
+            "url": "https://www.cigarworld.com/cigars/don-tomas/clasico/"
+          },
+          {
+            "label": "Meier & Dutch — catalogue Don Tomas Clasico",
+            "url": "https://www.meierdutch.com/product/don-tomas-clasico/JIA-PM.html"
+          }
+        ],
+        "comparisons": [
+          {
+            "label": "Référence et dimensions",
+            "reference": "Robusto confirmé au dépôt. Catalogue Meier & Dutch : 5½ pouces × 50, environ 140 mm.",
+            "declared": {
+              "julien": "Vitole « Oui » et référence explicitement inconnue : la bague identifie la gamme, pas le module.",
+              "louis": "Module « admis » et dimensions non mesurables : les champs ne décrivent pas le Robusto."
+            }
+          },
+          {
+            "label": "Origine et cape",
+            "reference": "Gamme hondurienne ; cape hondurienne selon General Cigar.",
+            "declared": {
+              "julien": "Honduras cohérent ; « terre de Sienne » décrit la couleur, pas l’origine de la cape.",
+              "louis": "Fabrication Honduras cohérente ; « verte/marron » est une observation visuelle."
+            }
+          },
+          {
+            "label": "Sous-cape et tripe",
+            "reference": "General Cigar indique une sous-cape hondurienne et une tripe dominicaine/hondurienne. Le catalogue Meier & Dutch varie dans ses détails de tripe selon les entrées ; le lot exact reste non établi.",
+            "declared": {
+              "julien": "Aucun détail de composition ; ne pas confondre origine générale et origine de toutes les feuilles.",
+              "louis": "« Inexistante » contredit la présence d’une sous-cape dans la référence ; « compacte » décrit la construction, pas le tabac de tripe."
+            }
+          },
+          {
+            "label": "Profil et arômes",
+            "reference": "Meier & Dutch annonce un profil moyen ; General Cigar cite fruits à coque, cacao et café. Ces repères ne prescrivent pas les sensations.",
+            "declared": {
+              "julien": "Noisettes grillées et cacao recoupent ces repères ; bois tendre, pierre et registre de Noël restent des perceptions personnelles.",
+              "louis": "Bois humide, mousse, meuble ancien, épices, puis marrons chauds et minéral dans les minutes : perceptions conservées sans exiger les arômes de la marque."
+            }
+          },
+          {
+            "label": "Éditions, conservation, prix et durée",
+            "reference": "Ces pages ne certifient pas l’édition du lot, la conservation de ces exemplaires, le prix payé ni la durée de fumage.",
+            "declared": {
+              "julien": "Deux mois, 65 % et 22 °C sont déclarés ; conditions dites « parfaites » sans contrôle indépendant. Prix et durée absents.",
+              "louis": "8 €, 1 h 30 et absence d’éditions régionale/limitée sont des déclarations, pas des faits certifiés par la recherche."
+            }
+          }
+        ],
+        "interpretation": "Les lacunes de référence et la sous-cape dite inexistante affectent l’identification ; elles ne sont pas pénalisées une seconde fois comme sensations erronées. Les divergences de composition entre catalogues imposent de rester prudent sur le lot. La confirmation du déposant et les corrections du Comité ne remplissent pas rétroactivement les formulaires. Aucun point ne dépend de la conformité aux arômes commerciaux."
+      },
+      "committee_review": {
+        "status": "valide-avec-reserves",
+        "date": "2026-10-23",
+        "sheet_ids": [
+          "julien-fiche-2",
+          "louis-fiche-3"
+        ],
+        "minutes_pdf": "documents/seances/2026-10-21-don-tomas-clasico-robusto/minutes.pdf",
+        "appreciation": "Deux fiches et des minutes complètes documentent une séance en plein air plus favorablement appréciée que la précédente. Les arômes de fruits à coque, de cacao, de bois et de pierre sont mieux développés, surtout chez Julien et dans les minutes attribuées à chacun. Le Robusto a dû être confirmé au dépôt ; les champs de module restent inexploitables et la sous-cape dite inexistante chez Louis appelle une correction. Le dossier est validé avec réserves : les notes individuelles intègrent ces lacunes, sans confondre goût personnel et précision du compte rendu. Le Comité conserve la cendre ; il réclame aussi les dimensions."
+      }
     }
   ],
   "members": [
