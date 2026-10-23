@@ -84,7 +84,7 @@ def member_link(m):
 def member_with_badge(m):
     grade = m.get('grade', '')
     if grade.casefold().strip() == 'rat de passage':
-        badge = '<img class="inline-grade" src="../images/badges/rat-de-passage.png" alt="Rat de Passage" title="Rat de Passage" width="36" height="36">'
+        badge = '<img class="inline-grade" src="../images/badges/rat-de-passage-36.webp" srcset="../images/badges/rat-de-passage-72.webp 2x" decoding="async" alt="Rat de Passage" title="Rat de Passage" width="36" height="36">'
     else:
         badge = f'<span class="badge">{esc(grade)}</span>' if grade else ''
     return '<span class="member-with-badge">' + member_link(m) + badge + '</span>'
@@ -197,7 +197,7 @@ def sheet_list(s, filter_rows=False):
     for f in s['sheets']:
         m = member(s, f)
         attrs = f' data-entry data-member="{esc(f["member_id"])}" data-brand="{esc(f["brand"])}"' if filter_rows else ''
-        rows.append(f'<li{attrs}><span class="archive-contributor">{member_with_badge(m)}<span class="archive-separator" aria-hidden="true">·</span><a class="archive-sheet-link" href="{sheet_url(f)}" aria-label="Fiche {f["number"]} de {esc(m["name"])} et compte rendu">Fiche {f["number"]}</a></span><span class="archive-sheet-score"><span>Comité</span> <strong>{score(f)}/100</strong></span></li>')
+        rows.append(f'<li{attrs}><span class="archive-contributor">{member_with_badge(m)}<span class="archive-separator" aria-hidden="true">·</span><a class="archive-sheet-link" href="{sheet_url(f)}" aria-label="{esc(f["title"])} — fiche de {esc(m["name"])}">{esc(f["title"])}</a></span><span class="archive-sheet-score"><span>Comité</span> <strong>{score(f)}/100</strong></span></li>')
     return '<ul class="archive-contributions">' + ''.join(rows) + '</ul>'
 
 def build(data):

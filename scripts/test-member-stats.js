@@ -37,3 +37,7 @@ assert.equal((drinksSection.match(/>Rhum</g)||[]).length,1,'One drink is counted
 const sessionsList=dashboard([base,second,third]).split('<ul class="member-session-list">')[1].split('</ul>')[0];
 assert.equal((sessionsList.match(/<li>/g)||[]).length,2,'History lists distinct sessions, not sheets');
 assert(!sessionsList.includes('Fiche test'),'History must stay compact');
+
+const chart=dashboard([base,third]).split('<svg class="timeline"')[1].split('</svg>')[0];
+assert.equal((chart.match(/data-point-value/g)||[]).length,2);
+assert(chart.includes('78/100') && chart.includes('90/100'));

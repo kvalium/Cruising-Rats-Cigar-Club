@@ -53,7 +53,7 @@ assert 'fiche-louis-fiche-2.html' in registry
 assert 'contexte commun uniquement' not in registry
 directory = (archives.ROOT / 'fiches-degustation/registre-membres.html').read_text()
 assert '<a href="membre-louis.html">Louis</a>' in directory
-assert '2 profils enregistrés' in directory
+assert '4 profils enregistrés' in directory
 assert 'membre-julien.html' in directory
 assert 'membre-l-monchany' not in directory and 'membre-s-hoummadi' not in directory, 'Prospects must not become members'
 october = next(s for s in data['sessions'] if s['date']=='2026-10-19')
@@ -159,3 +159,9 @@ assert new_page.index('Minutes de la séance') < new_page.index('Fiches et compt
 assert '20 h 17' in new_page and '140 mm' in new_page
 assert 'fiche-julien-fiche-2.html' in new_page and 'fiche-louis-fiche-3.html' in new_page
 assert 'sous-cape' in (archives.ROOT / 'fiches-degustation/fiche-louis-fiche-3.html').read_text()
+
+for member_id in ('m-crevette','remi'):
+    page = (archives.ROOT / f'fiches-degustation/membre-{member_id}.html').read_text()
+    assert 'Première dégustation à venir' in page
+    assert 'Moyenne du Comité' not in page and 'data-member-filters' not in page
+    assert not any(m['id']==member_id for s in data['sessions'] for m in s['participants'])

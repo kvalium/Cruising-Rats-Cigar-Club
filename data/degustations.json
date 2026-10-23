@@ -896,6 +896,16 @@
     {
       "id": "julien",
       "name": "Julien"
+    },
+    {
+      "id": "m-crevette",
+      "name": "M. Crevette",
+      "grade": "Rat de Passage"
+    },
+    {
+      "id": "remi",
+      "name": "Rémi",
+      "grade": "Rat de Passage"
     }
   ]
 }

@@ -3,11 +3,12 @@ import json
 import subprocess
 from html import escape as esc
 
-def grade_badge(person):
+def grade_badge(person, compact=False):
     grade = person.get('grade') or 'Grade non renseigné'
     # Only the validated grade receives this artwork; unknown grades keep their text.
     if grade.casefold().strip() == 'rat de passage':
-        return '<img class="grade-portrait" src="../images/badges/rat-de-passage.png" alt="Badge Rat de Passage : jeune rat avec une tétine" width="144" height="144">'
+        size = 96 if compact else 144
+        return f'<img class="grade-portrait" src="../images/badges/rat-de-passage-{size}.webp" srcset="../images/badges/rat-de-passage-{size*2}.webp 2x" decoding="async" alt="Badge Rat de Passage : jeune rat avec une tétine" width="{size}" height="{size}">'
     return ''
 
 def people_for(data):
@@ -34,7 +35,12 @@ def build_members(archive, data):
                 rows.append(row)
         page=archive.member_url(person)
         pages.append(page)
-        body=f'<p class="breadcrumbs"><a href="registre-membres.html">Registre des membres</a> / {esc(person["name"])}</p><section class="member-identity">{grade_badge(person)}<div><p class="member-grade">{esc(person.get("grade") or "Grade non renseigné")}</p><p class="archive-meta">Dernier grade documenté.</p><p>Un palais, des observations, un dossier qui s’épaissit. Le Comité suit les pièces ; les courbes font le reste.</p></div></section>'
+        introduction = 'Un palais, des observations, un dossier qui s’épaissit. Le Comité suit les pièces ; les courbes font le reste.' if rows else 'Un membre inscrit, un dossier ouvert. Le Comité attend la première fiche.'
+        body=f'<p class="breadcrumbs"><a href="registre-membres.html">Registre des membres</a> / {esc(person["name"])}</p><section class="member-identity">{grade_badge(person)}<div><p class="member-grade">{esc(person.get("grade") or "Grade non renseigné")}</p><p class="archive-meta">Dernier grade documenté.</p><p>{introduction}</p></div></section>'
+        if not rows:
+            body += '<section class="card"><h2>Première dégustation à venir</h2><p>Aucune dégustation ni fiche n’est encore enregistrée pour ce membre. Son historique et ses statistiques apparaîtront après sa première contribution.</p></section><p class="archive-footer"><a href="registre-membres.html">← Registre des membres</a> · <a href="index.html">Toutes les séances de dégustation</a></p>'
+            (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Registre du membre',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css"></head>'))
+            continue
         if rows:
             last_session,last_fiche=max(((s,f) for s in sessions for f in s['sheets'] if f['member_id']==member_id),key=lambda pair:(pair[0]['date'],pair[1]['number']))
             body+='<section class="card accent"><h2>Dernière appréciation du Comité</h2>'
@@ -60,7 +66,7 @@ def build_members(archive, data):
         attended = [s for s in sessions if any(m['id']==person['id'] for m in s['participants'])]
         sheets = [f for s in sessions for f in s['sheets'] if f['member_id']==person['id']]
         first = f'Première séance archivée : {archive.long_date(attended[0]["date"])}' if attended else 'Aucune séance archivée pour le moment.'
-        directory += f'<li class="card member-directory-card">{grade_badge(person)}<div class="directory-details"><div class="directory-heading"><h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2><span class="badge">{esc(person.get("grade") or "Grade non renseigné")}</span></div><p class="archive-meta">{len(attended)} séance' + ('s' if len(attended)>1 else '') + f' · {len(sheets)} fiche' + ('s' if len(sheets)>1 else '') + f'<br>{first}</p><a class="directory-profile" href="{archive.member_url(person)}" aria-label="Consulter le profil de {esc(person["name"])}">Profil et statistiques →</a></div></li>'
+        directory += f'<li class="card member-directory-card">{grade_badge(person, compact=True)}<div class="directory-details"><div class="directory-heading"><h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2><span class="badge">{esc(person.get("grade") or "Grade non renseigné")}</span></div><p class="archive-meta">{len(attended)} séance' + ('s' if len(attended)>1 else '') + f' · {len(sheets)} fiche' + ('s' if len(sheets)>1 else '') + f'<br>{first}</p><a class="directory-profile" href="{archive.member_url(person)}" aria-label="Consulter le profil de {esc(person["name"])}">Profil et statistiques →</a></div></li>'
     directory += '</ul><p class="archive-meta">Les grades affichés correspondent aux dernières informations documentées. Les statistiques portent sur les contributions archivées.</p><p class="archive-footer"><a href="index.html">← Toutes les séances de dégustation</a></p>'
     (root/'fiches-degustation/registre-membres.html').write_text(archive.shell('Registre des membres','registre-membres.html',directory))
     return pages + ['registre-membres.html']

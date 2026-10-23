@@ -35,7 +35,18 @@
     const ticks=[0,max/2,max].map(t=>`<line x1="${left}" x2="${right}" y1="${bottom-t/max*(bottom-top)}" y2="${bottom-t/max*(bottom-top)}" stroke="#c9c1b4"/><text x="35" y="${bottom-t/max*(bottom-top)+4}" text-anchor="end">${t}</text>`).join('');
     const line=positions.length>1?`<polyline points="${positions.map(p=>`${p.x},${p.y}`).join(' ')}" fill="none" stroke="#743c36" stroke-width="2"/>`:'';
     const valueLabel=value=>fmt(value)+(unit?' '+unit:'/'+max);
-    const nodes=positions.map(({r,x,y})=>`<a href="${h(r.url)}" aria-label="Fiche ${r.number}, ${dateLabel(r.date)}, ${valueLabel(r[key])}"><circle cx="${x}" cy="${y}" r="6" fill="#743c36"><title>${h(dateLabel(r.date))} — Fiche ${r.number} : ${valueLabel(r[key])}</title></circle></a>`).join('');
+    // Keep labels inside the chart and stagger nearby values to prevent overlap.
+    const placed=[];
+    const nodes=positions.map(({r,x,y})=>{
+      const text=valueLabel(r[key]), width=text.length*7+8;
+      const labelX=Math.max(left+width/2,Math.min(right-width/2,x));
+      const offsets=[-15,23,-32,40,-49,57];
+      const candidates=offsets.map(offset=>({x:labelX,y:Math.max(15,Math.min(220,y+offset)),width}));
+      const overlaps=box=>placed.filter(other=>Math.abs(box.x-other.x)<(box.width+other.width)/2+5 && Math.abs(box.y-other.y)<17).length;
+      candidates.sort((a,b)=>overlaps(a)-overlaps(b));
+      const box=candidates[0];placed.push(box);
+      return `<a href="${h(r.url)}" aria-label="Fiche ${r.number}, ${dateLabel(r.date)}, ${text}"><circle cx="${x}" cy="${y}" r="6" fill="#743c36"><title>${h(dateLabel(r.date))} — Fiche ${r.number} : ${text}</title></circle><text class="point-value" data-point-value x="${box.x}" y="${box.y}" text-anchor="middle" aria-hidden="true">${h(text)}</text></a>`;
+    }).join('');
     const datesText=hi===lo?`<text x="${(left+right)/2}" y="239" text-anchor="middle">${h(dateLabel(points[0].date))}</text>`:`<text x="${left}" y="239">${h(dateLabel(points[0].date))}</text><text x="${right}" y="239" text-anchor="end">${h(dateLabel(points[points.length-1].date))}</text>`;
     return `<svg class="timeline" viewBox="0 0 ${w} 255" role="img" aria-label="${h(label)}. ${points.length} observation(s), échelle de 0 à ${max} ${h(unit)}."><title>${h(label)}</title>${ticks}${line}${nodes}${datesText}</svg>${note(`${points.length} observation(s) renseignée(s). Chaque point ouvre la fiche correspondante.`)}<details><summary>Voir les valeurs du graphique</summary><ul>${points.map(r=>`<li><a href="${h(r.url)}">${h(dateLabel(r.date))} — Fiche ${r.number}</a> : ${valueLabel(r[key])}</li>`).join('')}</ul></details>`;
   }
