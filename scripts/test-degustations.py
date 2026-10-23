@@ -48,6 +48,9 @@ registry = (archives.ROOT / 'fiches-degustation/membre-louis.html').read_text()
 assert '78/100' in registry and '6,7/10' in registry
 assert 'Historique en cours de constitution' in registry
 assert 'contexte commun uniquement' not in registry
+directory = (archives.ROOT / 'fiches-degustation/registre-membres.html').read_text()
+assert '<a href="membre-louis.html">Louis</a>' in directory
+assert '1 profil enregistré' in directory
 session_page = (archives.ROOT / 'fiches-degustation/seance-2026-08-12-un-classique-sous-observation.html').read_text()
 assert 'Première fiche</span>' not in session_page, 'First-sheet badge must be absent from session cards'
 assert 'Consulter la fiche et le compte rendu' in session_page
@@ -72,6 +75,7 @@ with tempfile.TemporaryDirectory() as tmp:
     (root / 'index.html').write_text('<nav class="site-nav"><a href="index.html">ACCUEIL</a></nav>')
     (root / 'sitemap.xml').write_text('<urlset></urlset>')
     fixture = copy.deepcopy(data)
+    fixture.setdefault('members', []).append({'id':'alpha','name':'Alpha'})
     s = fixture['sessions'][0]
     s['minutes_pdf'] = 'minutes.pdf'
     s['participants'].append({'id':'test-member','name':'Test member','grade':'Grade test'})
@@ -88,6 +92,10 @@ with tempfile.TemporaryDirectory() as tmp:
     previous_root = archives.ROOT
     archives.ROOT = root
     archives.build(fixture)
+    assert (root / 'fiches-degustation/membre-alpha.html').is_file(), 'Roster members need profiles even before their first session'
+    directory = (root / 'fiches-degustation/registre-membres.html').read_text()
+    assert directory.index('>Alpha</a>') < directory.index('>Louis</a>'), 'Directory must be alphabetical'
+    assert 'membre-test-member.html' in directory, 'New participants must automatically enter the directory'
     index = (root / 'fiches-degustation/index.html').read_text()
     assert index.index('2026-08-12') < index.index('2026-01-01'), 'Incorrect descending order'
     assert '2 participants' in index and 'Minutes disponibles' in index

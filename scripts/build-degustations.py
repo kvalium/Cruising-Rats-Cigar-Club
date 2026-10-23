@@ -20,6 +20,9 @@ def long_date(value):
 def validate(data):
     sessions, sheets, member_numbers = set(), set(), set()
     rubrics = {}
+    roster_ids = [m['id'] for m in data.get('members', [])]
+    assert len(set(roster_ids)) == len(roster_ids), 'Duplicate member in roster'
+    assert all(re.fullmatch(r'[a-z0-9-]+', m['id']) and m['name'].strip() for m in data.get('members', [])), 'Invalid roster member'
     for s in data['sessions']:
         assert re.fullmatch(r'[a-z0-9-]+', s['id']) and s['id'] not in sessions, 'Invalid/duplicate session id'
         sessions.add(s['id'])
@@ -93,7 +96,7 @@ def shell(title_text, path, body, script=False):
 <link rel="icon" href="https://cruising-rats-cigar-club.s3.eu-west-3.amazonaws.com/logo_transparent.png" type="image/png">
 </head><body><div class="site-shell"><header class="site-header"><img class="logo" src="https://cruising-rats-cigar-club.s3.eu-west-3.amazonaws.com/logo_transparent.png" alt="Logo du Cruising Rats Cigar Club" width="155" height="155"><div class="kicker">CRUISING RATS CIGAR CLUB</div><h1 class="site-title">{esc(title_text)}</h1><div class="reference">SERVICE DES ARCHIVES ORGANOLEPTIQUES</div></header>
 {nav}<div class="banner">LES RATS DÉGUSTENT • LE COMITÉ EXAMINE • LES ARCHIVES CONSERVENT</div><main>{body}</main>
-<footer>CRUISING RATS CIGAR CLUB<br>COMITÉ EXÉCUTIF • SERVICE DE DÉGUSTATION ET D’ARCHIVAGE<br>On pipe rien, mais on a des fiches.<br><a href="index.html">Fiches de dégustation</a></footer></div>{'<script src="../js/archives.js" defer></script>' if script else ''}</body></html>'''
+<footer>CRUISING RATS CIGAR CLUB<br>COMITÉ EXÉCUTIF • SERVICE DE DÉGUSTATION ET D’ARCHIVAGE<br>On pipe rien, mais on a des fiches.<br><a href="index.html">Fiches de dégustation</a> · <a href="registre-membres.html">Registre des membres</a></footer></div>{'<script src="../js/archives.js" defer></script>' if script else ''}</body></html>'''
 
 RULES = '''<details class="card"><summary>Comprendre la note du Comité et le rôle des minutes</summary>
 <p>La note du Comité sur 100 évalue la précision, la cohérence et la qualité des observations du membre, à partir des pièces disponibles. La note du cigare sur 10 exprime le jugement personnel du dégustateur.</p>
@@ -160,7 +163,7 @@ def build(data):
     for s in sessions:
         n, count = len(s['participants']), len(s['sheets'])
         body += f'<article class="card archive-card" data-session><time class="news-date" datetime="{s["date"]}">{long_date(s["date"])}</time><h2><a href="{session_url(s)}">{esc(s["title"])}</a></h2><p class="archive-meta">{n} participant{"s" if n>1 else ""} · {count} fiche{"s" if count>1 else ""}{" · Minutes disponibles" if s.get("minutes_pdf") else ""}</p><p>{esc(" ; ".join(s["cigars"]))}</p>{sheet_list(s, True)}<a href="{session_url(s)}">Consulter le dossier de séance →</a></article>'
-    body += RULES
+    body += '<p><a href="registre-membres.html">Consulter le registre des membres →</a></p>' + RULES
     (out / 'index.html').write_text(shell('Fiches de dégustation', 'index.html', body, True))
     for s in sessions:
         crumbs = '<p class="breadcrumbs"><a href="index.html">Fiches de dégustation</a> / Séance</p>'

@@ -114,5 +114,11 @@
         "appreciation": "Cette première séance documentée fournit un relevé appliqué et une progression aromatique lisible, du foin au floral puis à la terre. Le Comité valide le dossier avec réserves sur la référence exacte du cigare et le tirage, insuffisamment renseignés. Aucune minute n’accompagne cette séance ; leur absence, facultative, ne pénalise pas son examen. Le cigare a livré des éléments, le formulaire conserve quelques silences."
       }
     }
+  ],
+  "members": [
+    {
+      "id": "louis",
+      "name": "Louis"
+    }
   ]
 }
