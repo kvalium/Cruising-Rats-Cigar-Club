@@ -3,6 +3,7 @@ import copy
 import importlib.util
 import json
 import tempfile
+import shutil
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlsplit, unquote
@@ -40,9 +41,19 @@ for p in (archives.ROOT / 'fiches-degustation').glob('*.html'):
             continue
         assert target.is_file(), f'Broken local link: {p.name} -> {href}'
 
+for name in ('seance-2026-08-12-un-classique-sous-observation.html', 'fiche-louis-fiche-1.html'):
+    text = (archives.ROOT / 'fiches-degustation' / name).read_text()
+    assert '<a href="membre-louis.html">Louis</a>' in text, 'Member name must link to registry'
+registry = (archives.ROOT / 'fiches-degustation/membre-louis.html').read_text()
+assert '78/100' in registry and '6,7/10' in registry
+assert 'Historique en cours de constitution' in registry
+assert 'contexte commun uniquement' not in registry
+
 with tempfile.TemporaryDirectory() as tmp:
     root = Path(tmp)
     (root / 'data').mkdir()
+    (root / 'js').mkdir()
+    shutil.copy2(archives.ROOT / 'js/member-stats.js', root / 'js/member-stats.js')
     (root / 'data/report.html').write_text('<section><h2>Test report</h2></section>')
     (root / 'sheet.pdf').write_bytes(b'%PDF-1.4')
     (root / 'minutes.pdf').write_bytes(b'%PDF-1.4')

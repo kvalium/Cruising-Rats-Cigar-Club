@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Generate static tasting archives. Run from any directory with Python 3."""
 import json
+import importlib.util
+from types import SimpleNamespace
 import re
 from datetime import date
 from html import escape as esc
@@ -17,10 +19,12 @@ def long_date(value):
 
 def validate(data):
     sessions, sheets, member_numbers = set(), set(), set()
+    rubrics = {}
     for s in data['sessions']:
         assert re.fullmatch(r'[a-z0-9-]+', s['id']) and s['id'] not in sessions, 'Invalid/duplicate session id'
         sessions.add(s['id'])
         date.fromisoformat(s['date'])
+        assert all(re.fullmatch(r'[a-z0-9-]+', m['id']) for m in s['participants']), 'Invalid member id'
         members = {m['id']: m for m in s['participants']}
         assert len(members) == len(s['participants']) and members, 'Invalid participants'
         assert s['sheets'], 'A published session needs at least one sheet'
@@ -41,8 +45,16 @@ def validate(data):
             assert f['revised'] >= f['published'], 'Revision precedes publication'
             assert sum(c['max'] for c in f['criteria']) == 100, 'Criteria must total 100'
             assert all(0 <= c['score'] <= c['max'] for c in f['criteria']), 'Invalid committee score'
+            if f.get('rubric_id'):
+                signature = sorted((c['label'], c['max']) for c in f['criteria'])
+                assert f['rubric_id'] not in rubrics or rubrics[f['rubric_id']] == signature, 'Changed criteria require a distinct rubric id'
+                rubrics[f['rubric_id']] = signature
             assert f['cigar_score'] is None or 0 <= f['cigar_score'] <= 10, 'Invalid cigar score'
             assert f['evaluation_basis'], 'Evaluation basis required'
+            for key in ('duration_minutes', 'ash_max_cm'):
+                value = f.get(key)
+                assert value is None or (isinstance(value, (int,float)) and not isinstance(value,bool) and 0 <= value < float('inf')), 'Invalid measurement'
+            assert f.get('aromas') is None or all(isinstance(a,str) and a for a in f['aromas']), 'Invalid aromas'
             if s.get('minutes_pdf'):
                 assert f.get('minutes_contribution'), 'Explain individual use (or non-use) of shared minutes'
 
@@ -57,6 +69,12 @@ def title(s, f):
 
 def sheet_url(f):
     return f"fiche-{f['id']}.html"
+
+def member_url(m):
+    return f"membre-{m['id']}.html"
+
+def member_link(m):
+    return f'<a href="{member_url(m)}">{esc(m["name"])}</a>'
 
 def session_url(s):
     return f"seance-{s['id']}.html"
@@ -87,7 +105,7 @@ def sheet_list(s, filter_rows=False):
     rows = []
     for f in s['sheets']:
         attrs = f' data-entry data-member="{esc(f["member_id"])}" data-brand="{esc(f["brand"])}"' if filter_rows else ''
-        rows.append(f'<li{attrs}><a href="{sheet_url(f)}">{esc(title(s, f))}</a><br><span class="archive-meta">{esc(member(s, f)["grade"])} · {esc(f["cigar"])}<br>Note du Comité : <strong>{score(f)}/100</strong></span>{" <span class=badge>Première fiche</span>" if f.get("first") else ""}</li>')
+        rows.append(f'<li{attrs}><a href="{sheet_url(f)}">{esc(title(s, f))}</a><br><span class="archive-meta">{member_link(member(s, f))} · {esc(member(s, f)["grade"])} · {esc(f["cigar"])}<br>Note du Comité : <strong>{score(f)}/100</strong></span>{" <span class=badge>Première fiche</span>" if f.get("first") else ""}</li>')
     return '<ul>' + ''.join(rows) + '</ul>'
 
 def build(data):
@@ -108,7 +126,7 @@ def build(data):
     for s in sessions:
         crumbs = '<p class="breadcrumbs"><a href="index.html">Fiches de dégustation</a> / Séance</p>'
         body = crumbs + f'<p class="news-date"><time datetime="{s["date"]}">{long_date(s["date"])}</time></p><p class="lead">{esc(s["context"])}</p><section class="card"><h2>Participants et cigares</h2><ul>'
-        body += ''.join(f'<li>{esc(m["name"])} — {esc(m["grade"])} <span class="archive-meta">(grade au moment de la dégustation)</span></li>' for m in s['participants'])
+        body += ''.join(f'<li>{member_link(m)} — {esc(m["grade"])} <span class="archive-meta">(grade au moment de la dégustation)</span></li>' for m in s['participants'])
         body += '</ul><ul>' + ''.join(f'<li>{esc(c)}</li>' for c in s['cigars']) + '</ul></section>'
         if s.get('minutes_pdf'):
             body += '<section class="card"><h2>Minutes de la séance</h2><p>Document commun aux participants. Les propos ne sont attribués à un membre que lorsque leur auteur est explicitement identifié.</p><div class="documents">' + pdf_links(s['minutes_pdf'], 'les minutes') + '</div></section>'
@@ -117,9 +135,9 @@ def build(data):
         (out / session_url(s)).write_text(shell(s['title'], session_url(s), body))
         for f in s['sheets']:
             m = member(s,f)
-            body = f'<p class="breadcrumbs"><a href="index.html">Fiches de dégustation</a> / <a href="{session_url(s)}">{esc(s["title"])}</a> / {esc(m["name"])} — Fiche {f["number"]}</p>'
+            body = f'<p class="breadcrumbs"><a href="index.html">Fiches de dégustation</a> / <a href="{session_url(s)}">{esc(s["title"])}</a> / {member_link(m)} — Fiche {f["number"]}</p>'
             body += f'<p><span class="badge">{esc(m["grade"])}</span>{"<span class=badge>Première fiche</span>" if f.get("first") else ""}</p><p class="archive-meta">Grade au moment de la dégustation · Dégustation du <time datetime="{s["date"]}">{long_date(s["date"])}</time><br>Publié le {long_date(f["published"])} · Dernière révision : {long_date(f["revised"])}</p>'
-            body += f'<section class="card"><h2>Identification du dossier</h2><p><strong>Membre :</strong> {esc(m["name"])}<br><strong>Cigare déclaré :</strong> {esc(f["cigar"])}<br><strong>Durée :</strong> {esc(f["duration"])}<br><strong>Accompagnement :</strong> {esc(f["pairing"])}<br><strong>Prix :</strong> {esc(f["price"])}</p><div class="documents">{pdf_links(f["pdf"], "la fiche")}</div>'
+            body += f'<section class="card"><h2>Identification du dossier</h2><p><strong>Membre :</strong> {member_link(m)}<br><strong>Cigare déclaré :</strong> {esc(f["cigar"])}<br><strong>Durée :</strong> {esc(f["duration"])}<br><strong>Accompagnement :</strong> {esc(f["pairing"])}<br><strong>Prix :</strong> {esc(f["price"])}</p><div class="documents">{pdf_links(f["pdf"], "la fiche")}</div>'
             if s.get('minutes_pdf'):
                 body += '<div class="documents">' + pdf_links(s['minutes_pdf'], 'les minutes communes') + '</div>'
             body += '</section>'
@@ -139,13 +157,17 @@ def build(data):
                 body += '<ul>' + ''.join(f'<li><a href="{sheet_url(of)}">{esc(title(os,of))}</a></li>' for os,of in others) + '</ul>'
             else:
                 body += '<p>Il s’agit de la première fiche archivée de ce membre. Le dossier attend la suite.</p>'
-            body += f'<p><a href="index.html?membre={esc(f["member_id"])}">Toutes les fiches de {esc(m["name"])} →</a></p><p><a href="{session_url(s)}">← Revenir à la séance</a> · <a href="index.html">Toutes les séances</a></p></section>'
+            body += f'<p><a href="{member_url(m)}">Registre et statistiques de {esc(m["name"])} →</a></p><p><a href="{session_url(s)}">← Revenir à la séance</a> · <a href="index.html">Toutes les séances</a></p></section>'
             (out / sheet_url(f)).write_text(shell(title(s,f), sheet_url(f), body))
+    spec = importlib.util.spec_from_file_location('member_pages', Path(__file__).with_name('member-pages.py'))
+    registry = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(registry)
+    member_pages = registry.build_members(SimpleNamespace(ROOT=ROOT, member_url=member_url, session_url=session_url, sheet_url=sheet_url, score=score, title=title, long_date=long_date, shell=shell), data)
     # Keep generated pages discoverable and remove only prior archive sitemap entries.
     sitemap = ROOT / 'sitemap.xml'
     text = sitemap.read_text()
     text = re.sub(r'\s*<url><loc>[^<]*/fiches-degustation/[^<]*</loc>.*?</url>', '', text, flags=re.S)
-    urls = ['index.html'] + [session_url(s) for s in sessions] + [sheet_url(f) for s in sessions for f in s['sheets']]
+    urls = ['index.html'] + [session_url(s) for s in sessions] + [sheet_url(f) for s in sessions for f in s['sheets']] + member_pages
     entries = ''.join(f'  <url><loc>{BASE}fiches-degustation/{p}</loc></url>\n' for p in urls)
     sitemap.write_text(text.replace('</urlset>', entries + '</urlset>'))
     ET.parse(sitemap)
