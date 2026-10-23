@@ -28,7 +28,8 @@ for p in (archives.ROOT / 'fiches-degustation').glob('*.html'):
     text = p.read_text()
     nav = text.split('<nav class="site-nav"')[1].split('</nav>')[0]
     assert 'Fiches de dégustation' not in nav, 'Archive accidentally added to main menu'
-    assert 'Consulter les minutes' not in text, 'No minutes should be linked for Louis'
+    if p.name in ('fiche-louis-fiche-1.html','seance-2026-08-12-un-classique-sous-observation.html'):
+        assert 'Consulter les minutes' not in text, 'August session has no minutes'
     links = Links()
     links.feed(text)
     for href in links.links:
@@ -46,11 +47,21 @@ for name in ('seance-2026-08-12-un-classique-sous-observation.html', 'fiche-loui
     assert '<a href="membre-louis.html">Louis</a>' in text, 'Member name must link to registry'
 registry = (archives.ROOT / 'fiches-degustation/membre-louis.html').read_text()
 assert '78/100' in registry and '6,7/10' in registry
-assert 'Historique en cours de constitution' in registry
+assert 'fiche-louis-fiche-2.html' in registry
 assert 'contexte commun uniquement' not in registry
 directory = (archives.ROOT / 'fiches-degustation/registre-membres.html').read_text()
 assert '<a href="membre-louis.html">Louis</a>' in directory
-assert '1 profil enregistré' in directory
+assert '2 profils enregistrés' in directory
+assert 'membre-julien.html' in directory
+assert 'membre-l-monchany' not in directory and 'membre-s-hoummadi' not in directory, 'Prospects must not become members'
+october = next(s for s in data['sessions'] if s['date']=='2026-10-19')
+assert len(october['participants'])==2 and len(october['prospects'])==2
+assert archives.session_assessment(october)['status']=='valide-avec-reserves'
+scores = {f['member_id']:archives.score(f) for f in october['sheets']}
+assert scores=={'julien':82,'louis':79}
+julien = next(f for f in october['sheets'] if f['member_id']=='julien')
+assert julien['cigar_score']==7.3 and julien['duration_minutes'] is None
+assert sum(f['member_id']=='louis' for s in data['sessions'] for f in s['sheets'])==2
 session_page = (archives.ROOT / 'fiches-degustation/seance-2026-08-12-un-classique-sous-observation.html').read_text()
 assert 'Première fiche</span>' not in session_page, 'First-sheet badge must be absent from session cards'
 assert 'Consulter la fiche et le compte rendu' in session_page
@@ -75,6 +86,7 @@ with tempfile.TemporaryDirectory() as tmp:
     (root / 'index.html').write_text('<nav class="site-nav"><a href="index.html">ACCUEIL</a></nav>')
     (root / 'sitemap.xml').write_text('<urlset></urlset>')
     fixture = copy.deepcopy(data)
+    fixture['sessions'] = [copy.deepcopy(data['sessions'][0])]
     fixture.setdefault('members', []).append({'id':'alpha','name':'Alpha'})
     s = fixture['sessions'][0]
     s['minutes_pdf'] = 'minutes.pdf'

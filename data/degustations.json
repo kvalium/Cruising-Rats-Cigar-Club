@@ -113,12 +113,234 @@
         "minutes_pdf": null,
         "appreciation": "Cette première séance documentée fournit un relevé appliqué et une progression aromatique lisible, du foin au floral puis à la terre. Le Comité valide le dossier avec réserves sur la référence exacte du cigare et le tirage, insuffisamment renseignés. Aucune minute n’accompagne cette séance ; leur absence, facultative, ne pénalise pas son examen. Le cigare a livré des éléments, le formulaire conserve quelques silences."
       }
+    },
+    {
+      "id": "2026-10-19-cao-gold-robusto",
+      "date": "2026-10-19",
+      "title": "CAO Gold Robusto — Deux fiches après minuit",
+      "context": "Séance ouverte le lundi 19 octobre 2026 à 23 h 01 au Pôle multiactivités, à Langon. Les minutes suivent la dégustation et la rédaction jusqu’au mardi 20 octobre à 1 h 04. Julien et Louis sont Rats de Passage ; L. Monchany et S. Hoummadi sont présentes comme prospects potentiels, sans inscription au registre des membres. Accompagnement : Golden Eight, liqueur de poire Williams ; musique : album du CRCC. Les horaires de séance ne sont pas assimilés aux durées individuelles de fumage.",
+      "participants": [
+        {
+          "id": "julien",
+          "name": "Julien",
+          "grade": "Rat de Passage"
+        },
+        {
+          "id": "louis",
+          "name": "Louis",
+          "grade": "Rat de Passage"
+        }
+      ],
+      "prospects": [
+        {
+          "name": "L. Monchany"
+        },
+        {
+          "name": "S. Hoummadi"
+        }
+      ],
+      "cigars": [
+        "CAO Gold Robusto — origine nicaraguayenne déclarée"
+      ],
+      "minutes_pdf": "documents/seances/2026-10-19-cao-gold-robusto/minutes.pdf",
+      "sheets": [
+        {
+          "id": "julien-fiche-1",
+          "member_id": "julien",
+          "number": 1,
+          "title": "Le poivre, les secrets et la sortie volontaire",
+          "first": true,
+          "brand": "CAO",
+          "cigar": "CAO Gold Robusto (identifié dans les pièces de séance)",
+          "duration": "Non renseignée ; les horaires des minutes concernent la séance et sa rédaction",
+          "pairing": "Golden Eight — liqueur de poire Williams (minutes communes)",
+          "price": "Non renseigné sur la fiche individuelle",
+          "pdf": "documents/seances/2026-10-19-cao-gold-robusto/fiche-julien-1.pdf",
+          "report": "data/comptes-rendus/julien-fiche-1.html",
+          "cigar_score": 7.3,
+          "cigar_score_note": "73/100 sur la fiche, confirmé comme note personnelle ; affiché à 7,3/10 pour comparaison.",
+          "published": "2026-10-23",
+          "revised": "2026-10-23",
+          "evaluation_basis": "Fiche individuelle et deux pages de minutes communes ; attribution et grade confirmés lors du dépôt.",
+          "minutes_contribution": "La référence CAO Gold Robusto, le contexte commun, la contestation de l’allumage de Julien et un épisode de rallumage personnel complètent l’identification et le suivi technique. Le rejet aromatique final est attribué à Louis et n’est pas repris comme une opinion de Julien. Les minutes ne permettent pas de calculer sa durée individuelle de fumage.",
+          "criteria": [
+            {
+              "label": "Identification et renseignements généraux",
+              "max": 15,
+              "score": 12,
+              "comment": "Auteur, date, lieu et conservation documentés ; numéro confirmé au dépôt, référence retrouvée dans les minutes."
+            },
+            {
+              "label": "Préparation et observations techniques",
+              "max": 20,
+              "score": 18,
+              "comment": "Construction, coupe, tirage et incident de tabac en bouche consignés ; minutes utiles sur l’allumage discuté et un rallumage."
+            },
+            {
+              "label": "Description et évolution aromatiques",
+              "max": 30,
+              "score": 23,
+              "comment": "Cuir, foin et poivre du Sichuan explicités ; deuxième tiers et final manquent de repères aromatiques nouveaux."
+            },
+            {
+              "label": "Cohérence et nuance du jugement",
+              "max": 20,
+              "score": 16,
+              "comment": "Volonté de rachat et note personnelle explicites ; « Rien ne change » et découverte progressive à distinguer, motif d’arrêt peu développé."
+            },
+            {
+              "label": "Soin et exploitation de la fiche",
+              "max": 15,
+              "score": 13,
+              "comment": "Deux pages largement exploitées et lisibles ; certaines cases et rubriques d’identification à rapprocher du texte."
+            }
+          ],
+          "appreciation": [
+            "Pour une première contribution, Julien produit un dossier substantiel : examen de la cape, conservation, coupe en V, tirage, incident de tabac en bouche et suivi par tiers. Les repères de cuir, de foin et de poivre du Sichuan sont explicitement nommés, sans devoir être inventés par la commission de lecture.",
+            "Les minutes apportent un complément utile sur l’allumage et le rallumage ; elles nuancent l’éloge général d’une dégustation dans les règles de l’art. Le Comité ne déduit ni faute certaine ni réussite parfaite du seul fait qu’une discussion ait eu lieu. Une controverse n’est pas encore une expertise.",
+            "Les prochains progrès concernent surtout la cohérence entre cases et commentaires. « Rien ne change » peut s’accorder avec une découverte personnelle progressive, à condition de préciser ce qui reste stable. L’abandon volontaire et les interrogations sur l’agrément final méritent aussi un motif sensoriel explicite.",
+            "La note documentaire du Comité est de 82/100. La note personnelle de 73/100 sur le cigare est conservée séparément. La mention manuscrite « Cigare de référence » reste le verdict de Julien ; elle ne devient pas une décision collective par la seule proximité d’un tampon."
+          ],
+          "mention": "Première fiche appliquée — observations concrètes, cohérence du récit à affiner.",
+          "rubric_id": "crcc-propose-2026-v1",
+          "duration_minutes": null,
+          "origin": "Nicaragua (déclarée)",
+          "module": "Robusto (déclaré)",
+          "reference_exact": "CAO Gold Robusto",
+          "aromas": [
+            "Cuir",
+            "Foin",
+            "Poivre"
+          ],
+          "strength_score": null,
+          "richness_score": null,
+          "ash_max_cm": null,
+          "technique": {
+            "draw": "Plutôt ouvert à froid (repère de la fiche)",
+            "relights": 1,
+            "touchups": null
+          },
+          "next_steps": [
+            "Renseigner le numéro et la référence complète dans les champs prévus.",
+            "Faire correspondre les cases d’arômes et d’évolution aux commentaires.",
+            "Expliquer le motif sensoriel de l’abandon volontaire.",
+            "Noter les horaires personnels de fumage et les interventions."
+          ],
+          "rubric_label": "Barème proposé du Comité — 2026"
+        },
+        {
+          "id": "louis-fiche-2",
+          "member_id": "louis",
+          "number": 2,
+          "title": "Le rallumage bénéfique et le final récalcitrant",
+          "first": false,
+          "brand": "CAO",
+          "cigar": "CAO Gold Robusto (identifié dans les pièces de séance)",
+          "duration": "1 h 56 déclarée sur la fiche",
+          "pairing": "Golden Eight — liqueur de poire Williams",
+          "price": "9 € déclarés",
+          "pdf": "documents/seances/2026-10-19-cao-gold-robusto/fiche-louis-2.pdf",
+          "report": "data/comptes-rendus/louis-fiche-2.html",
+          "cigar_score": 7.1,
+          "cigar_score_note": "Note personnelle manuscrite lue à 7,1/10.",
+          "published": "2026-10-23",
+          "revised": "2026-10-23",
+          "evaluation_basis": "Fiche individuelle et deux pages de minutes communes ; attribution et grade confirmés lors du dépôt.",
+          "minutes_contribution": "Deux épisodes de rallumage attribués à Louis et perte d’agrément aromatique finale corroborent les observations techniques et le jugement. Son commentaire sur la liqueur trop sucrée complète le contexte d’accord. Ces éléments sont pris en compte dans les critères de préparation et de cohérence ; les propos des autres participants ne lui sont pas attribués.",
+          "criteria": [
+            {
+              "label": "Identification et renseignements généraux",
+              "max": 15,
+              "score": 12,
+              "comment": "CAO Gold Robusto identifié, prix et durée renseignés ; dimension fantaisiste et composition non exploitable."
+            },
+            {
+              "label": "Préparation et observations techniques",
+              "max": 20,
+              "score": 15,
+              "comment": "Coupe, construction, cendre et rallumages documentés ; tirage à froid et puissance du deuxième tiers non renseignés."
+            },
+            {
+              "label": "Description et évolution aromatiques",
+              "max": 30,
+              "score": 22,
+              "comment": "Cuir, foin et thé à froid ; étapes bien distinguées, mais peu de descripteurs aromatiques au cours des tiers."
+            },
+            {
+              "label": "Cohérence et nuance du jugement",
+              "max": 20,
+              "score": 17,
+              "comment": "Dégustation douce puis forte et appauvrie ; final difficile corroboré par les minutes, termes de persistance à préciser."
+            },
+            {
+              "label": "Soin et exploitation de la fiche",
+              "max": 15,
+              "score": 13,
+              "comment": "Deuxième fiche suivie et lisible ; vocabulaire à mieux séparer des rubriques techniques."
+            }
+          ],
+          "appreciation": [
+            "Louis livre une deuxième fiche plus personnelle à froid et mieux identifiée commercialement. Le cuir, le foin et la feuille de thé constituent des repères utiles, tandis que la cendre, les changements de fumée et le rallumage reçoivent un véritable suivi.",
+            "Le dernier tiers est décrit sans complaisance : la puissance monte alors que la richesse diminue et que la sensation sur la langue devient difficile. Les minutes renforcent cette lecture en attribuant explicitement à Louis la perte d’agrément aromatique finale. Le Comité apprécie que le Rat ne transforme pas une bonne soirée en obligation d’aimer tout le cigare.",
+            "Le principal axe de progression reste la précision des rubriques : le tirage doit être renseigné, les dimensions doivent pouvoir se mesurer et les champs de composition doivent recevoir une information connue ou la mention « non renseigné ». Les évolutions « présent » ou « vers le feu ardent » gagneront à être accompagnées d’un arôme ou d’une sensation clairement distinguée.",
+            "L’évaluation atteint 79/100 contre 78/100 pour sa première fiche, avec le même barème proposé. Ce point supplémentaire traduit un meilleur ancrage du dossier et du suivi technique ; il ne représente ni une mesure de l’expertise de Louis ni un changement de grade. Le Comité conserve le Rat de Passage et recommande de conserver aussi un peu de place pour le tirage."
+          ],
+          "mention": "Deuxième fiche recevable — mémoire olfactive affirmée, précision technique à consolider.",
+          "rubric_id": "crcc-propose-2026-v1",
+          "duration_minutes": 116,
+          "origin": "Nicaragua (déclarée)",
+          "module": "Robusto (déclaré)",
+          "reference_exact": "CAO Gold Robusto",
+          "aromas": [
+            "Cuir",
+            "Foin",
+            "Thé"
+          ],
+          "strength_score": 6,
+          "richness_score": 4,
+          "ash_max_cm": null,
+          "technique": {
+            "draw": null,
+            "relights": 2,
+            "touchups": null
+          },
+          "next_steps": [
+            "Renseigner le tirage à froid et ses changements.",
+            "Remplacer les dimensions fantaisistes par une mesure ou une mention d’incertitude.",
+            "Distinguer composition du tabac, construction et couleur de cape.",
+            "Décrire les arômes perçus à chaque tiers et dater les interventions."
+          ],
+          "rubric_label": "Barème proposé du Comité — 2026"
+        }
+      ],
+      "committee_review": {
+        "status": "valide-avec-reserves",
+        "date": "2026-10-23",
+        "sheet_ids": [
+          "julien-fiche-1",
+          "louis-fiche-2"
+        ],
+        "minutes_pdf": "documents/seances/2026-10-19-cao-gold-robusto/minutes.pdf",
+        "appreciation": "Deux fiches complémentaires et des minutes circonstanciées permettent de reconstituer une séance conviviale, techniquement mouvementée et menée au-delà de minuit. Les rallumages et le final difficile de Louis sont documentés ; Julien distingue son appréciation globale de son abandon volontaire. Le Comité valide le dossier avec réserves sur certaines rubriques techniques, la cohérence des commentaires et un environnement comprenant des odeurs concurrentes. La greffière a tenu la chronologie ; le cigare, lui, a demandé plusieurs remises en service."
+      },
+      "source_confirmations": {
+        "confirmed_on": "2026-10-23",
+        "julien_sheet_number": 1,
+        "grades": "Rat de Passage pour Julien et Louis",
+        "prospects": "Initiales uniquement ; ne pas créer de profil de membre",
+        "julien_personal_cigar_score": "73/100, distinct de la note documentaire du Comité"
+      },
+      "library_directory": "/Cruising Rats Cigar Club/Fiches de dégustation/2026-10-19 - CAO Gold Robusto"
     }
   ],
   "members": [
     {
       "id": "louis",
       "name": "Louis"
+    },
+    {
+      "id": "julien",
+      "name": "Julien"
     }
   ]
 }

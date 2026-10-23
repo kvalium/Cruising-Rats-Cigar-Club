@@ -170,6 +170,8 @@ def build(data):
         body = crumbs + f'<p class="news-date"><time datetime="{s["date"]}">{long_date(s["date"])}</time></p><p class="lead">{esc(s["context"])}</p><section class="card"><h2>Participants et cigares</h2><ul>'
         body += ''.join(f'<li>{member_link(m)} — {esc(m["grade"])} <span class="archive-meta">(grade au moment de la dégustation)</span></li>' for m in s['participants'])
         body += '</ul><ul>' + ''.join(f'<li>{esc(c)}</li>' for c in s['cigars']) + '</ul></section>'
+        if s.get('prospects'):
+            body += '<section class="card"><h2>Prospects présents</h2><ul>' + ''.join(f'<li>{esc(p["name"])} — prospect potentiel</li>' for p in s['prospects']) + '</ul><p class="archive-meta">Mention de présence ; aucune inscription au registre des membres ni fiche individuelle attribuée.</p></section>'
         if s.get('minutes_pdf'):
             body += '<section class="card"><h2>Minutes de la séance</h2><p>Document commun aux participants. Les propos ne sont attribués à un membre que lorsque leur auteur est explicitement identifié.</p><div class="documents">' + pdf_links(s['minutes_pdf'], 'les minutes') + '</div></section>'
         body += session_verdict(s)
