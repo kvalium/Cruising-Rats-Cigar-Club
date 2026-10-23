@@ -13,7 +13,7 @@ archives = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(archives)
 data = json.loads((archives.ROOT / 'data/degustations.json').read_text())
 archives.validate(data)
-assert archives.score(data['sessions'][0]['sheets'][0]) == 78
+assert archives.score(data['sessions'][0]['sheets'][0]) == 70
 
 class Links(HTMLParser):
     def __init__(self):
@@ -48,7 +48,7 @@ for name in ('seance-2026-08-12-un-classique-sous-observation.html', 'fiche-loui
     text = (archives.ROOT / 'fiches-degustation' / name).read_text()
     assert '<a href="membre-louis.html">Louis</a>' in text, 'Member name must link to registry'
 registry = (archives.ROOT / 'fiches-degustation/membre-louis.html').read_text()
-assert '78/100' in registry and '6,7/10' in registry
+assert '70/100' in registry and '6,7/10' in registry
 assert 'fiche-louis-fiche-2.html' in registry
 assert 'contexte commun uniquement' not in registry
 directory = (archives.ROOT / 'fiches-degustation/registre-membres.html').read_text()
@@ -64,6 +64,12 @@ assert '<dl class="session-facts">' in october_page
 assert 'Clôture des fiches' in october_page
 assert 'https://www.caocigars.com/cigars/gold/' in october_page
 assert '127 mm' in october_page and 'Connecticut d’Équateur' in october_page
+assert 'Le cigare à l’épreuve des pièces' not in october_page
+assert october_page.index('Minutes de la séance') < october_page.index('Fiches et comptes rendus') < october_page.index('Appréciation générale du Comité')
+assert '<table' not in october_page
+first_page = (archives.ROOT / 'fiches-degustation/fiche-louis-fiche-1.html').read_text()
+assert '78/100 est ramenée' in first_page and '70/100' in first_page
+assert '124 mm' in first_page and 'pas une identification' in first_page
 for filename in ('fiche-julien-fiche-1.html','fiche-louis-fiche-2.html'):
     page = (archives.ROOT / 'fiches-degustation' / filename).read_text()
     assert 'Le cigare à l’épreuve des pièces' in page
@@ -129,7 +135,7 @@ with tempfile.TemporaryDirectory() as tmp:
     assert 'fiche-test-sheet.html' in (root / ('fiches-degustation/' + archives.session_url(s))).read_text()
     other = (root / 'fiches-degustation/fiche-test-sheet.html').read_text()
     assert 'contexte commun uniquement' in other
-    assert archives.score(f) == 78, 'Minutes must not automatically grant points'
+    assert archives.score(f) == 70, 'Minutes must not automatically grant points'
     assert 'older-sheet' in detail, 'Other sheets of the member missing'
     bad = copy.deepcopy(fixture)
     bad['sessions'][0]['sheets'][0]['minutes_contribution'] = None

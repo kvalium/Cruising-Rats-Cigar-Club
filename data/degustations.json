@@ -34,47 +34,48 @@
           "cigar_score_note": "Note manuscrite lue à 6,7/10.",
           "published": "2026-10-23",
           "revised": "2026-10-23",
-          "evaluation_basis": "Fiche de dégustation seule. Aucune minute jointe à cette séance.",
+          "evaluation_basis": "Fiche de dégustation seule, rapprochée des références officielles Habanos le 23 octobre 2026. Aucun modèle exact établi ; aucune minute jointe.",
           "minutes_contribution": null,
           "criteria": [
             {
               "label": "Identification et renseignements généraux",
-              "score": 11,
+              "score": 8,
               "max": 15,
-              "comment": "Informations principales présentes ; référence exacte et identification du dégustateur sur la fiche à compléter."
+              "comment": "Référence commerciale et longueur absentes : le calibre 50 seul ne suffit pas à identifier l’exemplaire. Origine cubaine compatible, atelier non vérifié."
             },
             {
               "label": "Préparation et observations techniques",
-              "score": 14,
+              "score": 12,
               "max": 20,
-              "comment": "Examen tactile et coupe renseignés ; tirage et suivi de combustion insuffisamment documentés."
+              "comment": "Tirage à froid absent, puissance du deuxième tiers non cochée et incidents de combustion non suivis. Coupe et examen tactile exploitables."
             },
             {
               "label": "Description et évolution aromatiques",
-              "score": 24,
+              "score": 21,
               "max": 30,
-              "comment": "Progression foin, floral, terre bien repérée ; quelques qualificatifs encore généraux."
+              "comment": "Foin, floral et terre distinguent les étapes ; « riche », « large », « cave » et « le cigare s’exprime » restent insuffisamment explicités."
             },
             {
               "label": "Cohérence et nuance du jugement",
               "score": 17,
               "max": 20,
-              "comment": "Appréciation mesurée ; distinction entre douceur et caractère corsé à préciser."
+              "comment": "Jugement personnel mesuré ; douceur et final plus corsé non distingués, sans contradiction sensorielle démontrée avec le profil fabricant."
             },
             {
               "label": "Soin et exploitation de la fiche",
               "score": 12,
               "max": 15,
-              "comment": "Écriture globalement lisible, trois tiers suivis ; quelques cases vides et une note masquée par le tampon."
+              "comment": "Première fiche lisible et trois tiers suivis ; cases vides et rapport qualité-prix masqué limitent l’exploitation."
             }
           ],
           "appreciation": [
-            "Louis remet une première fiche appliquée, suffisamment détaillée pour restituer le déroulement de sa dégustation. Son principal mérite réside dans l’observation d’une évolution : le cigare ne reçoit pas une description unique étendue artificiellement sur une heure.",
-            "Les progrès attendus concernent surtout la précision documentaire et la distinction des sensations. Pour sa prochaine fiche, Louis gagnera à renseigner systématiquement le tirage, à identifier exactement le cigare et à expliquer les termes généraux tels que « riche », « large » ou « corsé ». Il pourra également consigner la longueur maximale de cendre et les éventuels incidents de combustion, au besoin dans les marges.",
-            "Le Comité n’attend pas qu’il découvre davantage d’arômes pour remplir davantage de lignes. Une sensation simple, décrite avec justesse, suffit. L’absence d’un arôme reste préférable à l’invention d’une noisette sous pression administrative.",
-            "Cette contribution constitue un premier repère utile dans le parcours du Rat de Passage Louis. Elle ne préjuge d’aucune évolution de grade. Le Comité relève néanmoins qu’un cigare a été observé, qu’une fiche a été remplie et que les deux ont pu être rapprochés sans ouverture d’enquête."
+            "La première appréciation à 78/100 accordait trop de crédit à une fiche dont plusieurs éléments importants restent impossibles à vérifier ou à reproduire. Le Comité ramène l’évaluation documentaire à 70/100 après relecture de la pièce et rapprochement avec les références officielles Habanos.",
+            "La marque, le calibre et le format générique ne suffisent pas à reconnaître l’exemplaire. Le Short Churchills 124 mm × calibre 50 constitue une piste cohérente, mais ne sera pas proclamé modèle dégusté sans autre pièce. La mention « La Havane » demeure une déclaration sans identification d’atelier. Ces réserves pénalisent l’identification, pas l’authenticité du cigare, sur laquelle aucune preuve ne permet de conclure.",
+            "La coupe, l’examen tactile et la progression foin, floral, terre restent des éléments favorables. Ils ne compensent cependant pas le tirage non renseigné, la puissance du deuxième tiers laissée vide et les descriptions trop générales d’une palette dite riche ou large. La phrase « le cigare s’exprime » prouve surtout qu’un entretien doit se poursuivre.",
+            "Les points retranchés concernent les renseignements et observations manquants : −3 en identification, −2 en préparation et suivi technique, −3 en développement aromatique. Les critères de cohérence et de soin restent inchangés ; aucune pénalité supplémentaire n’est ajoutée pour les sensations douces, les arômes personnels ou le prix déclaré.",
+            "Cette première contribution demeure recevable avec réserves. La note personnelle du cigare, 6,7/10, ne change pas. Le Rat de Passage est encouragé à poursuivre ; le Comité, pour sa part, s’engage à compter les cases vides avant de saluer la densité du dossier."
           ],
-          "mention": "Première fiche encourageante — sens de l’observation établi, précision en cours d’affinage.",
+          "mention": "Première fiche recevable avec réserves — observations présentes, identification et suivi technique insuffisamment précis.",
           "rubric_id": "crcc-propose-2026-v1",
           "duration_minutes": 60,
           "origin": "Cuba (déclarée)",
@@ -96,12 +97,20 @@
             "touchups": null
           },
           "next_steps": [
-            "Renseigner systématiquement le tirage.",
-            "Relever la référence exacte du cigare.",
-            "Préciser les qualificatifs « riche », « large » et « corsé ».",
-            "Consigner la longueur maximale de cendre et les incidents de combustion."
+            "Relever la référence commerciale complète et la longueur.",
+            "Documenter le tirage à froid et la combustion.",
+            "Renseigner la puissance de chaque tiers.",
+            "Développer les qualificatifs généraux avec les sensations réellement perçues."
           ],
-          "rubric_label": "Barème proposé du Comité — 2026"
+          "rubric_label": "Barème proposé du Comité — 2026",
+          "revision_history": [
+            {
+              "date": "2026-10-23",
+              "previous_score": 78,
+              "score": 70,
+              "reason": "Réexamen motivé : identification non reproductible, tirage et suivi technique absents, richesse aromatique insuffisamment développée. Les ressentis personnels ne sont pas sanctionnés pour non-conformité au profil de marque."
+            }
+          ]
         }
       ],
       "committee_review": {
@@ -111,7 +120,80 @@
           "louis-fiche-1"
         ],
         "minutes_pdf": null,
-        "appreciation": "Cette première séance documentée fournit un relevé appliqué et une progression aromatique lisible, du foin au floral puis à la terre. Le Comité valide le dossier avec réserves sur la référence exacte du cigare et le tirage, insuffisamment renseignés. Aucune minute n’accompagne cette séance ; leur absence, facultative, ne pénalise pas son examen. Le cigare a livré des éléments, le formulaire conserve quelques silences."
+        "appreciation": "La fiche décrit une progression sensorielle exploitable, mais la référence exacte du Romeo y Julieta, le tirage et une partie du suivi technique restent insuffisamment renseignés. Le rapprochement avec Habanos permet une piste de modèle, sans authentifier l’exemplaire. Le Comité maintient un état validé avec réserves et révise la note documentaire à 70/100 ; l’absence de minutes facultatives n’entre pas dans la pénalité."
+      },
+      "cigar_summary": {
+        "title": "Romeo y Julieta — référence à confirmer",
+        "description": "La fiche décrit un cigare cubain de format Robusto et de calibre 50. Ces indications correspondent notamment au Short Churchills présenté par Habanos en 124 mm × calibre 50, mais la référence commerciale de l’exemplaire reste inconnue. La gamme classique est annoncée de force moyenne.",
+        "caution": "Short Churchills est une piste documentaire, pas une identification du cigare dégusté. Une photo de la boîte ou une référence exacte serait nécessaire pour conclure.",
+        "sources": [
+          {
+            "label": "Habanos — Romeo y Julieta",
+            "url": "https://www.habanos.com/en/the-habanos-brands-academia/romeo-y-julieta-brand/"
+          },
+          {
+            "label": "Habanos — Short Churchills",
+            "url": "https://www.habanos.com/es/news/habanos-s-a-presenta-short-churchills-el-robusto-de-romeo-y-julieta-es/"
+          }
+        ]
+      },
+      "cigar_verification": {
+        "title": "Romeo y Julieta — comparaison limitée par l’identification",
+        "checked": "2026-10-23",
+        "members": [
+          {
+            "id": "louis",
+            "name": "Louis"
+          }
+        ],
+        "sources": [
+          {
+            "label": "Habanos — Romeo y Julieta",
+            "url": "https://www.habanos.com/en/the-habanos-brands-academia/romeo-y-julieta-brand/"
+          },
+          {
+            "label": "Habanos — Short Churchills",
+            "url": "https://www.habanos.com/es/news/habanos-s-a-presenta-short-churchills-el-robusto-de-romeo-y-julieta-es/"
+          }
+        ],
+        "comparisons": [
+          {
+            "label": "Référence et dimensions",
+            "reference": "Habanos identifie le Short Churchills comme un Robustos de 124 mm × calibre 50. Ce rapprochement ne prouve pas le modèle dégusté.",
+            "declared": {
+              "louis": "« Robusto — cepo 50 » ; nom commercial et longueur absents. Identification non reproductible."
+            }
+          },
+          {
+            "label": "Origine et composition",
+            "reference": "La marque cubaine décrit des feuilles de sous-cape et de tripe de Vuelta Abajo. Le lot précis ne peut pas être vérifié ici.",
+            "declared": {
+              "louis": "Cuba pour les trois composants : compatible avec le cigare cubain déclaré. « La Havane » ne démontre pas l’atelier réel du spécimen."
+            }
+          },
+          {
+            "label": "Force",
+            "reference": "Romeo y Julieta classique : force moyenne selon Habanos ; description de gamme, sans équivalence obligatoire sur 10.",
+            "declared": {
+              "louis": "« Doux » aux premier et dernier tiers, 4/10 au bilan. Écart de ressenti à discuter ; pas de faute démontrée."
+            }
+          },
+          {
+            "label": "Développement des observations",
+            "reference": "La référence fabricant ne remplace ni le tirage mesuré ni le suivi individuel de combustion.",
+            "declared": {
+              "louis": "Tirage non renseigné, puissance du deuxième tiers vide, « riche » et « large » peu développés. Lacunes documentaires effectivement retenues dans la note."
+            }
+          },
+          {
+            "label": "Arômes, prix et durée",
+            "reference": "Pas de palette imposée au dégustateur ; pas de référence exacte pour vérifier un prix de séance ou une durée individuelle.",
+            "declared": {
+              "louis": "Foin, floral, terre et poivre conservés comme perceptions. 9 € et une heure restent déclarés, sans pénalité pour écart à un tarif ou une durée supposés."
+            }
+          }
+        ],
+        "interpretation": "Aucune contradiction matérielle avec un modèle identifié n’est démontrée, puisque le modèle reste indéterminé. La révision sanctionne les imprécisions majeures et les cases techniques absentes, sans inventer une faute sur Cuba ou sur les arômes. Le profil moyen de la marque ne permet pas de déclarer faux le ressenti doux du membre."
       }
     },
     {
@@ -290,7 +372,7 @@
             "Louis livre une deuxième fiche plus personnelle à froid et mieux identifiée commercialement. Le cuir, le foin et la feuille de thé constituent des repères utiles, tandis que la cendre, les changements de fumée et le rallumage reçoivent un véritable suivi.",
             "Le dernier tiers est décrit sans complaisance : la puissance monte alors que la richesse diminue et que la sensation sur la langue devient difficile. Les minutes renforcent cette lecture en attribuant explicitement à Louis la perte d’agrément aromatique finale. Le Comité apprécie que le Rat ne transforme pas une bonne soirée en obligation d’aimer tout le cigare.",
             "Le principal axe de progression reste la précision des rubriques : le tirage doit être renseigné, les dimensions doivent pouvoir se mesurer et les champs de composition doivent recevoir une information connue ou la mention « non renseigné ». Les évolutions « présent » ou « vers le feu ardent » gagneront à être accompagnées d’un arôme ou d’une sensation clairement distinguée.",
-            "L’évaluation atteint 79/100 contre 78/100 pour sa première fiche, avec le même barème proposé. Ce point supplémentaire traduit un meilleur ancrage du dossier et du suivi technique ; il ne représente ni une mesure de l’expertise de Louis ni un changement de grade. Le Comité conserve le Rat de Passage et recommande de conserver aussi un peu de place pour le tirage.",
+            "L’évaluation atteint 79/100 contre 70/100 pour sa première fiche, révisée le 23 octobre 2026 avec le même barème proposé. Cet écart traduit un dossier mieux identifié et un suivi technique plus exploitable ; il ne mesure pas à lui seul une progression de l’expertise et ne vaut aucun changement de grade. Le Comité conserve le Rat de Passage et recommande de conserver aussi un peu de place pour le tirage.",
             "Révision documentaire du 23 octobre 2026 : les caractéristiques du fabricant sont désormais comparées à la fiche et aux minutes. La note est maintenue, les lacunes d’identification ayant déjà été prises en compte. Les perceptions aromatiques ne sont pas notées selon leur conformité au discours de la marque."
           ],
           "mention": "Deuxième fiche recevable — mémoire olfactive affirmée, précision technique à consolider.",
@@ -448,6 +530,17 @@
           }
         ],
         "interpretation": "La référence produit précise les faits vérifiables ; elle ne prescrit pas le goût du membre. Un arôme absent de la liste de la marque n’est pas une erreur. Les origines de feuilles ne doivent pas être confondues avec le lieu de fabrication, que les pages retenues ne précisent pas. Les notes documentaires restent inchangées : les lacunes d’identification étaient déjà prises en compte ; les corrections apportées par le Comité ne deviennent pas des observations des membres."
+      },
+      "cigar_summary": {
+        "title": "CAO Gold Robusto",
+        "description": "Un Robusto de 127 mm, calibre 50, à cape Connecticut d’Équateur sur une sous-cape et une tripe du Nicaragua. CAO annonce un profil doux à moyen, avec notamment des repères de cuir, de poivre, de cacao, de noix et de terre.",
+        "caution": "Les sensations et le comportement des exemplaires de la séance restent détaillés dans les comptes rendus individuels.",
+        "sources": [
+          {
+            "label": "CAO — Gold (fabricant)",
+            "url": "https://www.caocigars.com/cigars/gold/"
+          }
+        ]
       }
     }
   ],

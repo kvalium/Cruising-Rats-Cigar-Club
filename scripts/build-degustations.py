@@ -90,12 +90,22 @@ def cigar_verification(s, member_id=None):
     if not verification:
         return ''
     columns = verification['members'] if member_id is None else [m for m in verification['members'] if m['id']==member_id]
-    body = '<section class="card cigar-verification"><h2>Le cigare à l’épreuve des pièces</h2><p>Caractéristiques de référence vérifiées, confrontées aux déclarations consignées. Les informations ajoutées par le Comité ne sont pas créditées rétroactivement aux dégustateurs.</p><div class="table-scroll"><table><caption>CAO Gold Robusto — comparaison documentaire</caption><thead><tr><th scope="col">Élément</th><th scope="col">Référence vérifiée</th>'
+    body = '<section class="card cigar-verification"><h2>Le cigare à l’épreuve des pièces</h2><p>Caractéristiques de référence vérifiées, confrontées aux déclarations consignées. Les informations ajoutées par le Comité ne sont pas créditées rétroactivement aux dégustateurs.</p><div class="table-scroll"><table><caption>' + esc(verification.get('title', 'CAO Gold Robusto — comparaison documentaire')) + '</caption><thead><tr><th scope="col">Élément</th><th scope="col">Référence vérifiée</th>'
     body += ''.join(f'<th scope="col">Fiche de {esc(m["name"])}</th>' for m in columns) + '</tr></thead><tbody>'
     for row in verification['comparisons']:
         body += f'<tr><th scope="row">{esc(row["label"])}</th><td>{esc(row["reference"])}</td>' + ''.join(f'<td>{esc(row["declared"][m["id"]])}</td>' for m in columns) + '</tr>'
     body += '</tbody></table></div><p>' + esc(verification['interpretation']) + '</p><p class="archive-meta">Sources consultées le ' + long_date(verification['checked']) + ' : '
     body += ' · '.join(f'<a href="{esc(src["url"])}" target="_blank" rel="noopener">{esc(src["label"])}</a>' for src in verification['sources']) + '.</p></section>'
+    return body
+
+def cigar_description(s):
+    summary = s.get('cigar_summary')
+    if not summary:
+        return ''
+    body = '<section class="card cigar-summary"><p class="smallcaps">LE CIGARE DE LA SÉANCE</p><h2>' + esc(summary['title']) + '</h2><p>' + esc(summary['description']) + '</p>'
+    if summary.get('caution'):
+        body += '<p class="archive-meta">' + esc(summary['caution']) + '</p>'
+    body += '<p class="archive-meta">' + ' · '.join(f'<a href="{esc(source["url"])}" target="_blank" rel="noopener">{esc(source["label"])}</a>' for source in summary.get('sources', [])) + '</p></section>'
     return body
 
 def session_intro(s):
@@ -199,8 +209,8 @@ def build(data):
         body = crumbs + session_intro(s)
         if s.get('minutes_pdf'):
             body += '<section class="card"><h2>Minutes de la séance</h2><p>Document commun aux participants. Les propos ne sont attribués à un membre que lorsque leur auteur est explicitement identifié.</p><div class="documents">' + pdf_links(s['minutes_pdf'], 'les minutes') + '</div></section>'
-        body += session_verdict(s) + cigar_verification(s)
-        body += '<section class="session-records"><h2>Fiches et comptes rendus</h2>' + session_sheets(s) + '</section>' + RULES
+        body += '<section class="session-records"><h2>Fiches et comptes rendus</h2>' + session_sheets(s) + '</section>'
+        body += session_verdict(s) + cigar_description(s) + RULES
         body += '<p class="archive-footer"><a href="index.html">← Toutes les séances</a></p>'
         (out / session_url(s)).write_text(shell(s['title'], session_url(s), body))
         for f in s['sheets']:
