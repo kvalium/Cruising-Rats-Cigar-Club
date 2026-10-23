@@ -135,7 +135,7 @@ def shell(title_text, path, body, script=False):
 <link rel="icon" href="https://cruising-rats-cigar-club.s3.eu-west-3.amazonaws.com/logo_transparent.png" type="image/png">
 </head><body><div class="site-shell"><header class="site-header"><img class="logo" src="https://cruising-rats-cigar-club.s3.eu-west-3.amazonaws.com/logo_transparent.png" alt="Logo du Cruising Rats Cigar Club" width="155" height="155"><div class="kicker">CRUISING RATS CIGAR CLUB</div><h1 class="site-title">{esc(title_text)}</h1><div class="reference">SERVICE DES ARCHIVES ORGANOLEPTIQUES</div></header>
 {nav}<div class="banner">LES RATS DÉGUSTENT • LE COMITÉ EXAMINE • LES ARCHIVES CONSERVENT</div><main>{body}</main>
-<footer>CRUISING RATS CIGAR CLUB<br>COMITÉ EXÉCUTIF • SERVICE DE DÉGUSTATION ET D’ARCHIVAGE<br>On pipe rien, mais on a des fiches.<br><a href="index.html">Fiches de dégustation</a> · <a href="registre-membres.html">Registre des membres</a></footer></div>{'<script src="../js/archives.js" defer></script>' if script else ''}</body></html>'''
+<footer>CRUISING RATS CIGAR CLUB<br>COMITÉ EXÉCUTIF • SERVICE DE DÉGUSTATION ET D’ARCHIVAGE<br>On pipe rien, mais on a des fiches.<br><a href="index.html">Dégustations</a> · <a href="registre-membres.html">Registre des membres</a></footer></div>{'<script src="../js/archives.js" defer></script>' if script else ''}</body></html>'''
 
 RULES = '''<details class="card"><summary>Comprendre la note du Comité et le rôle des minutes</summary>
 <p>La note du Comité sur 100 évalue la précision, la cohérence et la qualité des observations du membre, à partir des pièces disponibles. La note du cigare sur 10 exprime le jugement personnel du dégustateur.</p>
@@ -185,9 +185,10 @@ def session_sheets(s):
 def sheet_list(s, filter_rows=False):
     rows = []
     for f in s['sheets']:
+        m = member(s, f)
         attrs = f' data-entry data-member="{esc(f["member_id"])}" data-brand="{esc(f["brand"])}"' if filter_rows else ''
-        rows.append(f'<li{attrs}><a href="{sheet_url(f)}">{esc(title(s, f))}</a><br><span class="archive-meta">{member_link(member(s, f))} · {esc(member(s, f)["grade"])} · {esc(f["cigar"])}<br>Note du Comité : <strong>{score(f)}/100</strong></span>{" <span class=badge>Première fiche</span>" if f.get("first") else ""}</li>')
-    return '<ul>' + ''.join(rows) + '</ul>'
+        rows.append(f'<li{attrs}><span class="archive-contributor">{member_link(m)}<span class="archive-separator" aria-hidden="true">·</span><a class="archive-sheet-link" href="{sheet_url(f)}" aria-label="Fiche {f["number"]} de {esc(m["name"])} et compte rendu">Fiche {f["number"]}</a></span><span class="archive-sheet-score"><span>Comité</span> <strong>{score(f)}/100</strong></span></li>')
+    return '<ul class="archive-contributions">' + ''.join(rows) + '</ul>'
 
 def build(data):
     validate(data)
@@ -197,15 +198,15 @@ def build(data):
     people = {m['id']: m['name'] for s in sessions for m in s['participants']}
     brands = sorted({f['brand'] for s in sessions for f in s['sheets']})
     options = lambda values: ''.join(f'<option value="{esc(k)}">{esc(v)}</option>' for k,v in values)
-    body = '''<div class="archive-intro"><p class="lead">Les Rats dégustent. Le Comité examine. Les archives conservent.</p><p>Retrouvez les séances de dégustation, les fiches des membres et leur compte rendu. Les sensations sont personnelles ; leur classement est une affaire sérieuse.</p><p>Les séances sont classées par date de dégustation, de la plus récente à la plus ancienne. Les minutes communes, lorsqu’elles existent, sont conservées une seule fois et reliées aux fiches individuelles.</p></div>'''
-    body += f'''<form class="archive-filters" data-archive-filters hidden><label>Membre<select name="member"><option value="">Tous les membres</option>{options(sorted(people.items(), key=lambda p:p[1]))}</select></label><label>Marque<select name="brand"><option value="">Toutes les marques</option>{options((b,b) for b in brands)}</select></label></form><p class="archive-meta" data-result-count aria-live="polite">{len(sessions)} séance archivée</p><p data-empty hidden>Aucune fiche ne correspond à ces critères.</p>'''
+    body = '<div class="archive-intro"><p class="lead">Les dégustations du Club</p><p>Retrouvez chaque séance, ses fiches, ses minutes et les appréciations du Comité.</p></div>'
+    body += f'''<form class="archive-filters" data-archive-filters hidden><label>Membre<select name="member"><option value="">Tous les membres</option>{options(sorted(people.items(), key=lambda p:p[1]))}</select></label><label>Marque<select name="brand"><option value="">Toutes les marques</option>{options((b,b) for b in brands)}</select></label></form><p class="archive-meta" data-result-count aria-live="polite">{len(sessions)} séance{"s" if len(sessions)>1 else ""} archivée{"s" if len(sessions)>1 else ""}</p><p data-empty hidden>Aucune dégustation ne correspond à ces critères.</p>'''
     for s in sessions:
         n, count = len(s['participants']), len(s['sheets'])
-        body += f'<article class="card archive-card" data-session><time class="news-date" datetime="{s["date"]}">{long_date(s["date"])}</time><h2><a href="{session_url(s)}">{esc(s["title"])}</a></h2><p class="archive-meta">{n} participant{"s" if n>1 else ""} · {count} fiche{"s" if count>1 else ""}{" · Minutes disponibles" if s.get("minutes_pdf") else ""}</p><p>{esc(" ; ".join(s["cigars"]))}</p>{sheet_list(s, True)}<a href="{session_url(s)}">Consulter le dossier de séance →</a></article>'
+        body += f'<article class="archive-card" data-session><time class="news-date" datetime="{s["date"]}">{long_date(s["date"])}</time><h2><a href="{session_url(s)}">{esc(s["title"])}</a></h2><p class="archive-meta">{n} participant{"s" if n>1 else ""} · {count} fiche{"s" if count>1 else ""}{" · Minutes disponibles" if s.get("minutes_pdf") else ""}</p>{sheet_list(s, True)}</article>'
     body += '<p><a href="registre-membres.html">Consulter le registre des membres →</a></p>' + RULES
-    (out / 'index.html').write_text(shell('Fiches de dégustation', 'index.html', body, True))
+    (out / 'index.html').write_text(shell('Dégustations', 'index.html', body, True))
     for s in sessions:
-        crumbs = '<p class="breadcrumbs"><a href="index.html">Fiches de dégustation</a> / Séance</p>'
+        crumbs = '<p class="breadcrumbs"><a href="index.html">Dégustations</a> / Séance</p>'
         body = crumbs + session_intro(s)
         if s.get('minutes_pdf'):
             body += '<section class="card"><h2>Minutes de la séance</h2><p>Document commun aux participants. Les propos ne sont attribués à un membre que lorsque leur auteur est explicitement identifié.</p><div class="documents">' + pdf_links(s['minutes_pdf'], 'les minutes') + '</div></section>'
@@ -215,7 +216,7 @@ def build(data):
         (out / session_url(s)).write_text(shell(s['title'], session_url(s), body))
         for f in s['sheets']:
             m = member(s,f)
-            body = f'<p class="breadcrumbs"><a href="index.html">Fiches de dégustation</a> / <a href="{session_url(s)}">{esc(s["title"])}</a> / {member_link(m)} — Fiche {f["number"]}</p>'
+            body = f'<p class="breadcrumbs"><a href="index.html">Dégustations</a> / <a href="{session_url(s)}">{esc(s["title"])}</a> / {member_link(m)} — Fiche {f["number"]}</p>'
             body += f'<p><span class="badge">{esc(m["grade"])}</span>{"<span class=badge>Première fiche</span>" if f.get("first") else ""}</p><p class="archive-meta">Grade au moment de la dégustation · Dégustation du <time datetime="{s["date"]}">{long_date(s["date"])}</time><br>Publié le {long_date(f["published"])} · Dernière révision : {long_date(f["revised"])}</p>'
             body += f'<section class="card"><h2>Identification du dossier</h2><p><strong>Membre :</strong> {member_link(m)}<br><strong>Cigare déclaré :</strong> {esc(f["cigar"])}<br><strong>Durée :</strong> {esc(f["duration"])}<br><strong>Accompagnement :</strong> {esc(f["pairing"])}<br><strong>Prix :</strong> {esc(f["price"])}</p><div class="documents">{pdf_links(f["pdf"], "la fiche")}</div>'
             if s.get('minutes_pdf'):

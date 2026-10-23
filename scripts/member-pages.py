@@ -3,6 +3,13 @@ import json
 import subprocess
 from html import escape as esc
 
+def grade_badge(person):
+    grade = person.get('grade') or 'Grade non renseigné'
+    # Only the validated grade receives this artwork; unknown grades keep their text.
+    if grade.casefold().strip() == 'rat de passage':
+        return '<img class="grade-portrait" src="../images/badges/rat-de-passage.png" alt="Badge Rat de Passage : jeune rat avec une tétine" width="144" height="144">'
+    return ''
+
 def people_for(data):
     people = {m['id']:dict(m) for m in data.get('members', [])}
     for s in sorted(data['sessions'], key=lambda s:(s['date'],s['id'])):
@@ -27,7 +34,7 @@ def build_members(archive, data):
                 rows.append(row)
         page=archive.member_url(person)
         pages.append(page)
-        body=f'<p class="breadcrumbs"><a href="registre-membres.html">Registre des membres</a> / {esc(person["name"])}</p><p class="lead">Un palais, des observations, un dossier qui s’épaissit. Le Comité suit les pièces ; les courbes font le reste.</p><p><span class="badge">{esc(person.get("grade") or "Grade non renseigné")}</span> <span class="archive-meta">Dernier grade documenté.</span></p>'
+        body=f'<p class="breadcrumbs"><a href="registre-membres.html">Registre des membres</a> / {esc(person["name"])}</p><section class="member-identity">{grade_badge(person)}<div><p class="member-grade">{esc(person.get("grade") or "Grade non renseigné")}</p><p class="archive-meta">Dernier grade documenté.</p><p>Un palais, des observations, un dossier qui s’épaissit. Le Comité suit les pièces ; les courbes font le reste.</p></div></section>'
         if rows:
             last_session,last_fiche=max(((s,f) for s in sessions for f in s['sheets'] if f['member_id']==member_id),key=lambda pair:(pair[0]['date'],pair[1]['number']))
             body+='<section class="card accent"><h2>Dernière appréciation du Comité</h2>'
@@ -47,13 +54,13 @@ def build_members(archive, data):
         payload=json.dumps({'rows':rows},ensure_ascii=False).replace('<','\\u003c').replace('>','\\u003e').replace('&','\\u0026')
         body+=f'<script type="application/json" id="member-data">{payload}</script><script src="../js/member-stats.js" defer></script>'
         (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Registre du membre',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css"></head>'))
-    directory = '<p class="breadcrumbs"><a href="index.html">Fiches de dégustation</a> / Registre des membres</p><p class="lead">Les membres, leurs contributions et les pièces qui les accompagnent. Chaque nom ouvre un dossier personnel ; le Comité n’égare personne volontairement.</p><p>Retrouvez les profils enregistrés, leurs fiches et leurs statistiques de dégustation. Les membres sont classés par ordre alphabétique.</p>'
+    directory = '<p class="breadcrumbs"><a href="index.html">Dégustations</a> / Registre des membres</p><p class="lead">Les membres, leurs contributions et les pièces qui les accompagnent. Chaque nom ouvre un dossier personnel ; le Comité n’égare personne volontairement.</p><p>Retrouvez les profils enregistrés, leurs fiches et leurs statistiques de dégustation. Les membres sont classés par ordre alphabétique.</p>'
     directory += f'<p class="archive-meta">{len(people)} profil' + ('s enregistrés' if len(people)>1 else ' enregistré') + '.</p><ul class="member-directory">'
     for person in sorted(people.values(), key=lambda m:(m['name'].casefold(),m['id'])):
         attended = [s for s in sessions if any(m['id']==person['id'] for m in s['participants'])]
         sheets = [f for s in sessions for f in s['sheets'] if f['member_id']==person['id']]
         first = f'Première séance archivée : {archive.long_date(attended[0]["date"])}' if attended else 'Aucune séance archivée pour le moment.'
-        directory += f'<li class="card"><div class="directory-heading"><h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2><span class="badge">{esc(person.get("grade") or "Grade non renseigné")}</span></div><p class="archive-meta">{len(attended)} séance' + ('s' if len(attended)>1 else '') + f' · {len(sheets)} fiche' + ('s' if len(sheets)>1 else '') + f'<br>{first}</p><a class="sheet-read" href="{archive.member_url(person)}" aria-label="Consulter le profil de {esc(person["name"])}">Profil, fiches et statistiques <span aria-hidden="true">→</span></a></li>'
+        directory += f'<li class="card member-directory-card">{grade_badge(person)}<div class="directory-details"><div class="directory-heading"><h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2><span class="badge">{esc(person.get("grade") or "Grade non renseigné")}</span></div><p class="archive-meta">{len(attended)} séance' + ('s' if len(attended)>1 else '') + f' · {len(sheets)} fiche' + ('s' if len(sheets)>1 else '') + f'<br>{first}</p><a class="directory-profile" href="{archive.member_url(person)}" aria-label="Consulter le profil de {esc(person["name"])}">Profil et statistiques →</a></div></li>'
     directory += '</ul><p class="archive-meta">Les grades affichés correspondent aux dernières informations documentées. Les statistiques portent sur les contributions archivées.</p><p class="archive-footer"><a href="index.html">← Toutes les séances de dégustation</a></p>'
     (root/'fiches-degustation/registre-membres.html').write_text(archive.shell('Registre des membres','registre-membres.html',directory))
     return pages + ['registre-membres.html']
