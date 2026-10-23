@@ -27,6 +27,8 @@ class Links(HTMLParser):
 for p in (archives.ROOT / 'fiches-degustation').glob('*.html'):
     text = p.read_text()
     nav = text.split('<nav class="site-nav"')[1].split('</nav>')[0]
+    assert '(PDF, nouvel onglet)' not in text, 'Document button labels must stay concise'
+    assert ' download' not in text and 'Télécharger la fiche' not in text and 'Télécharger les minutes' not in text, 'No separate download links'
     assert 'Fiches de dégustation' not in nav, 'Archive accidentally added to main menu'
     if p.name in ('fiche-louis-fiche-1.html','seance-2026-08-12-un-classique-sous-observation.html'):
         assert 'Consulter les minutes' not in text, 'August session has no minutes'
@@ -57,6 +59,15 @@ assert 'membre-l-monchany' not in directory and 'membre-s-hoummadi' not in direc
 october = next(s for s in data['sessions'] if s['date']=='2026-10-19')
 assert len(october['participants'])==2 and len(october['prospects'])==2
 assert archives.session_assessment(october)['status']=='valide-avec-reserves'
+october_page = (archives.ROOT / 'fiches-degustation/seance-2026-10-19-cao-gold-robusto.html').read_text()
+assert '<dl class="session-facts">' in october_page
+assert 'Clôture des fiches' in october_page
+assert 'https://www.caocigars.com/cigars/gold/' in october_page
+assert '127 mm' in october_page and 'Connecticut d’Équateur' in october_page
+for filename in ('fiche-julien-fiche-1.html','fiche-louis-fiche-2.html'):
+    page = (archives.ROOT / 'fiches-degustation' / filename).read_text()
+    assert 'Le cigare à l’épreuve des pièces' in page
+    assert 'https://www.caocigars.com/cigars/gold/' in page
 scores = {f['member_id']:archives.score(f) for f in october['sheets']}
 assert scores=={'julien':82,'louis':79}
 julien = next(f for f in october['sheets'] if f['member_id']=='julien')

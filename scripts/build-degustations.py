@@ -83,7 +83,36 @@ def session_url(s):
     return f"seance-{s['id']}.html"
 
 def pdf_links(path, label):
-    return f'<a class="download" href="../{esc(path)}" target="_blank" rel="noopener">Consulter {label} (PDF, nouvel onglet)</a><a href="../{esc(path)}" download>Télécharger {label} (PDF)</a>'
+    return f'<a class="download" href="../{esc(path)}" target="_blank" rel="noopener">Consulter {label}</a>'
+
+def cigar_verification(s, member_id=None):
+    verification = s.get('cigar_verification')
+    if not verification:
+        return ''
+    columns = verification['members'] if member_id is None else [m for m in verification['members'] if m['id']==member_id]
+    body = '<section class="card cigar-verification"><h2>Le cigare à l’épreuve des pièces</h2><p>Caractéristiques de référence vérifiées, confrontées aux déclarations consignées. Les informations ajoutées par le Comité ne sont pas créditées rétroactivement aux dégustateurs.</p><div class="table-scroll"><table><caption>CAO Gold Robusto — comparaison documentaire</caption><thead><tr><th scope="col">Élément</th><th scope="col">Référence vérifiée</th>'
+    body += ''.join(f'<th scope="col">Fiche de {esc(m["name"])}</th>' for m in columns) + '</tr></thead><tbody>'
+    for row in verification['comparisons']:
+        body += f'<tr><th scope="row">{esc(row["label"])}</th><td>{esc(row["reference"])}</td>' + ''.join(f'<td>{esc(row["declared"][m["id"]])}</td>' for m in columns) + '</tr>'
+    body += '</tbody></table></div><p>' + esc(verification['interpretation']) + '</p><p class="archive-meta">Sources consultées le ' + long_date(verification['checked']) + ' : '
+    body += ' · '.join(f'<a href="{esc(src["url"])}" target="_blank" rel="noopener">{esc(src["label"])}</a>' for src in verification['sources']) + '.</p></section>'
+    return body
+
+def session_intro(s):
+    intro = s.get('introduction')
+    if intro:
+        body = f'<section class="session-opening"><p class="lead">{esc(intro["lead"])}</p><dl class="session-facts">'
+        for field in intro['facts']:
+            body += f'<div><dt>{esc(field["label"])}</dt><dd>{esc(field["value"])}</dd></div>'
+        body += '</dl><p class="archive-meta">' + esc(intro['note']) + '</p></section>'
+    else:
+        body = f'<p class="news-date"><time datetime="{s["date"]}">{long_date(s["date"])}</time></p><p class="lead">{esc(s["context"])}</p>'
+    body += '<section class="card session-attendees"><h2>Autour de la table</h2><div class="attendee-grid"><div><h3>Membres dégustateurs</h3><ul>'
+    body += ''.join(f'<li>{member_link(m)} — {esc(m["grade"])}</li>' for m in s['participants']) + '</ul><p class="archive-meta">Grades au moment de la séance.</p></div>'
+    if s.get('prospects'):
+        body += '<div><h3>Prospects présents</h3><ul>' + ''.join(f'<li>{esc(p["name"])}</li>' for p in s['prospects']) + '</ul></div>'
+    body += '</div><p><strong>Cigare :</strong> ' + esc(' ; '.join(s['cigars'])) + '</p></section>'
+    return body
 
 def shell(title_text, path, body, script=False):
     nav = re.search(r'<nav class="site-nav".*?</nav>', (ROOT / 'index.html').read_text(), re.S).group()
@@ -167,14 +196,10 @@ def build(data):
     (out / 'index.html').write_text(shell('Fiches de dégustation', 'index.html', body, True))
     for s in sessions:
         crumbs = '<p class="breadcrumbs"><a href="index.html">Fiches de dégustation</a> / Séance</p>'
-        body = crumbs + f'<p class="news-date"><time datetime="{s["date"]}">{long_date(s["date"])}</time></p><p class="lead">{esc(s["context"])}</p><section class="card"><h2>Participants et cigares</h2><ul>'
-        body += ''.join(f'<li>{member_link(m)} — {esc(m["grade"])} <span class="archive-meta">(grade au moment de la dégustation)</span></li>' for m in s['participants'])
-        body += '</ul><ul>' + ''.join(f'<li>{esc(c)}</li>' for c in s['cigars']) + '</ul></section>'
-        if s.get('prospects'):
-            body += '<section class="card"><h2>Prospects présents</h2><ul>' + ''.join(f'<li>{esc(p["name"])} — prospect potentiel</li>' for p in s['prospects']) + '</ul><p class="archive-meta">Mention de présence ; aucune inscription au registre des membres ni fiche individuelle attribuée.</p></section>'
+        body = crumbs + session_intro(s)
         if s.get('minutes_pdf'):
             body += '<section class="card"><h2>Minutes de la séance</h2><p>Document commun aux participants. Les propos ne sont attribués à un membre que lorsque leur auteur est explicitement identifié.</p><div class="documents">' + pdf_links(s['minutes_pdf'], 'les minutes') + '</div></section>'
-        body += session_verdict(s)
+        body += session_verdict(s) + cigar_verification(s)
         body += '<section class="session-records"><h2>Fiches et comptes rendus</h2>' + session_sheets(s) + '</section>' + RULES
         body += '<p class="archive-footer"><a href="index.html">← Toutes les séances</a></p>'
         (out / session_url(s)).write_text(shell(s['title'], session_url(s), body))
@@ -191,6 +216,7 @@ def build(data):
             body += f'<p><strong>Base de l’évaluation :</strong> {esc(f["evaluation_basis"])}</p>'
             if s.get('minutes_pdf'):
                 body += f'<p><strong>Apport des minutes :</strong> {esc(f["minutes_contribution"])}</p>'
+            body += cigar_verification(s, f['member_id'])
             body += '<article class="report" aria-label="Compte rendu détaillé">' + (ROOT / f['report']).read_text() + '</article>'
             body += '<section><h2>9. Note du Comité</h2><p>Cette note évalue la qualité de la contribution documentaire du membre. La note du cigare demeure son appréciation personnelle.</p><div class="table-scroll"><table><caption>Détail de l’évaluation sur 100</caption><thead><tr><th scope="col">Critère</th><th scope="col">Note</th><th scope="col">Appréciation</th></tr></thead><tbody>'
             body += ''.join(f'<tr><th scope="row">{esc(c["label"])}</th><td>{c["score"]}/{c["max"]}</td><td>{esc(c["comment"])}</td></tr>' for c in f['criteria'])
