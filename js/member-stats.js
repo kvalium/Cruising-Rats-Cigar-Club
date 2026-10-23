@@ -112,8 +112,8 @@
     html+=counter('Temps cumulé documenté',s.duration.length?fmt(s.duration.reduce((a,b)=>a+b,0))+' min':'Non renseigné',"Somme des durées de fiches ; pas un total horaire de séances.");
     html+='</div>';
     if(s.duration.length)html+=timeline(s.ordered,'duration_minutes',Math.max(60,...s.duration),'Durées de dégustation en minutes','min');
-    const pairings=countBy(rows.map(r=>r.pairing).filter(Boolean));
-    html+='<h3>Accompagnements déclarés</h3>'+bars(pairings,Math.max(1,...pairings.map(x=>x[1])))+'</section>';
+    const pairings=countBy(rows.flatMap(r=>[...new Set((Array.isArray(r.pairings)?r.pairings:[r.pairing]).filter(Boolean))]));
+    html+='<h3>Accompagnements déclarés</h3>'+bars(pairings,Math.max(1,...pairings.map(x=>x[1])))+note('Chaque accompagnement compte une fois par fiche, y compris lorsque plusieurs boissons ont été servies au cours de la même séance.')+'</section>';
     const draw=countBy(rows.map(r=>r.technique?.draw).filter(Boolean)), relights=rows.map(r=>r.technique?.relights).filter(finite), touchups=rows.map(r=>r.technique?.touchups).filter(finite), ash=validValues(rows,'ash_max_cm');
     html+='<section class="stat-section"><h2>Suivi technique et archives de la cendre</h2>';
     if(!draw.length&&!relights.length&&!touchups.length&&!ash.length)html+=note('Tirage, retouches, rallumages et longueur maximale de cendre : aucune donnée renseignée. Les graphiques correspondants apparaîtront dès les premières mesures.');
@@ -126,10 +126,10 @@
     if(ash.length)html+='<li>Première mesure de cendre documentée.</li>';
     if(rows.length>=10)html+='<li>Dix fiches documentées dans cette sélection.</li>';
     html+='</ul>'+note('Ces constats documentaires ne constituent ni une distinction officielle ni un changement de grade.')+'</section>';
-    html+='<section class="stat-section"><h2>Fiches de la sélection</h2>';
+    html+='<section class="stat-section"><h2>Séances de la sélection</h2><ul class="member-session-list">';
     const bySession=new Map();[...s.ordered].reverse().forEach(r=>{if(!bySession.has(r.session_id))bySession.set(r.session_id,[]);bySession.get(r.session_id).push(r);});
-    for(const group of bySession.values())html+=`<article class="card"><h3><a href="${h(group[0].session_url)}">${h(dateLabel(group[0].date))} — ${h(group[0].session_title)}</a></h3><ul>${group.map(r=>`<li><a href="${h(r.url)}">${h(r.full_title)}</a> — Comité : ${fmt(r.committee_score)}/100</li>`).join('')}</ul></article>`;
-    return html+'</section>';
+    for(const group of bySession.values())html+=`<li><time datetime="${h(group[0].date)}">${h(dateLabel(group[0].date))}</time><a href="${h(group[0].session_url)}">${h(group[0].session_title)}</a></li>`;
+    return html+'</ul></section>';
   }
 
   function mount() {

@@ -28,7 +28,7 @@ def build_members(archive, data):
             for f in s['sheets']:
                 if f['member_id'] != member_id:
                     continue
-                row = {key:f.get(key) for key in ('id','number','first','brand','cigar','module','origin','reference_exact','aromas','duration_minutes','ash_max_cm','technique','pairing','cigar_score','criteria','rubric_label')}
+                row = {key:f.get(key) for key in ('id','number','first','brand','cigar','module','origin','reference_exact','aromas','duration_minutes','ash_max_cm','technique','pairing','pairings','cigar_score','criteria','rubric_label')}
                 # Unknown schemas are isolated per fiche, never assumed comparable.
                 row.update(date=s['date'], session_id=s['id'], session_title=s['title'], session_url=archive.session_url(s), participant_count=len(s['participants']), committee_score=archive.score(f), rubric_id=f.get('rubric_id') or 'Barème non identifié — '+f['id'], url=archive.sheet_url(f), full_title=archive.title(s,f))
                 rows.append(row)

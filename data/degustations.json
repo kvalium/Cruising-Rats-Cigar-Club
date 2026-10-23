@@ -4,7 +4,7 @@
       "id": "2026-08-12-un-classique-sous-observation",
       "date": "2026-08-12",
       "title": "Un classique sous observation",
-      "context": "Première dégustation documentée du Rat de Passage Louis. Le lieu et les conditions ambiantes ne sont pas précisés dans la fiche.",
+      "context": "Première dégustation documentée de Louis. Le lieu et les conditions ambiantes ne sont pas précisés dans la fiche.",
       "participants": [
         {
           "id": "louis",
@@ -659,7 +659,11 @@
             "Reporter les horaires et interventions techniques sur la fiche.",
             "Relier la fin regrettable à une raison précise."
           ],
-          "revised": "2026-10-23"
+          "revised": "2026-10-23",
+          "pairings": [
+            "Rhum Planteray Sealander",
+            "Verveine maison citronnée 2026"
+          ]
         },
         {
           "id": "louis-fiche-3",
@@ -745,7 +749,11 @@
             "Cocher le tirage à froid et dater les rallumages.",
             "Nommer au moins un arôme ou une sensation précise par tiers."
           ],
-          "revised": "2026-10-23"
+          "revised": "2026-10-23",
+          "pairings": [
+            "Rhum Planteray Sealander",
+            "Verveine maison citronnée 2026"
+          ]
         }
       ],
       "library_directory": "/Cruising Rats Cigar Club/Fiches de dégustation/2026-10-21 - Don Tomás Clásico",
@@ -784,7 +792,7 @@
             "value": "Ulver — Neverland, puis Clubroot — Clubroot à 19 h 56"
           }
         ],
-        "note": "Julien et Louis, Rats de Passage, en présence de L. Monchany et S. Hoummadi, prospects. Les 1 h 32 entre les horaires des minutes ne constituent pas une durée individuelle : Louis déclare 1 h 30 ; Julien ne précise pas son temps de fumage."
+        "note": "Julien et Louis, en présence de L. Monchany et S. Hoummadi, prospects. Les 1 h 32 entre les horaires des minutes ne constituent pas une durée individuelle : Louis déclare 1 h 30 ; Julien ne précise pas son temps de fumage."
       },
       "cigar_summary": {
         "title": "Don Tomás Clásico Robusto",

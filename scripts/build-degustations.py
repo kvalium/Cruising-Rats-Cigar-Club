@@ -54,6 +54,8 @@ def validate(data):
                 rubrics[f['rubric_id']] = signature
             assert f['cigar_score'] is None or 0 <= f['cigar_score'] <= 10, 'Invalid cigar score'
             assert f['evaluation_basis'], 'Evaluation basis required'
+            if f.get('pairings') is not None:
+                assert isinstance(f['pairings'], list) and all(isinstance(v, str) and v.strip() for v in f['pairings']), 'Invalid accompaniments'
             for key in ('duration_minutes', 'ash_max_cm'):
                 value = f.get(key)
                 assert value is None or (isinstance(value, (int,float)) and not isinstance(value,bool) and 0 <= value < float('inf')), 'Invalid measurement'
@@ -78,6 +80,14 @@ def member_url(m):
 
 def member_link(m):
     return f'<a href="{member_url(m)}">{esc(m["name"])}</a>'
+
+def member_with_badge(m):
+    grade = m.get('grade', '')
+    if grade.casefold().strip() == 'rat de passage':
+        badge = '<img class="inline-grade" src="../images/badges/rat-de-passage.png" alt="Rat de Passage" title="Rat de Passage" width="36" height="36">'
+    else:
+        badge = f'<span class="badge">{esc(grade)}</span>' if grade else ''
+    return '<span class="member-with-badge">' + member_link(m) + badge + '</span>'
 
 def session_url(s):
     return f"seance-{s['id']}.html"
@@ -118,7 +128,7 @@ def session_intro(s):
     else:
         body = f'<p class="news-date"><time datetime="{s["date"]}">{long_date(s["date"])}</time></p><p class="lead">{esc(s["context"])}</p>'
     body += '<section class="card session-attendees"><h2>Autour de la table</h2><div class="attendee-grid"><div><h3>Membres dégustateurs</h3><ul>'
-    body += ''.join(f'<li>{member_link(m)} — {esc(m["grade"])}</li>' for m in s['participants']) + '</ul><p class="archive-meta">Grades au moment de la séance.</p></div>'
+    body += ''.join(f'<li>{member_with_badge(m)}</li>' for m in s['participants']) + '</ul><p class="archive-meta">Grades au moment de la séance.</p></div>'
     if s.get('prospects'):
         body += '<div><h3>Prospects présents</h3><ul>' + ''.join(f'<li>{esc(p["name"])}</li>' for p in s['prospects']) + '</ul></div>'
     body += '</div><p><strong>Cigare :</strong> ' + esc(' ; '.join(s['cigars'])) + '</p></section>'
@@ -179,7 +189,7 @@ def session_sheets(s):
     rows = []
     for f in s['sheets']:
         m = member(s, f)
-        rows.append(f'''<li class="session-sheet"><div class="sheet-heading"><div><p class="smallcaps">FICHE {f['number']} · {member_link(m)}</p><h3><a href="{sheet_url(f)}">{esc(f['title'])}</a></h3></div><div class="sheet-mark"><strong>{score(f)}/100</strong><span>Note du Comité</span></div></div><p class="archive-meta">{esc(m['grade'])} · {esc(f['cigar'])}<br>Dégustation du {long_date(s['date'])}</p><a class="sheet-read" href="{sheet_url(f)}" aria-label="Consulter la fiche {f['number']} de {esc(m['name'])} et le compte rendu">Consulter la fiche et le compte rendu <span aria-hidden="true">→</span></a></li>''')
+        rows.append(f'''<li class="session-sheet"><div class="sheet-heading"><div><p class="smallcaps">FICHE {f['number']} · {member_with_badge(m)}</p><h3><a href="{sheet_url(f)}">{esc(f['title'])}</a></h3></div><div class="sheet-mark"><strong>{score(f)}/100</strong><span>Note du Comité</span></div></div><p class="archive-meta">{esc(f['cigar'])}<br>Dégustation du {long_date(s['date'])}</p><a class="sheet-read" href="{sheet_url(f)}" aria-label="Consulter la fiche {f['number']} de {esc(m['name'])} et le compte rendu">Consulter la fiche et le compte rendu <span aria-hidden="true">→</span></a></li>''')
     return '<ul class="session-sheets">' + ''.join(rows) + '</ul>'
 
 def sheet_list(s, filter_rows=False):
@@ -187,7 +197,7 @@ def sheet_list(s, filter_rows=False):
     for f in s['sheets']:
         m = member(s, f)
         attrs = f' data-entry data-member="{esc(f["member_id"])}" data-brand="{esc(f["brand"])}"' if filter_rows else ''
-        rows.append(f'<li{attrs}><span class="archive-contributor">{member_link(m)}<span class="archive-separator" aria-hidden="true">·</span><a class="archive-sheet-link" href="{sheet_url(f)}" aria-label="Fiche {f["number"]} de {esc(m["name"])} et compte rendu">Fiche {f["number"]}</a></span><span class="archive-sheet-score"><span>Comité</span> <strong>{score(f)}/100</strong></span></li>')
+        rows.append(f'<li{attrs}><span class="archive-contributor">{member_with_badge(m)}<span class="archive-separator" aria-hidden="true">·</span><a class="archive-sheet-link" href="{sheet_url(f)}" aria-label="Fiche {f["number"]} de {esc(m["name"])} et compte rendu">Fiche {f["number"]}</a></span><span class="archive-sheet-score"><span>Comité</span> <strong>{score(f)}/100</strong></span></li>')
     return '<ul class="archive-contributions">' + ''.join(rows) + '</ul>'
 
 def build(data):

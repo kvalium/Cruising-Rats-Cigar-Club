@@ -28,3 +28,12 @@ assert(!hostile.includes('<img src=x'));
 assert(!hostile.includes('<script>bad'));
 assert(dashboard([]).includes('Aucune fiche'));
 console.log('Member statistics checks passed: missing values, zeros, session deduplication, rubric separation, one-point charts, escaping.');
+
+const drinks=dashboard([{...base,pairing:'Ancien libellé combiné',pairings:['Rhum','Verveine','Rhum']}]);
+const drinksSection=drinks.split('<h3>Accompagnements déclarés</h3>')[1].split('</section>')[0];
+assert(drinksSection.includes('Rhum') && drinksSection.includes('Verveine'));
+assert(!drinksSection.includes('Ancien libellé combiné'));
+assert.equal((drinksSection.match(/>Rhum</g)||[]).length,1,'One drink is counted once per sheet');
+const sessionsList=dashboard([base,second,third]).split('<ul class="member-session-list">')[1].split('</ul>')[0];
+assert.equal((sessionsList.match(/<li>/g)||[]).length,2,'History lists distinct sessions, not sheets');
+assert(!sessionsList.includes('Fiche test'),'History must stay compact');
