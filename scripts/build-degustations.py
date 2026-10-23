@@ -101,6 +101,45 @@ RULES = '''<details class="card"><summary>Comprendre la note du Comité et le r�
 <p>L’absence de minutes ne retire aucun point. Leur présence seule n’en ajoute aucun. Chaque compte rendu indique les pièces utilisées et, lorsqu’il existe des minutes, leur apport individuel à l’évaluation. La note est réexaminée dans les critères concernés, avec une date de révision.</p>
 <p>Le barème présenté avec la première fiche est un barème d’analyse proposé ; il ne constitue pas un règlement préexistant du Club. Une note ne vaut pas changement de grade.</p></details>'''
 
+SESSION_STATES = {
+    'en-examen': 'EN EXAMEN',
+    'valide': 'VALIDÉ',
+    'valide-avec-reserves': 'VALIDÉ AVEC RÉSERVES',
+    'a-regulariser': 'À RÉGULARISER',
+    'a-reexaminer': 'À RÉEXAMINER',
+    'archive': 'ARCHIVÉ',
+}
+
+def session_assessment(s):
+    review = s.get('committee_review')
+    if not review:
+        return {'status': 'en-examen', 'appreciation': 'Les pièces de la séance sont archivées. L’appréciation générale du Comité reste à établir.'}
+    assert review['status'] in SESSION_STATES, 'Unknown session status'
+    date.fromisoformat(review['date'])
+    assert review['appreciation'], 'Session appreciation required'
+    # New pieces require a fresh global review, even when individual marks already exist.
+    if sorted(review['sheet_ids']) != sorted(f['id'] for f in s['sheets']) or review.get('minutes_pdf') != s.get('minutes_pdf'):
+        return {'status': 'a-reexaminer', 'appreciation': 'Les pièces de la séance ont évolué depuis le dernier examen. Le Comité doit actualiser son appréciation générale à partir du dossier complet.'}
+    return review
+
+def session_verdict(s, compact=False):
+    review = session_assessment(s)
+    state = f'<span class="session-state state-{review["status"]}">{SESSION_STATES[review["status"]]}</span>'
+    if compact:
+        return state
+    count = len(s['sheets'])
+    documents = f'{count} fiche' + ('s' if count > 1 else '')
+    documents += ' et minutes communes' if s.get('minutes_pdf') else ' ; aucune minute jointe (document facultatif)'
+    dated = f'<span class="archive-meta">Avis du {long_date(review["date"])}</span>' if review.get('date') else ''
+    return f'<section class="card session-verdict" aria-labelledby="session-verdict-title"><div class="verdict-heading"><h2 id="session-verdict-title">Appréciation générale du Comité</h2>{state}</div><p>{esc(review["appreciation"])}</p><p class="archive-meta"><strong>Pièces du dossier :</strong> {documents}.</p>{dated}<p class="archive-meta">L’état porte sur le dossier de séance. Les notes des membres restent individuelles.</p></section>'
+
+def session_sheets(s):
+    rows = []
+    for f in s['sheets']:
+        m = member(s, f)
+        rows.append(f'''<li class="session-sheet"><div class="sheet-heading"><div><p class="smallcaps">FICHE {f['number']} · {member_link(m)}</p><h3><a href="{sheet_url(f)}">{esc(f['title'])}</a></h3></div><div class="sheet-mark"><strong>{score(f)}/100</strong><span>Note du Comité</span></div></div><p class="archive-meta">{esc(m['grade'])} · {esc(f['cigar'])}<br>Dégustation du {long_date(s['date'])}</p><a class="sheet-read" href="{sheet_url(f)}" aria-label="Consulter la fiche {f['number']} de {esc(m['name'])} et le compte rendu">Consulter la fiche et le compte rendu <span aria-hidden="true">→</span></a></li>''')
+    return '<ul class="session-sheets">' + ''.join(rows) + '</ul>'
+
 def sheet_list(s, filter_rows=False):
     rows = []
     for f in s['sheets']:
@@ -130,7 +169,8 @@ def build(data):
         body += '</ul><ul>' + ''.join(f'<li>{esc(c)}</li>' for c in s['cigars']) + '</ul></section>'
         if s.get('minutes_pdf'):
             body += '<section class="card"><h2>Minutes de la séance</h2><p>Document commun aux participants. Les propos ne sont attribués à un membre que lorsque leur auteur est explicitement identifié.</p><div class="documents">' + pdf_links(s['minutes_pdf'], 'les minutes') + '</div></section>'
-        body += '<section class="card archive-card"><h2>Fiches et comptes rendus</h2>' + sheet_list(s) + '</section>' + RULES
+        body += session_verdict(s)
+        body += '<section class="session-records"><h2>Fiches et comptes rendus</h2>' + session_sheets(s) + '</section>' + RULES
         body += '<p class="archive-footer"><a href="index.html">← Toutes les séances</a></p>'
         (out / session_url(s)).write_text(shell(s['title'], session_url(s), body))
         for f in s['sheets']:

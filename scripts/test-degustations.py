@@ -48,6 +48,18 @@ registry = (archives.ROOT / 'fiches-degustation/membre-louis.html').read_text()
 assert '78/100' in registry and '6,7/10' in registry
 assert 'Historique en cours de constitution' in registry
 assert 'contexte commun uniquement' not in registry
+session_page = (archives.ROOT / 'fiches-degustation/seance-2026-08-12-un-classique-sous-observation.html').read_text()
+assert 'Première fiche</span>' not in session_page, 'First-sheet badge must be absent from session cards'
+assert 'Consulter la fiche et le compte rendu' in session_page
+assert 'VALIDÉ AVEC RÉSERVES' in session_page
+assert 'Appréciation générale du Comité' in session_page
+assert archives.session_assessment(data['sessions'][0])['status'] == 'valide-avec-reserves'
+unreviewed = copy.deepcopy(data['sessions'][0])
+unreviewed.pop('committee_review')
+assert archives.session_assessment(unreviewed)['status'] == 'en-examen'
+new_minutes = copy.deepcopy(data['sessions'][0])
+new_minutes['minutes_pdf'] = 'new-minutes.pdf'
+assert archives.session_assessment(new_minutes)['status'] == 'a-reexaminer', 'Adding shared minutes must trigger a new overall assessment'
 
 with tempfile.TemporaryDirectory() as tmp:
     root = Path(tmp)
@@ -79,6 +91,8 @@ with tempfile.TemporaryDirectory() as tmp:
     index = (root / 'fiches-degustation/index.html').read_text()
     assert index.index('2026-08-12') < index.index('2026-01-01'), 'Incorrect descending order'
     assert '2 participants' in index and 'Minutes disponibles' in index
+    session_html = (root / ('fiches-degustation/' + archives.session_url(s))).read_text()
+    assert 'À RÉEXAMINER' in session_html, 'Adding a sheet must trigger a fresh global review'
     detail = (root / 'fiches-degustation/fiche-louis-fiche-1.html').read_text()
     assert 'Consulter les minutes communes' in detail and 'Précision technique attribuée' in detail
     assert 'fiche-test-sheet.html' in (root / ('fiches-degustation/' + archives.session_url(s))).read_text()
