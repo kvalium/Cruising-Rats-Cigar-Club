@@ -7,6 +7,7 @@ Le site est rédigé en français. Les pages ci-dessous présentent le club, ses
 ## Pages principales
 
 - [Accueil et présentation du club](https://cruising-rats-cigar-club.fr/)
+- [Histoire et fondateurs du Club](https://cruising-rats-cigar-club.fr/fondateurs.html)
 - [Activités du club](https://cruising-rats-cigar-club.fr/activites.html)
 - [Déguster un cigare et consulter les fiches](https://cruising-rats-cigar-club.fr/degustation.html)
 - [Actualités du CRCC](https://cruising-rats-cigar-club.fr/actualites.html)

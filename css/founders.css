@@ -11,3 +11,23 @@
 .founders-grid h3{margin-top:10px}
 .founders-grid p{margin-bottom:0}
 .founders-grid{margin-bottom:36px}
+
+/* Aperçu de l'histoire sur la page d'accueil */
+.founders-teaser-card{display:grid;grid-template-columns:minmax(0,290px) minmax(0,1fr);gap:26px;align-items:center}
+.founders-teaser-image{display:block;min-width:0}
+.founders-teaser-image img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border:1px solid var(--line)}
+.founders-teaser-copy h3{margin:10px 0}
+.founders-teaser-copy p{margin-bottom:18px}
+.founders-teaser-copy .download{font-size:11px;line-height:1.4}
+/* Page dédiée : un peu plus d'espace pour l'archive */
+.founders-page .founders>h2{margin-top:17px}
+.founders-page .founders-portrait{margin-top:26px}
+.founders-page .founders-history{margin-bottom:26px}
+.founders-page .founders-grid{margin-bottom:30px}
+.founders-afterword{margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}
+.founders-afterword h2{margin-top:12px}
+.founders-afterword p:last-child{margin-bottom:0}
+@media(max-width:700px){
+  .founders-teaser-card{grid-template-columns:1fr;gap:18px}
+  .founders-teaser-image{max-width:460px}
+}
