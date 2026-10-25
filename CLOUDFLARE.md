@@ -3,12 +3,12 @@
 ## État au 25 octobre 2026
 
 - Base D1 `crcc-archives` créée en juridiction UE (`ae82b3fb-f396-4ca5-9cfb-a4098e4704cf`). Import vérifié : 4 membres, 3 séances, 5 fiches et 5 comptes rendus.
-- Worker `crcc-publication` déployé et lié à cette base. Aucun jeton de publication ou d'export n'est encore défini : les routes internes refusent les accès.
-- Le projet Pages `crcc-site` est lié au dépôt GitHub. Les builds de `main` restent désactivés ; les branches de prévisualisation sont activées. La commande de build et les variables S3 sont configurées.
+- Worker `crcc-publication` déployé et lié à cette base. Son export D1 est protégé par un jeton transmis au build Pages ; le jeton de publication de l'agent reste à configurer.
+- Le projet Pages `crcc-site` est lié au dépôt GitHub. Les builds de `main` restent désactivés ; les branches de prévisualisation sont activées. La prévisualisation `https://feat-cloudflare-d1-migration.crcc-site.pages.dev/` construit ses archives depuis D1 et vérifie les objets S3.
 - Les sept PDF de dégustation, les sept déclinaisons du badge et la photo des fondateurs sont présents dans S3 avec leur type MIME.
-- La zone Cloudflare du domaine (`515c4fe9578e7e9826c71b0b3a111ae4`) est créée et en attente d'activation. Les serveurs de noms proposés sont `etienne.ns.cloudflare.com` et `melody.ns.cloudflare.com`. Aucun enregistrement DNS n'y est encore défini et les serveurs de noms du registrar n'ont pas été modifiés. L'ancien site reste en place.
+- La zone Cloudflare du domaine (`515c4fe9578e7e9826c71b0b3a111ae4`) est créée et en attente d'activation. Les serveurs de noms proposés sont `etienne.ns.cloudflare.com` et `melody.ns.cloudflare.com`. Le domaine est associé à Pages et un CNAME proxifié vers `crcc-site.pages.dev` est préparé dans la zone. Les serveurs de noms du registrar n'ont pas été modifiés. L'ancien site reste en place.
 
-La branche contient l'identifiant D1 réel dans `cloudflare/wrangler.jsonc`. Vérifier sa présence dans la PR brouillon après la mise à jour GitHub.
+La branche contient l'identifiant D1 réel dans `cloudflare/wrangler.jsonc`. Il reste à mettre en place le jeton de publication, le Deploy Hook Pages et une sauvegarde privée régulière avant la bascule de production.
 
 Le dépôt conserve le code, les gabarits et une copie de référence des archives. Après
 l'import initial, **D1 est la source de publication** des membres et séances. Cloudflare
