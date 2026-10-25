@@ -149,23 +149,24 @@ def enrich_news_pages():
         img = img.replace('class="hero-image"', 'class="news-feature-image"')
         body_html = ''.join('<p>' + p + '</p>' for p in paragraphs[2:])
         intro_html = ''.join('<p>' + p + '</p>' for p in paragraphs[:2])
+        related_href = escape(entry['related'], quote=True)
+        related_title = escape(entry['relatedTitle'])
         doc = (
             '<main class="news-main"><article class="news-feature">'
-            '<header class="news-feature-header"><div class="news-date">' + date + '</div>'
-            '<h1 class="news-feature-title">' + title + '</h1>'
+            f'<header class="news-feature-header"><div class="news-date">{date}</div>'
+            f'<h1 class="news-feature-title">{title}</h1>'
             '<p class="news-feature-kicker">BULLETIN OFFICIEL · ANALYSE &amp; OBSERVATIONS</p>'
             '</header>'
             '<div class="news-feature-intro">'
-            '<figure class="news-feature-figure">' + img
+            f'<figure class="news-feature-figure">{img}'
             '<figcaption>Pièce iconographique jointe au dossier.</figcaption></figure>'
-            '<div class="news-feature-opening">' + intro_html + '</div></div>'
-            '<div class="news-feature-body">' + body_html + '</div>'
+            f'<div class="news-feature-opening">{intro_html}</div></div>'
+            f'<div class="news-feature-body">{body_html}</div>'
             '<aside class="news-feature-related" aria-label="Lectures associées">'
             '<h2>Dans les archives du Club</h2><ul>'
             '<li><a href="../degustation.html">Comprendre les étapes d’une dégustation</a></li>'
             '<li><a href="../fiches-degustation/index.html">Consulter les fiches de dégustation</a></li>'
-            '<li><a href="' + escape(entry['related'], quote=True) + '">'
-            + escape(entry['relatedTitle']) + '</a></li>'
+            f'<li><a href="{related_href}">{related_title}</a></li>'
             '</ul></aside>'
             '<nav class="news-feature-back" aria-label="Retour aux actualités">'
             '<a href="../actualites.html">← Toutes les actualités du CRCC</a></nav>'
@@ -173,7 +174,7 @@ def enrich_news_pages():
         )
         raw = raw.replace(match.group(0), doc, 1)
         # Existing JSON-LD datePublished retains the original publication date.
-        raw = raw.replace('"dateModified":"', '"dateModified":"2026-10-25","previousDateModified":"', 1)
+        raw = re.sub(r'"dateModified":"[^"]+"', '"dateModified":"2026-10-25"', raw, count=1)
         path.write_text(raw, encoding='utf-8')
 
 def main():
