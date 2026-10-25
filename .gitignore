@@ -1,0 +1,8 @@
+dist/
+cloudflare/initial.sql
+.env
+.env.*
+node_modules/
+__pycache__/
+*.pyc
+.openai/

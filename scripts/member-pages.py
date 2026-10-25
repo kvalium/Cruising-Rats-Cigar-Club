@@ -16,6 +16,9 @@ def people_for(data):
     for s in sorted(data['sessions'], key=lambda s:(s['date'],s['id'])):
         for m in s['participants']:
             people[m['id']] = {**people.get(m['id'], {}), **m}
+    for m in data.get('members', []):
+        if m.get('grade_updated_at'):
+            people[m['id']] = {**people.get(m['id'], {}), **m}
     return people
 
 def build_members(archive, data):

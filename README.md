@@ -1,5 +1,8 @@
 # Cruising Rats Cigar Club
 
+> Nouvelle plateforme en préparation : [architecture, import D1, publication et bascule du domaine](CLOUDFLARE.md).
+> Les pages GitHub Pages restent la version publique tant que `cruising-rats-cigar-club.fr` n'a pas été basculé.
+
 > **Dépôt officiel du Cruising Rats Cigar Club.**
 >
 > Organisme indépendant consacré à l’étude, à la dégustation et à la documentation du cigare, sous réserve de validation par le Comité compétent.

@@ -1,0 +1,8 @@
+{
+  "name": "crcc-publication",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-25",
+  "d1_databases": [
+    { "binding": "DB", "database_name": "crcc-archives", "database_id": "ae82b3fb-f396-4ca5-9cfb-a4098e4704cf" }
+  ]
+}
