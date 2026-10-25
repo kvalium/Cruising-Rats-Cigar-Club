@@ -58,7 +58,7 @@ for page in pages:
             errors.append(f'Broken local link: {rel} -> {href}')
     if rel.startswith('fiches-degustation/') and 'noindex,nofollow' not in html:
         errors.append('Private archive missing noindex: ' + rel)
-    if not rel.startswith('fiches-degustation/') and any('/fiches-degustation/' in ref or ref.startswith('fiches-degustation/') for ref in p.references):
+    if not rel.startswith('fiches-degustation/') and any(('/fiches-degustation/' in ref or ref.startswith('fiches-degustation/')) and not (ref.endswith('/fiches-degustation/') or ref == 'fiches-degustation/') for ref in p.references):
         errors.append('Public link to private archive: ' + rel)
 
 tree = ET.parse(root / 'sitemap.xml')

@@ -187,6 +187,7 @@ def enrich_news_pages():
             '</article></main>'
         )
         raw = raw.replace(match.group(0), doc, 1)
+        raw = raw.replace('</footer>', '<br><a href="../fiches-degustation/" rel="nofollow">ACCÈS MEMBRES</a></footer>', 1)
         # Existing JSON-LD datePublished retains the original publication date.
         raw = re.sub(r'"dateModified":"[^"]+"', '"dateModified":"2026-10-25"', raw, count=1)
         path.write_text(raw, encoding='utf-8')
