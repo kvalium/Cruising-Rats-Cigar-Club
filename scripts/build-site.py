@@ -101,6 +101,29 @@ def rewrite_public_urls():
     ET.parse(sitemap)
     (DIST / 'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n')
 
+def enrich_news_pages():
+    """Add original topic-specific editorial background and useful internal links."""
+    entries = json.loads((ROOT / 'data' / 'news-seo.json').read_text(encoding='utf-8'))
+    assert len(entries) == 65, 'Expected 65 article notes'
+    for entry in entries:
+        path = DIST / 'actualites' / entry['file']
+        if not path.is_file():
+            raise RuntimeError('Missing news article: ' + entry['file'])
+        html = path.read_text(encoding='utf-8')
+        anchor = '<p><a href="../actualites.html">← Retour à toutes les actualités du CRCC</a></p>'
+        if html.count(anchor) != 1:
+            raise RuntimeError('Could not locate article footer: ' + entry['file'])
+        from html import escape
+        contextual = ('<section aria-label="Pour mieux comprendre" class="card">'
+                      '<h3>Pour mieux comprendre</h3><p>' + escape(entry['text']) + '</p>'
+                      '<p><strong>Pour approfondir :</strong> '
+                      '<a href="../degustation.html">le guide de dégustation du CRCC</a>, '
+                      '<a href="../fiches-degustation/index.html">les comptes rendus et fiches</a> et '
+                      '<a href="' + escape(entry['related']) + '">' + escape(entry['relatedTitle']) + '</a>.</p>'
+                      '</section>')
+        html = html.replace(anchor, contextual + '\\n' + anchor)
+        path.write_text(html, encoding='utf-8')
+
 def main():
     if DIST.exists():
         shutil.rmtree(DIST)
@@ -118,6 +141,7 @@ def main():
     env = {**os.environ, 'CRCC_SITE_URL': SITE + '/'}
     subprocess.run([sys.executable, 'scripts/build-degustations.py'], cwd=DIST, env=env, check=True)
     rewrite_public_urls()
+    enrich_news_pages()
     shutil.rmtree(DIST / 'scripts')
     shutil.rmtree(DIST / 'data')
     print('Static release built in dist/')
