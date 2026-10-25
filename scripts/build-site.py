@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
 SITE = os.environ.get('CRCC_SITE_URL', 'https://cruising-rats-cigar-club.fr').rstrip('/')
 S3 = os.environ.get('CRCC_S3_BASE', '').rstrip('/')
+S3_ORIGIN = 'https://cruising-rats-cigar-club.s3.eu-west-3.amazonaws.com'
 OLD = ('https://kvalium.github.io/CRCC/',
        'https://kvalium.github.io/Cruising-Rats-Cigar-Club/')
 
@@ -48,7 +49,8 @@ def verify_assets(data):
     if os.environ.get('CRCC_REQUIRE_S3') == '1':
         def check(path):
             try:
-                with urlopen(Request(path, method='HEAD'), timeout=15) as response:
+                origin_path = S3_ORIGIN + path[len(S3):] if path.startswith(S3 + '/') else path
+                with urlopen(Request(origin_path, method='HEAD'), timeout=15) as response:
                     if response.status != 200:
                         raise RuntimeError(f'S3 object unavailable: {path}')
             except Exception as error:
