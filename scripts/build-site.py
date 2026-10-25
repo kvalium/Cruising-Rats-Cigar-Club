@@ -215,6 +215,8 @@ def enrich_news_pages():
         path.write_text(raw, encoding='utf-8')
 
 def main():
+    if os.environ.get('CRCC_REDACT_UPLOAD_0'):
+        subprocess.run([sys.executable, str(ROOT / 'scripts/redact-public-pdfs.py')], cwd=ROOT, check=True)
     if DIST.exists():
         shutil.rmtree(DIST)
     DIST.mkdir()
