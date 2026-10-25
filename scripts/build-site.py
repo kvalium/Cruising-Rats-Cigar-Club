@@ -99,6 +99,18 @@ def rewrite_public_urls():
     ET.parse(sitemap)
     (DIST / 'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n')
 
+def inline_homepage_css():
+    """Inline the small critical CSS on the homepage to avoid blocking requests."""
+    page = DIST / 'index.html'
+    html = page.read_text()
+    for stylesheet in ('style.css', 'founders.css'):
+        link = f'<link rel="stylesheet" href="css/{stylesheet}">'
+        if html.count(link) != 1:
+            raise RuntimeError(f'Expected one homepage stylesheet link: {stylesheet}')
+        css = (DIST / 'css' / stylesheet).read_text()
+        html = html.replace(link, '<style>\\n' + css + '\\n</style>', 1)
+    page.write_text(html)
+
 def main():
     if DIST.exists():
         shutil.rmtree(DIST)
@@ -112,6 +124,7 @@ def main():
         shutil.copy2(path, DIST / path.name)
     for name in ('sitemap.xml', 'robots.txt', '_headers'):
         shutil.copy2(ROOT / name, DIST / name)
+    inline_homepage_css()
     prepare_data(snapshot())
     env = {**os.environ, 'CRCC_SITE_URL': SITE + '/'}
     subprocess.run([sys.executable, 'scripts/build-degustations.py'], cwd=DIST, env=env, check=True)
