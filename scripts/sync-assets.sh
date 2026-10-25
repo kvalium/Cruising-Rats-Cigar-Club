@@ -6,5 +6,5 @@ bucket="${CRCC_S3_BUCKET:-cruising-rats-cigar-club}"
 
 # Credentials come from the operator's AWS profile/role, never from this repository.
 aws s3 sync "$project_root/documents/" "s3://$bucket/documents/" --no-progress
-aws s3 sync "$project_root/images/" "s3://$bucket/images/" --no-progress
+aws s3 sync "$project_root/images/" "s3://$bucket/images/" --exclude "membres-fondateurs-crcc.png" --no-progress
 echo "S3 assets synchronized (no remote deletion)."
