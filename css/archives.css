@@ -13,3 +13,12 @@
 .member-with-badge{display:inline-flex;align-items:center;gap:9px;vertical-align:middle}.member-with-badge>a{font-weight:600}.inline-grade{width:36px;height:36px;object-fit:contain;flex-shrink:0}.archive-card .archive-contributions{display:block;max-width:380px}.archive-card .archive-contributions li{min-width:0;gap:18px;padding:4px 0}.archive-contributor{align-items:center}.archive-contributor .member-with-badge>a{text-decoration:none}.session-attendees .attendee-grid>div>ul{list-style:none;padding:0}.session-attendees li{margin-bottom:8px}.sheet-heading .smallcaps{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.sheet-heading .member-with-badge{letter-spacing:normal;text-transform:none;font-size:15px}
 
 .archive-card .archive-contributions{max-width:none}.archive-card .archive-contributions li{align-items:center;gap:24px}.archive-contributor{flex:1;min-width:0;gap:12px}.archive-contributor .member-with-badge{flex-shrink:0;min-width:104px}.archive-sheet-link{line-height:1.5;font-size:14px;text-decoration:none}.archive-sheet-link:hover{text-decoration:underline}.archive-sheet-score{flex-shrink:0}@media(max-width:600px){.archive-card .archive-contributions li{align-items:flex-start;gap:12px;padding:8px 0}.archive-contributor{flex-wrap:wrap;gap:6px}.archive-contributor .member-with-badge{min-width:0}.archive-contributor .archive-separator{display:none}.archive-sheet-link{flex-basis:100%}.archive-sheet-score{padding-top:10px}}
+
+/* CRCC : repères lisibles avant l'analyse détaillée d'une fiche. */
+.tasting-at-glance{margin:22px 0 26px;padding:22px 24px;border:1px solid var(--line);background:var(--white)}
+.tasting-at-glance h2{font:24px/1.3 Georgia,serif;margin:0 0 17px}
+.tasting-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 22px;margin:0}
+.tasting-facts div{min-width:0;border-top:1px solid var(--line);padding-top:10px}
+.tasting-facts dt{font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.tasting-facts dd{margin:4px 0 0;overflow-wrap:anywhere;font-size:16px;line-height:1.5;color:var(--ink)}
+@media(max-width:650px){.tasting-facts{grid-template-columns:1fr}.tasting-at-glance{padding:18px}}

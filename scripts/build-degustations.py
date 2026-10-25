@@ -138,6 +138,19 @@ def session_intro(s):
     body += '</div><p><strong>Cigare :</strong> ' + esc(' ; '.join(s['cigars'])) + '</p></section>'
     return body
 
+def tasting_facts(f):
+    """Compact quick-reference panel using only documented tasting fields."""
+    facts = [
+        ('Module déclaré', f.get('module') or 'Non précisé'),
+        ('Durée', f.get('duration') or 'Non précisée'),
+        ('Accompagnement', f.get('pairing') or 'Non renseigné'),
+        ('Arômes notés', ', '.join(f.get('aromas') or []) or 'Non renseignés'),
+    ]
+    return ('<section class="tasting-at-glance" aria-label="Repères de dégustation">'
+            '<h2>Repères de dégustation</h2><dl class="tasting-facts">' +
+            ''.join('<div><dt>' + esc(label) + '</dt><dd>' + esc(str(value)) +
+                    '</dd></div>' for label,value in facts) + '</dl></section>')
+
 def shell(title_text, path, body, script=False):
     nav = re.search(r'<nav class="site-nav".*?</nav>', (ROOT / 'index.html').read_text(), re.S).group()
     nav = re.sub(r' aria-current="page"', '', nav)
@@ -146,8 +159,8 @@ def shell(title_text, path, body, script=False):
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{esc(title_text)} — CRCC</title><meta name="description" content="{esc(title_text)} : archives, documents sources et appréciation du Comité du Cruising Rats Cigar Club.">
 <link rel="canonical" href="{BASE}fiches-degustation/{esc(path)}"><link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/archives.css">
-<link rel="icon" href="https://cruising-rats-cigar-club.s3.eu-west-3.amazonaws.com/logo_transparent.png" type="image/png">
-</head><body><div class="site-shell"><header class="site-header"><img class="logo" src="https://cruising-rats-cigar-club.s3.eu-west-3.amazonaws.com/logo_transparent.png" alt="Logo du Cruising Rats Cigar Club" width="155" height="155"><div class="kicker">CRUISING RATS CIGAR CLUB</div><h1 class="site-title">{esc(title_text)}</h1><div class="reference">SERVICE DES ARCHIVES ORGANOLEPTIQUES</div></header>
+<link rel="icon" href="https://assets.cruising-rats-cigar-club.fr/images/crcc-logo-header-155.webp" type="image/webp">
+</head><body><div class="site-shell"><header class="site-header"><img class="logo" src="https://assets.cruising-rats-cigar-club.fr/images/crcc-logo-header-155.webp" alt="Logo du Cruising Rats Cigar Club" width="155" height="155"><div class="kicker">CRUISING RATS CIGAR CLUB</div><h1 class="site-title">{esc(title_text)}</h1><div class="reference">SERVICE DES ARCHIVES ORGANOLEPTIQUES</div></header>
 {nav}<div class="banner">LES RATS DÉGUSTENT • LE COMITÉ EXAMINE • LES ARCHIVES CONSERVENT</div><main>{body}</main>
 <footer>CRUISING RATS CIGAR CLUB<br>COMITÉ EXÉCUTIF • SERVICE DE DÉGUSTATION ET D’ARCHIVAGE<br>On pipe rien, mais on a des fiches.<br><a href="index.html">Dégustations</a> · <a href="registre-membres.html">Registre des membres</a></footer></div>{'<script src="../js/archives.js" defer></script>' if script else ''}</body></html>'''
 
@@ -232,6 +245,7 @@ def build(data):
             m = member(s,f)
             body = f'<p class="breadcrumbs"><a href="index.html">Dégustations</a> / <a href="{session_url(s)}">{esc(s["title"])}</a> / {member_link(m)} — Fiche {f["number"]}</p>'
             body += f'<p><span class="badge">{esc(m["grade"])}</span>{"<span class=badge>Première fiche</span>" if f.get("first") else ""}</p><p class="archive-meta">Grade au moment de la dégustation · Dégustation du <time datetime="{s["date"]}">{long_date(s["date"])}</time><br>Publié le {long_date(f["published"])} · Dernière révision : {long_date(f["revised"])}</p>'
+            body += tasting_facts(f)
             body += f'<section class="card"><h2>Identification du dossier</h2><p><strong>Membre :</strong> {member_link(m)}<br><strong>Cigare déclaré :</strong> {esc(f["cigar"])}<br><strong>Durée :</strong> {esc(f["duration"])}<br><strong>Accompagnement :</strong> {esc(f["pairing"])}<br><strong>Prix :</strong> {esc(f["price"])}</p><div class="documents">{pdf_links(f["pdf"], "la fiche")}</div>'
             if s.get('minutes_pdf'):
                 body += '<div class="documents">' + pdf_links(s['minutes_pdf'], 'les minutes communes') + '</div>'

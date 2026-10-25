@@ -46,13 +46,13 @@ for p in (archives.ROOT / 'fiches-degustation').glob('*.html'):
 
 for name in ('seance-2026-08-12-un-classique-sous-observation.html', 'fiche-louis-fiche-1.html'):
     text = (archives.ROOT / 'fiches-degustation' / name).read_text()
-    assert '<a href="membre-louis.html">Louis</a>' in text, 'Member name must link to registry'
+    assert '<a href="membre-louis.html">Zéro</a>' in text, 'Member name must link to registry'
 registry = (archives.ROOT / 'fiches-degustation/membre-louis.html').read_text()
 assert '70/100' in registry and '6,7/10' in registry
 assert 'fiche-louis-fiche-2.html' in registry
 assert 'contexte commun uniquement' not in registry
 directory = (archives.ROOT / 'fiches-degustation/registre-membres.html').read_text()
-assert '<a href="membre-louis.html">Louis</a>' in directory
+assert '<a href="membre-louis.html">Zéro</a>' in directory
 assert '4 profils enregistrés' in directory
 assert 'membre-julien.html' in directory
 assert 'membre-l-monchany' not in directory and 'membre-s-hoummadi' not in directory, 'Prospects must not become members'
@@ -109,7 +109,7 @@ with tempfile.TemporaryDirectory() as tmp:
     s['minutes_pdf'] = 'minutes.pdf'
     s['participants'].append({'id':'test-member','name':'Test member','grade':'Grade test'})
     f = s['sheets'][0]
-    f.update(pdf='sheet.pdf', report='data/report.html', minutes_contribution='Précision technique attribuée à Louis ; critères réexaminés, note inchangée.')
+    f.update(pdf='sheet.pdf', report='data/report.html', minutes_contribution='Précision technique attribuée à Zéro ; critères réexaminés, note inchangée.')
     second = copy.deepcopy(f)
     second.update(id='test-sheet', member_id='test-member', minutes_contribution='Aucune observation attribuée à ce membre ; contexte commun uniquement.')
     s['sheets'].append(second)
@@ -123,7 +123,7 @@ with tempfile.TemporaryDirectory() as tmp:
     archives.build(fixture)
     assert (root / 'fiches-degustation/membre-alpha.html').is_file(), 'Roster members need profiles even before their first session'
     directory = (root / 'fiches-degustation/registre-membres.html').read_text()
-    assert directory.index('>Alpha</a>') < directory.index('>Louis</a>'), 'Directory must be alphabetical'
+    assert directory.index('>Alpha</a>') < directory.index('>Zéro</a>'), 'Directory must be alphabetical'
     assert 'membre-test-member.html' in directory, 'New participants must automatically enter the directory'
     index = (root / 'fiches-degustation/index.html').read_text()
     assert index.index('2026-08-12') < index.index('2026-01-01'), 'Incorrect descending order'
