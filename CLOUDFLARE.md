@@ -5,7 +5,7 @@
 - Base D1 `crcc-archives` créée en juridiction UE (`ae82b3fb-f396-4ca5-9cfb-a4098e4704cf`). Import vérifié : 4 membres, 3 séances, 5 fiches et 5 comptes rendus.
 - Worker `crcc-publication` déployé et lié à cette base. Aucun jeton de publication ou d'export n'est encore défini : les routes internes refusent les accès.
 - Le projet Pages n'a pas été créé : Cloudflare renvoie une erreur 401 concernant son installation GitHub. Réparer cette connexion avant d'activer les déploiements Git.
-- Les sept PDF de dégustation et les sept déclinaisons du badge sont présents dans S3 avec leur type MIME. La photo des fondateurs conserve l'URL publique du site GitHub Pages actuel ; elle n'a pas été recopiée dans S3.
+- Les sept PDF de dégustation, les sept déclinaisons du badge et la photo des fondateurs sont présents dans S3 avec leur type MIME.
 - La zone Cloudflare du domaine (`515c4fe9578e7e9826c71b0b3a111ae4`) est créée et en attente d'activation. Les serveurs de noms proposés sont `etienne.ns.cloudflare.com` et `melody.ns.cloudflare.com`. Aucun enregistrement DNS n'y est encore défini et les serveurs de noms du registrar n'ont pas été modifiés. L'ancien site reste en place.
 
 La branche contient l'identifiant D1 réel dans `cloudflare/wrangler.jsonc`. Vérifier sa présence dans la PR brouillon après la mise à jour GitHub.
@@ -18,14 +18,12 @@ L'ancien GitHub Pages reste disponible jusqu'à la bascule vérifiée.
 
 ## 1. Préparer S3
 
-Le script `bash scripts/sync-assets.sh` copie `documents/` et les badges de `images/` vers le bucket
+Le script `bash scripts/sync-assets.sh` copie `documents/` et `images/` vers le bucket
 `cruising-rats-cigar-club`, sans supprimer les objets distants. Il utilise le profil
 AWS de l'opérateur. Vérifier que chaque objet destiné à une archive publique est
 accessible par HTTPS (réponse HTTP 200). Ne pas publier les exports privés de D1
 dans un préfixe S3 accessible au public. Les fichiers source locaux restent dans Git
 pour préserver les anciennes URL de GitHub Pages pendant la transition.
-La photo `images/membres-fondateurs-crcc.png` est déjà publique sur l'ancien site :
-le nouveau build garde son URL existante et ne la synchronise pas vers S3.
 
 ## 2. Créer D1 et importer une fois les archives
 
