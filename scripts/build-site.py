@@ -58,6 +58,27 @@ def verify_assets(data):
         with ThreadPoolExecutor(max_workers=8) as pool:
             list(pool.map(check, sorted(paths)))
 
+def anonymize_public_text(value):
+    """Public pseudonyms; never change immutable IDs or source file paths."""
+    substitutions = (
+        ('L. Monchany', 'Mme L. M.'),
+        ('S. Hoummadi', 'Mlle S. H.'),
+        ('Louis', 'Zéro'),
+        ('Julien', 'KV'),
+    )
+    for original, alias in substitutions:
+        value = re.sub(r'(?<!\w)' + re.escape(original) + r'(?!\w)', alias, value)
+    return value
+
+def anonymize_public_record(obj):
+    if isinstance(obj, dict):
+        return {k: anonymize_public_record(v) for k,v in obj.items()}
+    if isinstance(obj, list):
+        return [anonymize_public_record(v) for v in obj]
+    if isinstance(obj, str):
+        return anonymize_public_text(obj)
+    return obj
+
 def prepare_data(fetched):
     if fetched:
         data = {'members': fetched['members'], 'sessions': fetched['sessions']}
@@ -69,9 +90,10 @@ def prepare_data(fetched):
                     raise ValueError('Invalid report path')
                 target = DIST / report_path
                 target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_text(reports[sheet['id']])
+                target.write_text(anonymize_public_text(reports[sheet['id']]))
     else:
         data = json.loads((DIST / 'data/degustations.json').read_text())
+    data = anonymize_public_record(data)
     verify_assets(data)
     if S3:
         for session in data['sessions']:
@@ -83,11 +105,24 @@ def prepare_data(fetched):
                 session['committee_review']['minutes_pdf'] = s3_url(session['committee_review']['minutes_pdf'])
     (DIST / 'data/degustations.json').write_text(json.dumps(data, ensure_ascii=False))
 
+def canonical_public_url(url):
+    """Cloudflare Pages redirects extensionful HTML URLs to clean URLs."""
+    if not url.startswith(SITE + '/'):
+        return url
+    if url.endswith('/index.html'):
+        return url[:-10]
+    if url.endswith('.html'):
+        return url[:-5]
+    return url
+
 def rewrite_public_urls():
     for path in DIST.rglob('*.html'):
         html = path.read_text()
         for prefix in OLD:
             html = html.replace(prefix, SITE + '/')
+        for selector in ('<link rel="canonical" href="', '<meta property="og:url" content="'):
+            html = re.sub(re.escape(selector) + r'([^"]+)',
+                lambda m: selector + canonical_public_url(m.group(1)), html)
         if S3:
             html = html.replace(SITE + '/images/', S3 + '/images/')
             html = html.replace('../images/', S3 + '/images/')
@@ -97,6 +132,8 @@ def rewrite_public_urls():
     xml = sitemap.read_text()
     for prefix in OLD:
         xml = xml.replace(prefix, SITE + '/')
+    xml = re.sub(r'<loc>([^<]+)</loc>',
+                 lambda m: '<loc>' + canonical_public_url(m.group(1)) + '</loc>', xml)
     sitemap.write_text(xml)
     ET.parse(sitemap)
     (DIST / 'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n')
@@ -197,7 +234,8 @@ def main():
     enrich_news_pages()
     shutil.rmtree(DIST / 'scripts')
     shutil.rmtree(DIST / 'data')
-    print('Static release built in dist/')
+    subprocess.run([sys.executable, str(ROOT / 'scripts/check-site.py'), str(DIST)], cwd=ROOT, check=True)
+    print('Static release built and verified in dist/')
 
 if __name__ == '__main__':
     main()
