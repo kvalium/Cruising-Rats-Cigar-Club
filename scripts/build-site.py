@@ -204,7 +204,32 @@ def main():
         shutil.copy2(path, DIST / path.name)
     for name in ('sitemap.xml', 'robots.txt', '_headers', 'llms.txt'):
         shutil.copy2(ROOT / name, DIST / name)
-    # Les archives de dégustations restent dans le dépôt, sans publication publique.
+    # Rebuild tasting archives behind the shared-password Cloudflare middleware.
+    prepare_data(snapshot())
+    protected_docs = DIST / 'fiches-degustation-docs'
+    protected_docs.mkdir()
+    shutil.copytree(ROOT / 'documents', protected_docs / 'documents')
+    tasting_data = DIST / 'data' / 'degustations.json'
+    payload = json.loads(tasting_data.read_text())
+    for session in payload['sessions']:
+        def private_doc_path(path):
+            if '/documents/' in path:
+                return 'fiches-degustation-docs/documents/' + path.split('/documents/', 1)[1]
+            return 'fiches-degustation-docs/documents/' + path.removeprefix('documents/')
+        if session.get('minutes_pdf'):
+            session['minutes_pdf'] = private_doc_path(session['minutes_pdf'])
+        for sheet in session['sheets']:
+            sheet['pdf'] = private_doc_path(sheet['pdf'])
+        if session.get('committee_review') and session['committee_review'].get('minutes_pdf'):
+            session['committee_review']['minutes_pdf'] = session['minutes_pdf']
+    tasting_data.write_text(json.dumps(payload,ensure_ascii=False))
+    env = {**os.environ, 'CRCC_SITE_URL': SITE + '/'}
+    subprocess.run([sys.executable, 'scripts/build-degustations.py'], cwd=DIST, env=env, check=True)
+    sitemap = DIST / 'sitemap.xml'
+    sitemap.write_text(re.sub(r'\s*<url><loc>[^<]*/fiches-degustation/[^<]*</loc>.*?</url>', '', sitemap.read_text(), flags=re.S))
+    for page in (DIST / 'fiches-degustation').glob('*.html'):
+        html = page.read_text()
+        page.write_text(html.replace('</head>', '<meta name="robots" content="noindex,nofollow"></head>', 1))
     rewrite_public_urls()
     enrich_news_pages()
     shutil.rmtree(DIST / 'scripts')
