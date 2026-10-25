@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from urllib.request import Request, urlopen
 from xml.etree import ElementTree as ET
@@ -16,6 +17,8 @@ SITE = os.environ.get('CRCC_SITE_URL', 'https://cruising-rats-cigar-club.fr').rs
 S3 = os.environ.get('CRCC_S3_BASE', '').rstrip('/')
 OLD = ('https://kvalium.github.io/CRCC/',
        'https://kvalium.github.io/Cruising-Rats-Cigar-Club/')
+FOUNDER_IMAGE = 'images/membres-fondateurs-crcc.png'
+FOUNDER_PUBLIC_URL = OLD[1] + FOUNDER_IMAGE
 
 def snapshot():
     endpoint = os.environ.get('CRCC_DATA_URL')
@@ -40,15 +43,18 @@ def verify_assets(data):
         return
     paths = {s3_url(s['minutes_pdf']) for s in data['sessions'] if s.get('minutes_pdf')}
     paths |= {s3_url(f['pdf']) for s in data['sessions'] for f in s['sheets']}
-    paths |= {s3_url(p.relative_to(ROOT).as_posix()) for p in (ROOT / 'images').rglob('*') if p.is_file()}
+    paths |= {s3_url(p.relative_to(ROOT).as_posix()) for p in (ROOT / 'images').rglob('*')
+              if p.is_file() and p.relative_to(ROOT).as_posix() != FOUNDER_IMAGE}
     if os.environ.get('CRCC_REQUIRE_S3') == '1':
-        for path in sorted(paths):
+        def check(path):
             try:
                 with urlopen(Request(path, method='HEAD'), timeout=15) as response:
                     if response.status != 200:
                         raise RuntimeError(f'S3 object unavailable: {path}')
             except Exception as error:
                 raise RuntimeError(f'S3 object unavailable: {path}') from error
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            list(pool.map(check, sorted(paths)))
 
 def prepare_data(fetched):
     if fetched:
@@ -81,6 +87,9 @@ def rewrite_public_urls():
         for prefix in OLD:
             html = html.replace(prefix, SITE + '/')
         if S3:
+            # This portrait is already published on the original site; keep its
+            # existing URL without copying personal imagery to another host.
+            html = html.replace(FOUNDER_IMAGE, FOUNDER_PUBLIC_URL)
             html = html.replace('../images/', S3 + '/images/')
             html = re.sub(r'(["\'])images/', lambda m: m.group(1) + S3 + '/images/', html)
         path.write_text(html)
