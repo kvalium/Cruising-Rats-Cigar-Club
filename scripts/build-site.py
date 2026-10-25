@@ -25,7 +25,10 @@ def snapshot():
     token = os.environ.get('CRCC_EXPORT_TOKEN')
     if not token:
         raise RuntimeError('CRCC_EXPORT_TOKEN is required with CRCC_DATA_URL')
-    request = Request(endpoint, headers={'Authorization': 'Bearer ' + token})
+    request = Request(endpoint, headers={
+        'Authorization': 'Bearer ' + token,
+        'User-Agent': 'CRCC-Pages-Build/1.0',
+    })
     with urlopen(request, timeout=30) as response:
         return json.load(response)
 
