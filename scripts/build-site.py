@@ -105,7 +105,7 @@ def main():
     if DIST.exists():
         shutil.rmtree(DIST)
     DIST.mkdir()
-    for directory in ('css', 'js', 'jeu', 'scripts', 'data'):
+    for directory in ('css', 'js', 'jeu', 'scripts', 'data', 'news-thumbs'):
         shutil.copytree(ROOT / directory, DIST / directory)
     if not S3:
         for directory in ('images', 'documents'):
