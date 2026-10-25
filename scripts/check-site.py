@@ -57,12 +57,14 @@ for page in pages:
         if not target.is_file():
             errors.append(f'Broken local link: {rel} -> {href}')
     if rel.startswith('fiches-degustation/'):
-        plain = ' '.join(p.visible)
-        if re.search(r'\b(?:Louis|Julien|Monchany|Hoummadi)\b', plain):
-            errors.append('Unanonymized display text in ' + rel)
+        errors.append('Private archive included in public release: ' + rel)
+    if any('/fiches-degustation/' in ref or ref.startswith('fiches-degustation/') for ref in p.references):
+        errors.append('Public link to private archive: ' + rel)
 
 tree = ET.parse(root / 'sitemap.xml')
 urlset = {n.text for n in tree.iter() if n.tag.endswith('loc') and n.text}
+if any('/fiches-degustation/' in u for u in urlset):
+    errors.append('Private archive listed in sitemap')
 if not any('/fondateurs' in u for u in urlset):
     errors.append('Founders page missing from sitemap')
 if len([u for u in urlset if '/actualites/' in u]) != 65:
@@ -75,4 +77,4 @@ if errors:
     for error in errors[:50]:
         print(' - ' + error)
     sys.exit(1)
-print(f'CRCC site audit passed: {len(pages)} pages, {len(urlset)} sitemap URLs; anonymization and links checked.')
+print(f'CRCC site audit passed: {len(pages)} pages, {len(urlset)} sitemap URLs; archive removal and links checked.')

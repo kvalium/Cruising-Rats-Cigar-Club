@@ -58,27 +58,6 @@ def verify_assets(data):
         with ThreadPoolExecutor(max_workers=8) as pool:
             list(pool.map(check, sorted(paths)))
 
-def anonymize_public_text(value):
-    """Public pseudonyms; never change immutable IDs or source file paths."""
-    substitutions = (
-        ('L. Monchany', 'Mme L. M.'),
-        ('S. Hoummadi', 'Mlle S. H.'),
-        ('Louis', 'Zéro'),
-        ('Julien', 'KV'),
-    )
-    for original, alias in substitutions:
-        value = re.sub(r'(?<!\w)' + re.escape(original) + r'(?!\w)', alias, value)
-    return value
-
-def anonymize_public_record(obj):
-    if isinstance(obj, dict):
-        return {k: anonymize_public_record(v) for k,v in obj.items()}
-    if isinstance(obj, list):
-        return [anonymize_public_record(v) for v in obj]
-    if isinstance(obj, str):
-        return anonymize_public_text(obj)
-    return obj
-
 def prepare_data(fetched):
     if fetched:
         data = {'members': fetched['members'], 'sessions': fetched['sessions']}
@@ -90,10 +69,9 @@ def prepare_data(fetched):
                     raise ValueError('Invalid report path')
                 target = DIST / report_path
                 target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_text(anonymize_public_text(reports[sheet['id']]))
+                target.write_text(reports[sheet['id']])
     else:
         data = json.loads((DIST / 'data/degustations.json').read_text())
-    data = anonymize_public_record(data)
     verify_assets(data)
     if S3:
         for session in data['sessions']:
@@ -202,7 +180,6 @@ def enrich_news_pages():
             '<aside class="news-feature-related" aria-label="Lectures associées">'
             '<h2>Dans les archives du Club</h2><ul>'
             '<li><a href="../degustation.html">Comprendre les étapes d’une dégustation</a></li>'
-            '<li><a href="../fiches-degustation/index.html">Consulter les fiches de dégustation</a></li>'
             f'<li><a href="{related_href}">{related_title}</a></li>'
             '</ul></aside>'
             '<nav class="news-feature-back" aria-label="Retour aux actualités">'
@@ -215,8 +192,6 @@ def enrich_news_pages():
         path.write_text(raw, encoding='utf-8')
 
 def main():
-    if os.environ.get('CRCC_REDACT_UPLOAD_0') or os.environ.get('CRCC_REDACT_AUDIT'):
-        subprocess.run([sys.executable, str(ROOT / 'scripts/redact-public-pdfs.py')], cwd=ROOT, check=True)
     if DIST.exists():
         shutil.rmtree(DIST)
     DIST.mkdir()
@@ -229,9 +204,7 @@ def main():
         shutil.copy2(path, DIST / path.name)
     for name in ('sitemap.xml', 'robots.txt', '_headers', 'llms.txt'):
         shutil.copy2(ROOT / name, DIST / name)
-    prepare_data(snapshot())
-    env = {**os.environ, 'CRCC_SITE_URL': SITE + '/'}
-    subprocess.run([sys.executable, 'scripts/build-degustations.py'], cwd=DIST, env=env, check=True)
+    # Les archives de dégustations restent dans le dépôt, sans publication publique.
     rewrite_public_urls()
     enrich_news_pages()
     shutil.rmtree(DIST / 'scripts')
