@@ -27,9 +27,10 @@ PDFS=(
 
 def main():
     urls=[os.environ.get('CRCC_REDACT_UPLOAD_'+str(i),'') for i in range(len(PDFS))]
-    if not any(urls):
+    audit = os.environ.get('CRCC_REDACT_AUDIT') == '1'
+    if not any(urls) and not audit:
         return
-    if not all(urls):
+    if any(urls) and not all(urls):
         raise RuntimeError('Partial redaction upload URL configuration: stopping safely')
     try:
         import fitz
@@ -74,6 +75,10 @@ def main():
             if remaining:
                 raise RuntimeError('Unredacted text remains in '+key+': '+repr(remaining))
             output.append((key,dest,upload_url,dict(found)))
+        if audit:
+            for key,path,url,counts in output:
+                print('AUDIT '+key+' '+repr(counts)+' bytes='+str(path.stat().st_size))
+            return
         # Validation completed on every PDF; no originals are overwritten until here.
         for key,path,url,counts in output:
             # PDFs with no matching surnames are left byte-for-byte unchanged on S3.
