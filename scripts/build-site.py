@@ -102,37 +102,79 @@ def rewrite_public_urls():
     (DIST / 'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n')
 
 def enrich_news_pages():
-    """Turn each bulletin into a cohesive four-paragraph article, without a SEO box."""
+    """Publish full-length satirical editorial articles in the original CRCC style."""
     from html import escape
     entries = json.loads((ROOT / 'data' / 'news-seo.json').read_text(encoding='utf-8'))
     if len(entries) != 65:
-        raise RuntimeError('Expected 65 editorial additions')
+        raise RuntimeError('Expected exactly 65 news articles')
+
+    related_targets = {entry['file'] for entry in entries}
     for entry in entries:
-        path = DIST / 'actualites' / entry['file']
-        if not path.is_file():
-            raise RuntimeError('Missing news article: ' + entry['file'])
-        page = path.read_text(encoding='utf-8')
-        anchor = '<p><a href="../actualites.html">← Retour à toutes les actualités du CRCC</a></p>'
-        if page.count(anchor) != 1:
-            raise RuntimeError('Missing article footer: ' + entry['file'])
-        # Keep the original two satirical paragraphs and add two editorial paragraphs.
-        sentences = re.split(r'(?<=[.!?]) +(?=[A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ«])', entry['text'])
-        if len(sentences) < 3:
-            raise RuntimeError('Too few editorial sentences: ' + entry['file'])
-        pivot = (len(sentences) + 1) // 2
-        first = escape(' '.join(sentences[:pivot]))
-        second = escape(' '.join(sentences[pivot:]))
-        extra = ('<p>' + first + ' Consultez aussi '
-                 '<a href="../degustation.html">notre guide de dégustation du cigare</a>.</p>'
-                 '<p>' + second + ' Pour comparer les observations, '
-                 '<a href="../fiches-degustation/index.html">parcourez les fiches du Club</a> '
-                 'ou découvrez <a href="' + escape(entry['related'], quote=True) + '">'
-                 + escape(entry['relatedTitle']) + '</a>.</p>')
-        page = page.replace(anchor, extra + chr(10) + anchor)
-        # The source WebP is only 460 px wide: avoid enlargement to 880 px.
-        page = page.replace('class="hero-image" src=', 'class="hero-image" src=', 1)
-        page = page.replace('style="height:auto;aspect-ratio:460/330"', 'style="width:100%;max-width:460px;height:auto;aspect-ratio:460/330;object-fit:cover"', 1)
-        path.write_text(page, encoding='utf-8')
+        name = entry['file']
+        path = DIST / 'actualites' / name
+        if not path.is_file() or entry.get('related') not in related_targets:
+            raise RuntimeError('Missing article or related page: ' + name)
+
+        paragraphs = entry['paragraphs']
+        if len(paragraphs) != 5:
+            raise RuntimeError('Each news article must contain exactly five paragraphs: ' + name)
+        def count_words(paragraph):
+            return len(re.findall(r"[\wÀ-ÿ]+(?:['’\-][\wÀ-ÿ]+)*", re.sub(r'<[^>]+>', ' ', paragraph)))
+        total = sum(count_words(p) for p in paragraphs)
+        if not 200 <= total <= 350:
+            raise RuntimeError(f'Article word count {total} outside 200–350: {name}')
+
+        raw = path.read_text(encoding='utf-8')
+        match = re.search(
+            r'(?s)<main><article><div class="news-date">(.+?)</div>'
+            r'<h2>(.+?)</h2>(<img class="hero-image"[^>]+>)'
+            r'(.*?)<p><a href="../actualites.html">← Retour à toutes les actualités du CRCC</a></p></article></main>',
+            raw
+        )
+        if match is None:
+            raise RuntimeError('Unexpected source HTML in ' + name)
+        date, title, img, original_text = match.groups()
+        source_paragraphs = re.findall(r'(?s)<p>(.*?)</p>', original_text)
+        if source_paragraphs != paragraphs[:2]:
+            raise RuntimeError('Original bulletin paragraphs changed: ' + name)
+
+        # Avoid altering global CSS. Only individual news pages load the new stylesheet.
+        raw = raw.replace('</head>', '<link rel="stylesheet" href="../css/news-article.css"></head>', 1)
+        raw = raw.replace('<body>', '<body class="news-article-page">', 1)
+        raw = raw.replace('<h1 class="site-title">Bulletin officiel du Club</h1>',
+                          '<div class="site-title">Bulletin officiel du Club</div>', 1)
+
+        # An image of 460x330 is shown at up to 340 CSS pixels on desktop.
+        img = img.replace('style="height:auto;aspect-ratio:460/330"', '')
+        img = img.replace('class="hero-image"', 'class="news-feature-image"')
+        body_html = ''.join('<p>' + p + '</p>' for p in paragraphs[2:])
+        intro_html = ''.join('<p>' + p + '</p>' for p in paragraphs[:2])
+        doc = (
+            '<main class="news-main"><article class="news-feature">'
+            '<header class="news-feature-header"><div class="news-date">' + date + '</div>'
+            '<h1 class="news-feature-title">' + title + '</h1>'
+            '<p class="news-feature-kicker">BULLETIN OFFICIEL · ANALYSE &amp; OBSERVATIONS</p>'
+            '</header>'
+            '<div class="news-feature-intro">'
+            '<figure class="news-feature-figure">' + img
+            '<figcaption>Pièce iconographique jointe au dossier.</figcaption></figure>'
+            '<div class="news-feature-opening">' + intro_html + '</div></div>'
+            '<div class="news-feature-body">' + body_html + '</div>'
+            '<aside class="news-feature-related" aria-label="Lectures associées">'
+            '<h2>Dans les archives du Club</h2><ul>'
+            '<li><a href="../degustation.html">Comprendre les étapes d’une dégustation</a></li>'
+            '<li><a href="../fiches-degustation/index.html">Consulter les fiches de dégustation</a></li>'
+            '<li><a href="' + escape(entry['related'], quote=True) + '">'
+            + escape(entry['relatedTitle']) + '</a></li>'
+            '</ul></aside>'
+            '<nav class="news-feature-back" aria-label="Retour aux actualités">'
+            '<a href="../actualites.html">← Toutes les actualités du CRCC</a></nav>'
+            '</article></main>'
+        )
+        raw = raw.replace(match.group(0), doc, 1)
+        # Existing JSON-LD datePublished retains the original publication date.
+        raw = raw.replace('"dateModified":"', '"dateModified":"2026-10-25","previousDateModified":"', 1)
+        path.write_text(raw, encoding='utf-8')
 
 def main():
     if DIST.exists():
