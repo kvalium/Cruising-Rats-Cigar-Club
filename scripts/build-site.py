@@ -110,7 +110,7 @@ def main():
             shutil.copytree(ROOT / directory, DIST / directory)
     for path in ROOT.glob('*.html'):
         shutil.copy2(path, DIST / path.name)
-    for name in ('sitemap.xml', 'robots.txt'):
+    for name in ('sitemap.xml', 'robots.txt', '_headers'):
         shutil.copy2(ROOT / name, DIST / name)
     prepare_data(snapshot())
     env = {**os.environ, 'CRCC_SITE_URL': SITE + '/'}
