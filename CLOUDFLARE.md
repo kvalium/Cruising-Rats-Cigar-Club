@@ -8,7 +8,11 @@
 - Les sept PDF de dégustation, les sept déclinaisons du badge et la photo des fondateurs sont présents dans S3 avec leur type MIME.
 - La zone Cloudflare du domaine (`515c4fe9578e7e9826c71b0b3a111ae4`) est créée et en attente d'activation. Les serveurs de noms proposés sont `etienne.ns.cloudflare.com` et `melody.ns.cloudflare.com`. Le domaine est associé à Pages et un CNAME proxifié vers `crcc-site.pages.dev` est préparé dans la zone. Les serveurs de noms du registrar n'ont pas été modifiés. L'ancien site reste en place.
 
-La branche contient l'identifiant D1 réel dans `cloudflare/wrangler.jsonc`. Il reste à mettre en place le jeton de publication, le Deploy Hook Pages et une sauvegarde privée régulière avant la bascule de production.
+La branche contient l'identifiant D1 réel dans `cloudflare/wrangler.jsonc`. Un export initial est stocké dans le bucket privé `crcc-private-backups-038698405614` sous `d1/2026-10-25/crcc-archives.sql` ; son téléchargement et sa restauration locale ont été vérifiés (4 membres, 3 séances, 5 fiches, 5 comptes rendus). Il reste à mettre en place le jeton de publication, le Deploy Hook Pages et la fréquence des exports avant la bascule de production.
+
+Le Worker et la base `crcc-archives-staging` ont servi à un essai réel : requête non
+autorisée rejetée (401), nouvelle séance enregistrée (202), puis révision archivée
+dans `session_versions`. La production conserve ses trois séances initiales.
 
 Le dépôt conserve le code, les gabarits et une copie de référence des archives. Après
 l'import initial, **D1 est la source de publication** des membres et séances. Cloudflare
@@ -110,7 +114,9 @@ vérifié les liens externes.
 
 L'offre gratuite D1 conserve sept jours de restauration. Exporter périodiquement
 la base (`npx wrangler d1 export crcc-archives --remote --output backup.sql`) et
-stocker la copie dans un emplacement privé distinct du bucket public.
+stocker la copie dans le bucket privé `crcc-private-backups-038698405614`, jamais
+dans le bucket public des PDF. La première copie et son test de restauration sont
+faits ; l'export périodique reste à automatiser.
 
 ## Périmètre reporté
 
