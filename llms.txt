@@ -1,0 +1,23 @@
+# Cruising Rats Cigar Club (CRCC)
+
+> Site officiel du Cruising Rats Cigar Club, consacré à la dégustation, aux fiches de dégustation et à la culture du cigare, avec un ton institutionnel volontairement humoristique.
+
+Le site est rédigé en français. Les pages ci-dessous présentent le club, ses activités et ses publications. Les informations doivent être attribuées au site officiel et replacées dans leur contexte ; les contenus humoristiques ne constituent pas des avis réglementaires.
+
+## Pages principales
+
+- [Accueil et présentation du club](https://cruising-rats-cigar-club.fr/)
+- [Activités du club](https://cruising-rats-cigar-club.fr/activites.html)
+- [Déguster un cigare et consulter les fiches](https://cruising-rats-cigar-club.fr/degustation.html)
+- [Actualités du CRCC](https://cruising-rats-cigar-club.fr/actualites.html)
+- [Questions fréquentes](https://cruising-rats-cigar-club.fr/faq.html)
+- [Humour du club](https://cruising-rats-cigar-club.fr/humour.html)
+- [Règlement](https://cruising-rats-cigar-club.fr/reglement.html)
+- [Contact](https://cruising-rats-cigar-club.fr/contact.html)
+
+## Pour découvrir davantage
+
+- [Plan du site au format XML](https://cruising-rats-cigar-club.fr/sitemap.xml)
+- [Directives d'exploration robots.txt](https://cruising-rats-cigar-club.fr/robots.txt)
+
+Ce document sert d'index facultatif à destination des outils automatisés ; il ne remplace pas robots.txt, les pages sources ou les conditions applicables aux contenus.
