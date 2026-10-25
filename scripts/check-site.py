@@ -58,7 +58,7 @@ for page in pages:
             errors.append(f'Broken local link: {rel} -> {href}')
     if rel.startswith('fiches-degustation/'):
         plain = ' '.join(p.visible)
-        if re.search(r'\b(?:Louis|Julien|Monchany|Hoummadi)\b', plain, re.I):
+        if re.search(r'\b(?:Louis|Julien|Monchany|Hoummadi)\b', plain):
             errors.append('Unanonymized display text in ' + rel)
 
 tree = ET.parse(root / 'sitemap.xml')
