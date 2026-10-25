@@ -4,13 +4,14 @@ import json
 import importlib.util
 from types import SimpleNamespace
 import re
+import os
 from datetime import date
 from html import escape as esc
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = 'https://kvalium.github.io/Cruising-Rats-Cigar-Club/'
+BASE = os.environ.get('CRCC_SITE_URL', 'https://cruising-rats-cigar-club.fr/').rstrip('/') + '/'
 MONTHS = ['', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
 
 def long_date(value):
@@ -31,7 +32,7 @@ def validate(data):
         members = {m['id']: m for m in s['participants']}
         assert len(members) == len(s['participants']) and members, 'Invalid participants'
         assert s['sheets'], 'A published session needs at least one sheet'
-        if s.get('minutes_pdf'):
+        if s.get('minutes_pdf') and not s['minutes_pdf'].startswith('https://'):
             assert (ROOT / s['minutes_pdf']).is_file(), 'Missing minutes PDF'
         for f in s['sheets']:
             assert re.fullmatch(r'[a-z0-9-]+', f['id']) and f['id'] not in sheets, 'Invalid/duplicate sheet id'
@@ -41,6 +42,8 @@ def validate(data):
             assert isinstance(f['number'], int) and f['number'] > 0 and number not in member_numbers, 'Duplicate member sheet number'
             member_numbers.add(number)
             for field in ('pdf', 'report'):
+                if field == 'pdf' and f[field].startswith('https://'):
+                    continue
                 p = (ROOT / f[field]).resolve()
                 assert p.is_relative_to(ROOT) and p.is_file(), f'Missing/invalid {field}'
             for field in ('published', 'revised'):
@@ -93,7 +96,8 @@ def session_url(s):
     return f"seance-{s['id']}.html"
 
 def pdf_links(path, label):
-    return f'<a class="download" href="../{esc(path)}" target="_blank" rel="noopener">Consulter {label}</a>'
+    href = path if path.startswith('https://') else '../' + path
+    return f'<a class="download" href="{esc(href)}" target="_blank" rel="noopener">Consulter {label}</a>'
 
 def cigar_verification(s, member_id=None):
     verification = s.get('cigar_verification')
