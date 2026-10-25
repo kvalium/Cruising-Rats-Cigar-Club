@@ -116,7 +116,7 @@ def enrich_news_pages():
         if page.count(anchor) != 1:
             raise RuntimeError('Missing article footer: ' + entry['file'])
         # Keep the original two satirical paragraphs and add two editorial paragraphs.
-        sentences = re.split(r'(?<=[.!?])\\s+(?=[A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ«])', entry['text'])
+        sentences = re.split(r'(?<=[.!?]) +(?=[A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ«])', entry['text'])
         if len(sentences) < 3:
             raise RuntimeError('Too few editorial sentences: ' + entry['file'])
         pivot = (len(sentences) + 1) // 2
@@ -128,7 +128,7 @@ def enrich_news_pages():
                  '<a href="../fiches-degustation/index.html">parcourez les fiches du Club</a> '
                  'ou découvrez <a href="' + escape(entry['related'], quote=True) + '">'
                  + escape(entry['relatedTitle']) + '</a>.</p>')
-        page = page.replace(anchor, extra + '\\n' + anchor)
+        page = page.replace(anchor, extra + chr(10) + anchor)
         # The source WebP is only 460 px wide: avoid enlargement to 880 px.
         page = page.replace('class="hero-image" src=', 'class="hero-image" src=', 1)
         page = page.replace('style="height:auto;aspect-ratio:460/330"', 'style="width:100%;max-width:460px;height:auto;aspect-ratio:460/330;object-fit:cover"', 1)
