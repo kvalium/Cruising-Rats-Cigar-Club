@@ -102,27 +102,37 @@ def rewrite_public_urls():
     (DIST / 'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n')
 
 def enrich_news_pages():
-    """Add original topic-specific editorial background and useful internal links."""
+    """Turn each bulletin into a cohesive four-paragraph article, without a SEO box."""
+    from html import escape
     entries = json.loads((ROOT / 'data' / 'news-seo.json').read_text(encoding='utf-8'))
-    assert len(entries) == 65, 'Expected 65 article notes'
+    if len(entries) != 65:
+        raise RuntimeError('Expected 65 editorial additions')
     for entry in entries:
         path = DIST / 'actualites' / entry['file']
         if not path.is_file():
             raise RuntimeError('Missing news article: ' + entry['file'])
-        html = path.read_text(encoding='utf-8')
+        page = path.read_text(encoding='utf-8')
         anchor = '<p><a href="../actualites.html">← Retour à toutes les actualités du CRCC</a></p>'
-        if html.count(anchor) != 1:
-            raise RuntimeError('Could not locate article footer: ' + entry['file'])
-        from html import escape
-        contextual = ('<section aria-label="Pour mieux comprendre" class="card">'
-                      '<h3>Pour mieux comprendre</h3><p>' + escape(entry['text']) + '</p>'
-                      '<p><strong>Pour approfondir :</strong> '
-                      '<a href="../degustation.html">le guide de dégustation du CRCC</a>, '
-                      '<a href="../fiches-degustation/index.html">les comptes rendus et fiches</a> et '
-                      '<a href="' + escape(entry['related']) + '">' + escape(entry['relatedTitle']) + '</a>.</p>'
-                      '</section>')
-        html = html.replace(anchor, contextual + '\\n' + anchor)
-        path.write_text(html, encoding='utf-8')
+        if page.count(anchor) != 1:
+            raise RuntimeError('Missing article footer: ' + entry['file'])
+        # Keep the original two satirical paragraphs and add two editorial paragraphs.
+        sentences = re.split(r'(?<=[.!?])\\s+(?=[A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ«])', entry['text'])
+        if len(sentences) < 3:
+            raise RuntimeError('Too few editorial sentences: ' + entry['file'])
+        pivot = (len(sentences) + 1) // 2
+        first = escape(' '.join(sentences[:pivot]))
+        second = escape(' '.join(sentences[pivot:]))
+        extra = ('<p>' + first + ' Consultez aussi '
+                 '<a href="../degustation.html">notre guide de dégustation du cigare</a>.</p>'
+                 '<p>' + second + ' Pour comparer les observations, '
+                 '<a href="../fiches-degustation/index.html">parcourez les fiches du Club</a> '
+                 'ou découvrez <a href="' + escape(entry['related'], quote=True) + '">'
+                 + escape(entry['relatedTitle']) + '</a>.</p>')
+        page = page.replace(anchor, extra + '\\n' + anchor)
+        # The source WebP is only 460 px wide: avoid enlargement to 880 px.
+        page = page.replace('class="hero-image" src=', 'class="hero-image" src=', 1)
+        page = page.replace('style="height:auto;aspect-ratio:460/330"', 'style="width:100%;max-width:460px;height:auto;aspect-ratio:460/330;object-fit:cover"', 1)
+        path.write_text(page, encoding='utf-8')
 
 def main():
     if DIST.exists():
