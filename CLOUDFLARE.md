@@ -20,6 +20,10 @@ Pages sert des fichiers HTML générés lors de chaque publication ; les visites
 public n'interrogent ni le Worker ni D1. PDF et images sont servis depuis le S3 du club.
 L'ancien GitHub Pages reste disponible jusqu'à la bascule vérifiée.
 
+## État des dossiers classifiés
+
+Les fiches de Pipa, Cigarolo et M. le Président sont conservées dans D1 et construites dans l'espace membres protégé par Pages. Leur texte n'est pas commité dans le dépôt public. Le Worker de publication D1 est déployé séparément ; ne pas connecter son build automatique au dépôt du site Pages, car `wrangler deploy` à la racine remplace son code par des assets statiques.
+
 ## 1. Préparer S3
 
 Le script `bash scripts/sync-assets.sh` copie `documents/` et `images/` vers le bucket
