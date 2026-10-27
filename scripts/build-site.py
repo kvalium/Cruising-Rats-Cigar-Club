@@ -218,7 +218,7 @@ def install_album_control():
              '.crcc-album-link:hover,.crcc-album-link:focus-visible{background:#743c36}'
              '.crcc-album-note{font-size:12px;color:#756e63;margin-bottom:0}'
              '</style>')
-    html = html.replace('<main>', '<main>' + card, 1)
+    html = html.replace('</section>\n\n<div class="card accent"><h2>La Grande Homologation', '</section>\n\n' + card + '\n<div class="card accent"><h2>La Grande Homologation', 1)
     html = html.replace('</head>', style + '</head>', 1)
     page.write_text(html, encoding='utf-8')
 
