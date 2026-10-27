@@ -202,8 +202,7 @@ def install_album_control():
             '<p>La bande originale des grandes décisions, des dégustations et des dossiers classés sans suite.</p>'
             '<a class="crcc-album-link" href="https://suno.com/album/434de566-c9ba-4e71-ab21-dcc1e1eb3a77" '
             'target="_blank" rel="noopener noreferrer">♫ Écouter l’album officiel du CRCC</a>'
-            '<p class="crcc-album-note">Écoute facultative. L’album s’ouvre dans un autre onglet pour '
-            'continuer pendant votre navigation sur le site.</p></section>')
+            '</section>')
     style = ('<style>'
              '.crcc-album-card{margin:30px auto;padding:25px 28px;max-width:850px;'
              'background:#eeebe3;border:1px solid #c9c1b4;border-left:4px solid #743c36;'
