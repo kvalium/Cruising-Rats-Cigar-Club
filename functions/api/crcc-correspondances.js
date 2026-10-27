@@ -29,7 +29,14 @@ function personalizeOriginal(t,m){
       h=h.slice(0,position)+box+h.slice(position);
    }
  }
- if(m.template_id==="communication"){const content=safe(m.body).split(/\n\s*\n/).map(p=>"<p>"+p.replace(/\n/g,"<br>")+"</p>").join("");h=h.replace("{{CONTENU_COMMUNICATION}}",content);}
+ if(m.template_id==="communication"){
+ let content=safe(m.body);
+ content=content.replace(/\[([^\]]+)\]\((https:\/\/[^\s)]+)\)/g,'<a style="color:#743c36" href="$2">$1</a>');
+ content=content.replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>").replace(/\*([^*\n]+)\*/g,"<em>$1</em>");
+ content=content.split(/\n\s*\n/).map(p=>p.startsWith("## ")?'<h2 style="font:normal 22px Georgia,serif">'+p.slice(3)+'</h2>':"<p>"+p.replace(/\n/g,"<br>")+"</p>").join("");
+ if(!h.includes("{{CONTENU_COMMUNICATION}}"))throw Error("Corps de communication introuvable");
+ h=h.replace("{{CONTENU_COMMUNICATION}}",content);
+}
  if(m.reference){const at=h.toLowerCase().lastIndexOf("</td>");if(at>0)h=h.slice(0,at)+"<p>Réf. : "+safe(m.reference)+"</p>"+h.slice(at);}
  return h;
 }
