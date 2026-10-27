@@ -192,6 +192,35 @@ def enrich_news_pages():
         raw = re.sub(r'"dateModified":"[^"]+"', '"dateModified":"2026-10-25"', raw, count=1)
         path.write_text(raw, encoding='utf-8')
 
+def install_album_control():
+    """An opt-in album button for the public headers, including news pages."""
+    album_button = ('<button class="crcc-album-toggle" type="button" '
+                    'data-crcc-album aria-pressed="false" '
+                    'title="Ouvrir l’album officiel du CRCC">♫ ALBUM · OFF</button>')
+    style = ('<style>'
+             '.site-header{position:relative}'
+             '.crcc-album-toggle{position:absolute;right:16px;top:14px;'
+             'font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:1px;'
+             'padding:9px 12px;color:#e8d9bb;background:#292722;'
+             'border:1px solid #9e8966;border-radius:2px;cursor:pointer;z-index:2}'
+             '.crcc-album-toggle[aria-pressed="true"]{color:#292722;background:#c7b186}'
+             '.crcc-album-toggle:focus-visible{outline:3px solid #c7b186;outline-offset:3px}'
+             '@media(max-width:560px){.crcc-album-toggle{position:static;'
+             'display:block;margin:12px auto 0}}'
+             '</style>')
+    for page in DIST.rglob('*.html'):
+        if 'fiches-degustation' in page.parts or 'jeu' in page.parts:
+            continue
+        html = page.read_text(encoding='utf-8')
+        opening = re.search(r'<header\\b[^>]*class=["\\\'][^"\\\']*\\bsite-header\\b[^"\\\']*["\\\'][^>]*>', html, re.I)
+        if not opening:
+            continue
+        base = '../' if page.parent != DIST else ''
+        html = html[:opening.end()] + album_button + html[opening.end():]
+        html = html.replace('</head>', style + '</head>', 1)
+        html = html.replace('</body>', '<script defer src="' + base + 'js/crcc-album.js"></script></body>', 1)
+        page.write_text(html, encoding='utf-8')
+
 def main():
     if DIST.exists():
         shutil.rmtree(DIST)
@@ -235,6 +264,7 @@ def main():
         page.write_text(html.replace('</head>', '<meta name="robots" content="noindex,nofollow"></head>', 1))
     rewrite_public_urls()
     enrich_news_pages()
+    install_album_control()
     shutil.rmtree(DIST / 'scripts')
     shutil.rmtree(DIST / 'data')
     subprocess.run([sys.executable, str(ROOT / 'scripts/check-site.py'), str(DIST)], cwd=ROOT, check=True)
