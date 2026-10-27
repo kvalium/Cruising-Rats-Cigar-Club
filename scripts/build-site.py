@@ -221,6 +221,37 @@ def install_album_control():
     html = html.replace('</head>', style + '</head>', 1)
     page.write_text(html, encoding='utf-8')
 
+def install_instagram_link():
+    """Discreet monochrome Instagram icon in all public CRCC headers."""
+    icon = ('<a class="crcc-instagram" '
+            'href="https://www.instagram.com/cruising_rats_cigar_club_off/" '
+            'target="_blank" rel="noopener noreferrer" '
+            'aria-label="Instagram officiel du CRCC" title="Instagram officiel du CRCC">'
+            '<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" '
+            'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
+            'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+            '<rect width="20" height="20" x="2" y="2" rx="5"/>'
+            '<circle cx="12" cy="12" r="4"/>'
+            '<circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/>'
+            '</svg></a>')
+    style = ('<style>.site-header{position:relative}'
+             '.crcc-instagram{position:absolute;top:14px;right:17px;display:flex;'
+             'align-items:center;justify-content:center;width:36px;height:36px;'
+             'color:#b6a88f;text-decoration:none;opacity:.78;z-index:2}'
+             '.crcc-instagram:hover,.crcc-instagram:focus-visible{color:#e0d0b3;opacity:1}'
+             '.crcc-instagram:focus-visible{outline:2px solid currentColor;outline-offset:2px}'
+             '</style>')
+    for page in DIST.rglob('*.html'):
+        if 'fiches-degustation' in page.parts or 'jeu' in page.parts:
+            continue
+        html = page.read_text(encoding='utf-8')
+        opening = re.search(r'<header[^>]*class=["\\']site-header["\\'][^>]*>', html, re.I)
+        if not opening:
+            continue
+        html = html[:opening.end()] + icon + html[opening.end():]
+        html = html.replace('</head>', style + '</head>', 1)
+        page.write_text(html, encoding='utf-8')
+
 def main():
     if DIST.exists():
         shutil.rmtree(DIST)
@@ -265,6 +296,7 @@ def main():
     rewrite_public_urls()
     enrich_news_pages()
     install_album_control()
+    install_instagram_link()
     shutil.rmtree(DIST / 'scripts')
     shutil.rmtree(DIST / 'data')
     subprocess.run([sys.executable, str(ROOT / 'scripts/check-site.py'), str(DIST)], cwd=ROOT, check=True)
