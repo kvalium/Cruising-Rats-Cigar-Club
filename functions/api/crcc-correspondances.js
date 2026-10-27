@@ -72,7 +72,7 @@ async function handle(req,env){
   if(op==="template"){
    const id=String(input.id||""),label=String(input.label||""),subject=String(input.subject||""),html=String(input.original_html||"");
    if(!id||!label.trim()||!subject.trim()||html.length<100||html.length>150000||!/<html\b/i.test(html)||!/<\/html>/i.test(html)||/<script\b/i.test(html))return json({error:"Modèle HTML invalide. Un document HTML complet sans script est requis."},400);
-   const result=await db.prepare("UPDATE mail_templates SET label=?,subject=?,original_html=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(label,subject,html,id).run();
+   let observation=null;if(id==="candidature"){const start=html.indexOf("PROPOSITION DU COMITÉ EXÉCUTIF"),d=html.indexOf("<div",start+30),gt=html.indexOf(">",d),end=html.indexOf("</div>",gt);if(start<0||d<0||gt<0||end<0)return json({error:"Bloc de proposition introuvable dans le modèle."},400);observation=html.slice(gt+1,end).replace(/<br\s*\/?\s*>/gi,"\n").replace(/<[^>]*>/g,"").trim();}const result=await db.prepare("UPDATE mail_templates SET label=?,subject=?,original_html=?,observation=COALESCE(?,observation),updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(label,subject,html,observation,id).run();
    return result.meta.changes?json({ok:true}):json({error:"Modèle inconnu"},404);
   }
   if(op==="delete"){
