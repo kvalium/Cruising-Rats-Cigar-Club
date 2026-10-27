@@ -40,6 +40,21 @@ def build_members(archive, data):
         pages.append(page)
         introduction = 'Un palais, des observations, un dossier qui s’épaissit. Le Comité suit les pièces ; les courbes font le reste.' if rows else 'Un membre inscrit, un dossier ouvert. Le Comité attend la première fiche.'
         body=f'<p class="breadcrumbs"><a href="registre-membres.html">Registre des membres</a> / {esc(person["name"])}</p><section class="member-identity">{grade_badge(person)}<div><p class="member-grade">{esc(person.get("grade") or "Grade non renseigné")}</p><p class="archive-meta">Dernier grade documenté.</p><p>{introduction}</p></div></section>'
+        classified = person.get('classified_profile')
+        if classified:
+            # The dossier text comes from the private D1 snapshot at build time.
+            # Keep the generator in the public repository free of dossier content.
+            body = (f'<p class="breadcrumbs"><a href="registre-membres.html">Registre des membres</a> / {esc(person["name"])}</p>'
+                    f'<section class="card accent"><p class="member-grade">SECRET DÉFENSE · DOSSIER RÉSERVÉ</p>'
+                    f'<h2>{esc(person["name"])}</h2><p>{esc(classified["role"])}</p>'
+                    f'<p>{esc(classified["summary"])}</p></section>'
+                    '<section class="card"><h2>Observations autorisées</h2><ul>'
+                    + ''.join(f'<li>{esc(item)}</li>' for item in classified['observations'])
+                    + '</ul></section><section class="card"><h2>Réserve du Comité</h2>'
+                    f'<p>{esc(classified["reserve"])}</p></section>'
+                    '<p class="archive-footer"><a href="registre-membres.html">← Registre des membres</a></p>')
+            (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Dossier classifié',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css"></head>'))
+            continue
         if not rows:
             body += '<section class="card"><h2>Première dégustation à venir</h2><p>Aucune dégustation ni fiche n’est encore enregistrée pour ce membre. Son historique et ses statistiques apparaîtront après sa première contribution.</p></section><p class="archive-footer"><a href="registre-membres.html">← Registre des membres</a> · <a href="index.html">Toutes les séances de dégustation</a></p>'
             (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Registre du membre',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css"></head>'))
@@ -69,6 +84,13 @@ def build_members(archive, data):
         attended = [s for s in sessions if any(m['id']==person['id'] for m in s['participants'])]
         sheets = [f for s in sessions for f in s['sheets'] if f['member_id']==person['id']]
         first = f'Première séance archivée : {archive.long_date(attended[0]["date"])}' if attended else 'Aucune séance archivée pour le moment.'
+        if person.get('classified_profile'):
+            directory += (f'<li class="card member-directory-card"><div class="directory-details"><div class="directory-heading">'
+                          f'<h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2>'
+                          '<span class="badge">Secret défense</span></div>'
+                          '<p class="archive-meta">Dossier réservé · Consultation après identification.</p>'
+                          f'<a class="directory-profile" href="{archive.member_url(person)}">Consulter le dossier →</a></div></li>')
+            continue
         directory += f'<li class="card member-directory-card">{grade_badge(person, compact=True)}<div class="directory-details"><div class="directory-heading"><h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2><span class="badge">{esc(person.get("grade") or "Grade non renseigné")}</span></div><p class="archive-meta">{len(attended)} séance' + ('s' if len(attended)>1 else '') + f' · {len(sheets)} fiche' + ('s' if len(sheets)>1 else '') + f'<br>{first}</p><a class="directory-profile" href="{archive.member_url(person)}" aria-label="Consulter le profil de {esc(person["name"])}">Profil et statistiques →</a></div></li>'
     directory += '</ul><p class="archive-meta">Les grades affichés correspondent aux dernières informations documentées. Les statistiques portent sur les contributions archivées.</p><p class="archive-footer"><a href="index.html">← Toutes les séances de dégustation</a></p>'
     (root/'fiches-degustation/registre-membres.html').write_text(archive.shell('Registre des membres','registre-membres.html',directory))
