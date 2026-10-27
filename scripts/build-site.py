@@ -245,7 +245,7 @@ def install_instagram_link():
         if 'fiches-degustation' in page.parts or 'jeu' in page.parts:
             continue
         html = page.read_text(encoding='utf-8')
-        opening = re.search(r'<header[^>]*class=["\\']site-header["\\'][^>]*>', html, re.I)
+        opening = re.search(r'<header[^>]*class="site-header"[^>]*>', html, re.I)
         if not opening:
             continue
         html = html[:opening.end()] + icon + html[opening.end():]
