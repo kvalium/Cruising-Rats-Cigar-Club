@@ -22,7 +22,7 @@ function personalizeOriginal(template, m) {
  const extraObservation=m.observation||"";
  if(extraObservation) additions.push('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #c9c1b4;border-collapse:collapse;background:#eeebe3;margin:20px 0"><tr><td style="padding:12px 15px;background:#292722;color:#fff;font:12px Arial;letter-spacing:1px">OBSERVATION COMPLÉMENTAIRE DU COMITÉ EXÉCUTIF</td></tr><tr><td style="padding:18px;font:14px/23px Arial;color:#4b4740">'+safe(extraObservation).replace(/\n/g,'<br>')+'</td></tr></table>');
  // Insert before the ending of the historic letter, retaining the rest intact.
- if(additions.length)html=html.replace(/<\/body>/i,additions.join('\n')+'</body>');
+ if(additions.length){const ix=html.toLowerCase().lastIndexOf('</td>');if(ix<0)throw Error("Structure HTML du modèle invalide");html=html.slice(0,ix)+additions.join('\n')+html.slice(ix);}
  // Fix outdated official-site link in the historical admission template.
  html=html.replace(/https:\/\/kvalium\.github\.io\/Cruising-Rats-Cigar-Club\/?/g,"https://cruising-rats-cigar-club.fr/");
  return html;
