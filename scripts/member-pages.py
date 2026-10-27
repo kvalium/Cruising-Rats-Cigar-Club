@@ -48,9 +48,9 @@ DISTINCTIONS = [
 def facts_for(person, sessions):
     sheets=[(s,f) for s in sessions for f in s['sheets'] if f['member_id']==person['id']]
     attendance=[s for s in sessions if any(p['id']==person['id'] for p in s['participants'])]
-    refs=set((f.get('reference_exact') or f.get('cigar') or '').strip().casefold() for _,f in sheets)
+    refs=set(str(f.get('reference_exact') or f.get('cigar') or '').strip().casefold() for _,f in sheets)
     refs.discard('')
-    cuts=set((f.get('technique') or '').strip().casefold() for _,f in sheets)
+    cuts=set(str(f.get('technique') or '').strip().casefold() for _,f in sheets)
     cuts.discard('')
     validashes=[(float(f['ash_max_cm']),s,f) for s,f in sheets if isinstance(f.get('ash_max_cm'),(int,float)) and f['ash_max_cm']>0]
     validminutes=[(float(f['duration_minutes']),s,f) for s,f in sheets if isinstance(f.get('duration_minutes'),(int,float)) and f['duration_minutes']>0]
