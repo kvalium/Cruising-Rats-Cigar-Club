@@ -21,6 +21,104 @@ def people_for(data):
             people[m['id']] = {**people.get(m['id'], {}), **m}
     return people
 
+GRADES = [
+    ("Rat de Passage", 0, 0, 0),
+    ("Rat homologué", 3, 0, 0),
+    ("Rat notable", 12, 6, 6),
+    ("Rat vénérable", 30, 15, 18),
+    ("Grand Rat", 60, 30, 36),
+]
+DISTINCTIONS = [
+    ("poumon-bronze", "Poumon de Bronze", "10 fiches homologuées", "auto"),
+    ("collectionneur-vitoles", "Collectionneur de Vitoles", "10 références de cigares distinctes", "auto"),
+    ("cendre-longue", "Ordre de la Cendre Longue", "Record actuel de cendre mesurée", "record"),
+    ("coupeur-emerite", "Coupeur émérite", "Trois techniques de coupe réglementaires documentées", "auto"),
+    ("rat-metronome", "Rat Métronome", "Cinq séances consécutives documentées", "auto"),
+    ("rat-centenaire", "Rat Centenaire", "100 fiches homologuées", "auto"),
+    ("quatre-saisons", "Rat des Quatre Saisons", "Une fiche par saison sur une même année", "auto"),
+    ("rat-encyclopedique", "Rat Encyclopédique", "20 références distinctes", "auto"),
+    ("rat-de-fer", "Rat de Fer", "20 séances documentées", "auto"),
+    ("rat-au-repos", "Rat au Repos", "Record homologué de repos du cigare", "record"),
+    ("sous-surveillance", "Rat sous surveillance", "Enquête officielle du Comité", "committee"),
+    ("tres-administratif", "Mention Très Administratif", "Observation exceptionnellement détaillée", "committee"),
+    ("palmes-coupe-cigare", "Palmes du Coupe-Cigare", "Service exceptionnel rendu au Club", "committee"),
+    ("silence-observateur", "Médaille du Silence Observateur", "Séance sans avis exploitable", "committee"),
+    ("rat-emerite", "Rat émérite", "Distinction honorifique exceptionnelle", "committee"),
+]
+def facts_for(person, sessions):
+    sheets=[(s,f) for s in sessions for f in s['sheets'] if f['member_id']==person['id']]
+    attendance=[s for s in sessions if any(p['id']==person['id'] for p in s['participants'])]
+    refs=set((f.get('reference_exact') or f.get('cigar') or '').strip().casefold() for _,f in sheets)
+    refs.discard('')
+    cuts=set((f.get('technique') or '').strip().casefold() for _,f in sheets)
+    cuts.discard('')
+    validashes=[(float(f['ash_max_cm']),s,f) for s,f in sheets if isinstance(f.get('ash_max_cm'),(int,float)) and f['ash_max_cm']>0]
+    validminutes=[(float(f['duration_minutes']),s,f) for s,f in sheets if isinstance(f.get('duration_minutes'),(int,float)) and f['duration_minutes']>0]
+    seasons={}
+    for sess,_ in sheets:
+        y=int(sess['date'][:4]);month=int(sess['date'][5:7]);season=(month%12)//3
+        seasons.setdefault(y,set()).add(season)
+    automatic=set()
+    if len(sheets)>=10:automatic.add('poumon-bronze')
+    if len(refs)>=10:automatic.add('collectionneur-vitoles')
+    if len(refs)>=20:automatic.add('rat-encyclopedique')
+    if len(sheets)>=100:automatic.add('rat-centenaire')
+    if len(attendance)>=20:automatic.add('rat-de-fer')
+    if len(cuts)>=3:automatic.add('coupeur-emerite')
+    if any(len(v)==4 for v in seasons.values()):automatic.add('quatre-saisons')
+    # A record or five consecutive club-wide sessions is established separately.
+    return {'sheets':sheets,'attendance':attendance,'refs':refs,'cuts':cuts,'ashes':validashes,'minutes':validminutes,'auto':automatic}
+
+def awards_for(person,facts):
+    manual=set(person.get('distinctions') or [])
+    allowed={d[0] for d in DISTINCTIONS if d[3]=='committee'}
+    return facts['auto'] | (manual & allowed)
+
+def grade_progress(person,facts):
+    count=len(facts['sheets']);n=len(facts['attendance'])
+    first=facts['attendance'][0]['date'] if facts['attendance'] else ''
+    eligible=[]
+    from datetime import date
+    months=((date.today().year-int(first[:4]))*12+date.today().month-int(first[5:7])) if first else 0
+    for label,req,meet,age in GRADES:
+        if count>=req and n>=meet and months>=age:eligible.append(label)
+    return eligible[-1] if eligible else GRADES[0][0]
+
+def medal_html(person,facts):
+    earned=awards_for(person,facts)
+    return ('<section class="card"><h2>Distinctions du membre</h2><p class="archive-meta">'
+            'Distinctions automatiques calculées à partir des archives et distinctions honorifiques décidées par le Comité.</p>'
+            +(''.join('<span class="badge" title="'+esc(desc)+'">✦ '+esc(name)+'</span> '
+                      for key,name,desc,kind in DISTINCTIONS if key in earned) if earned else
+              '<p>Aucune distinction encore attribuée. Les dossiers sont suivis.</p>')
+            +'</section>')
+
+def record_html(people,sessions,archive):
+    metrics=[('Cendre la plus longue','ashes','cm'),('Dégustation la plus longue','minutes','minutes'),
+             ('Plus grand nombre de fiches','sheets','fiches'),('Plus grande variété de références','refs','références')]
+    facts={key:facts_for(person,sessions) for key,person in people.items() if not person.get('classified_profile')}
+    rows=[]
+    for label,key,unit in metrics:
+        candidates=[]
+        for member_id,v in facts.items():
+            value=(max((item[0] for item in v[key]),default=None) if key in ('ashes','minutes') else len(v[key]))
+            if value is not None and value>0:candidates.append((value,member_id))
+        if not candidates:
+            rows.append('<tr><th>'+esc(label)+'</th><td>Non homologué — données insuffisantes</td></tr>')
+            continue
+        best=max(value for value,_ in candidates)
+        holders=[(mid,people[mid]) for value,mid in candidates if value==best]
+        rendered=' / '.join('<a href="'+archive.member_url(p)+'">'+esc(p['name'])+'</a>' for _,p in holders)
+        rows.append('<tr><th>'+esc(label)+'</th><td><strong>'+esc(str(int(best) if float(best).is_integer() else best))+' '+unit+'</strong> — '+rendered+'</td></tr>')
+    return '<section class="card"><h2>Registre des records homologables</h2><p class="archive-meta">Calculé uniquement à partir des informations archivées ; les mesures absentes ne sont pas estimées.</p><div class="table-scroll"><table><tbody>'+''.join(rows)+'</tbody></table></div></section>'
+
+def hierarchy_html():
+    return '<section class="card"><h2>Ordre des grades</h2><ol>'+''.join(
+        '<li><strong>'+esc(label)+'</strong> — '+str(fiches)+' fiches'+
+        (' · '+str(sessions)+' séances minimum' if sessions else '')+
+        (' · '+str(months)+' mois minimum' if months else '')+'</li>'
+        for label,fiches,sessions,months in GRADES)+'</ol><p>Les seuils ouvrent un droit à examen, jamais une promotion automatique. Le Comité valide chaque changement de grade. Le Président demeure hors hiérarchie.</p></section>'
+
 def build_members(archive, data):
     root = archive.ROOT
     sessions = sorted(data['sessions'], key=lambda s:(s['date'],s['id']))
@@ -40,6 +138,11 @@ def build_members(archive, data):
         pages.append(page)
         introduction = 'Un palais, des observations, un dossier qui s’épaissit. Le Comité suit les pièces ; les courbes font le reste.' if rows else 'Un membre inscrit, un dossier ouvert. Le Comité attend la première fiche.'
         body=f'<p class="breadcrumbs"><a href="registre-membres.html">Registre des membres</a> / {esc(person["name"])}</p><section class="member-identity">{grade_badge(person)}<div><p class="member-grade">{esc(person.get("grade") or "Grade non renseigné")}</p><p class="archive-meta">Dernier grade documenté.</p><p>{introduction}</p></div></section>'
+        facts=facts_for(person,sessions)
+        if not person.get('classified_profile'):
+            body+=hierarchy_html()
+            body+='<section class="card"><h2>Progression</h2><p><strong>Grade attribué : '+esc(person.get('grade') or 'Non renseigné')+'</strong></p><p>'+str(len(facts['sheets']))+' fiches · '+str(len(facts['attendance']))+' séances · Éligibilité documentaire estimée : '+esc(grade_progress(person,facts))+'. Une décision du Comité reste nécessaire.</p></section>'
+            body+=medal_html(person,facts)
         classified = person.get('classified_profile')
         if classified:
             # The dossier text comes from the private D1 snapshot at build time.
@@ -92,6 +195,8 @@ def build_members(archive, data):
                           f'<a class="directory-profile" href="{archive.member_url(person)}">Consulter le dossier →</a></div></li>')
             continue
         directory += f'<li class="card member-directory-card">{grade_badge(person, compact=True)}<div class="directory-details"><div class="directory-heading"><h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2><span class="badge">{esc(person.get("grade") or "Grade non renseigné")}</span></div><p class="archive-meta">{len(attended)} séance' + ('s' if len(attended)>1 else '') + f' · {len(sheets)} fiche' + ('s' if len(sheets)>1 else '') + f'<br>{first}</p><a class="directory-profile" href="{archive.member_url(person)}" aria-label="Consulter le profil de {esc(person["name"])}">Profil et statistiques →</a></div></li>'
-    directory += '</ul><p class="archive-meta">Les grades affichés correspondent aux dernières informations documentées. Les statistiques portent sur les contributions archivées.</p><p class="archive-footer"><a href="index.html">← Toutes les séances de dégustation</a></p>'
+    directory += '</ul>'+hierarchy_html()+record_html(people,sessions,archive)
+    directory += '<section class="card"><h2>Répertoire des distinctions</h2><ul>'+''.join('<li><strong>'+esc(name)+'</strong> — '+esc(desc)+' <small>('+ ('Comité' if kind=='committee' else 'record' if kind=='record' else 'statistiques')+')</small></li>' for _,name,desc,kind in DISTINCTIONS)+'</ul></section>'
+    directory += '<p class="archive-meta">Les grades affichés correspondent aux dernières informations documentées. Les statistiques portent sur les contributions archivées.</p><p class="archive-footer"><a href="index.html">← Toutes les séances de dégustation</a></p>'
     (root/'fiches-degustation/registre-membres.html').write_text(archive.shell('Registre des membres','registre-membres.html',directory))
     return pages + ['registre-membres.html']
