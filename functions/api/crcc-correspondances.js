@@ -14,6 +14,12 @@ function personalizeOriginal(t,m){
  let h=t.original_html;
  if(!h)throw Error("Modèle HTML manquant");
  h=h.replace(/Cher\s+(?:Candidat|Membre)\s*,/i,"Cher "+safe(m.recipient_name||"membre")+",");
+ if(m.template_id==="candidature" && m.observation.trim()){
+   const marker=h.indexOf("PROPOSITION DU COMITÉ EXÉCUTIF");
+   const start=h.indexOf("<div",marker+30),gt=h.indexOf(">",start),end=h.indexOf("</div>",gt);
+   if(marker<0||start<0||gt<0||end<0)throw Error("Bloc de proposition introuvable");
+   h=h.slice(0,gt+1)+"\n"+safe(m.observation).replace(/\n/g,"<br>")+"\n"+h.slice(end);
+ }
  const grade=m.template_id==="ratDePassage"||m.template_id==="ratHomologue";
  if(grade){
    if(!m.observation.trim())throw Error("Observation obligatoire pour une notification de grade");
@@ -63,7 +69,18 @@ async function handle(req,env){
   if(existing){await db.prepare("UPDATE mail_messages SET recipient=?,recipient_name=?,template_id=?,subject=?,body=?,observation=?,reference=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(m.recipient,m.recipient_name,m.template_id,m.subject,m.body,m.observation,m.reference,id).run();}
   else{await db.prepare("INSERT INTO mail_messages (id,recipient,recipient_name,template_id,subject,body,observation,reference) VALUES (?,?,?,?,?,?,?,?)").bind(id,m.recipient,m.recipient_name,m.template_id,m.subject,m.body,m.observation,m.reference).run();}
   await db.prepare("INSERT INTO mail_events (message_id,event_type,details) VALUES (?,?,?)").bind(id,"draft.saved","Brouillon enregistré").run();return json({ok:true,id});}
-  if(op==="template"){const id=String(input.id||""),title=String(input.label||""),subject=String(input.subject||""),opening=String(input.opening||""),body=String(input.body||""),observation=String(input.observation||""),closing=String(input.closing||"");if(!id||!title||!subject||[title,subject,opening,body,observation,closing].some(s=>s.length>15000))return json({error:"Contenu du modèle invalide"},400);const result=await db.prepare("UPDATE mail_templates SET label=?,subject=?,opening=?,body=?,observation=?,closing=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(title,subject,opening,body,observation,closing,id).run();return result.meta.changes?json({ok:true}):json({error:"Modèle inconnu"},404);}
+  if(op==="template"){
+   const id=String(input.id||""),label=String(input.label||""),subject=String(input.subject||""),html=String(input.original_html||"");
+   if(!id||!label.trim()||!subject.trim()||html.length<100||html.length>150000||!/<html\b/i.test(html)||!/<\/html>/i.test(html)||/<script\b/i.test(html))return json({error:"Modèle HTML invalide. Un document HTML complet sans script est requis."},400);
+   const result=await db.prepare("UPDATE mail_templates SET label=?,subject=?,original_html=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(label,subject,html,id).run();
+   return result.meta.changes?json({ok:true}):json({error:"Modèle inconnu"},404);
+  }
+  if(op==="delete"){
+   const id=String(input.id||"");const found=await db.prepare("SELECT status FROM mail_messages WHERE id=?").bind(id).first();
+   if(!found)return json({error:"Courrier introuvable."},404);
+   await db.batch([db.prepare("DELETE FROM mail_events WHERE message_id=?").bind(id),db.prepare("DELETE FROM mail_messages WHERE id=?").bind(id)]);
+   return json({ok:true,was_sent:found.status!=="draft"});
+  }
   if(op==="send"){if(!env.RESEND_API_KEY||!env.CRCC_MAIL_FROM)return json({error:"Resend non configuré : aucun message envoyé."},503);const id=String(input.id||"");const pre=await db.prepare("SELECT * FROM mail_messages WHERE id=? AND status='draft'").bind(id).first();if(!pre)return json({error:"Courrier introuvable ou déjà envoyé."},409);const t0=await db.prepare("SELECT original_html FROM mail_templates WHERE id=?").bind(pre.template_id).first();if(!t0?.original_html)return json({error:"Modèle indisponible"},503);let finalHTML;try{finalHTML=personalizeOriginal(t0,pre)}catch(e){return json({error:e.message},400)}const claim=await db.prepare("UPDATE mail_messages SET status='sending',updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='draft'").bind(id).run();if(claim.meta.changes!==1)return json({error:"Envoi non autorisé : ce brouillon n'est plus disponible."},409);const m=await db.prepare("SELECT * FROM mail_messages WHERE id=?").bind(id).first();const template=await db.prepare("SELECT original_html FROM mail_templates WHERE id=?").bind(m.template_id).first();if(!template?.original_html)return json({error:"Modèle HTML original introuvable. Aucun envoi effectué."},503);const payload={from:env.CRCC_MAIL_FROM,to:[m.recipient],subject:m.subject,html:finalHTML,text:"Cher "+(m.recipient_name||"membre")+",\n\n"+m.body+"\n\n"+(m.observation||"")+"\n\nPour le Comité exécutif — Le Président",headers:{"X-Entity-Ref-ID":id}};if(env.CRCC_MAIL_REPLY_TO)payload.reply_to=env.CRCC_MAIL_REPLY_TO;
   let result;try{result=await fetch("https://api.resend.com/emails",{method:"POST",headers:{"Authorization":"Bearer "+env.RESEND_API_KEY,"Content-Type":"application/json","Idempotency-Key":"crcc-"+id},body:JSON.stringify(payload)})}catch(err){return json({error:"Réponse Resend incertaine : vérifier Resend avant de réessayer.",id},502)}
   if(!result.ok){const reason=(await result.text()).slice(0,400);await db.prepare("UPDATE mail_messages SET status='draft',updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='sending'").bind(id).run();await db.prepare("INSERT INTO mail_events (message_id,event_type,details) VALUES (?,?,?)").bind(id,"resend.rejected",reason).run();return json({error:"Resend a refusé l'envoi : "+reason},502)}
