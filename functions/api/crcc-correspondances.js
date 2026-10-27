@@ -29,6 +29,7 @@ function personalizeOriginal(t,m){
       h=h.slice(0,position)+box+h.slice(position);
    }
  }
+ if(m.template_id==="communication"){const content=safe(m.body).split(/\n\s*\n/).map(p=>"<p>"+p.replace(/\n/g,"<br>")+"</p>").join("");h=h.replace("{{CONTENU_COMMUNICATION}}",content);}
  if(m.reference){const at=h.toLowerCase().lastIndexOf("</td>");if(at>0)h=h.slice(0,at)+"<p>Réf. : "+safe(m.reference)+"</p>"+h.slice(at);}
  return h;
 }
