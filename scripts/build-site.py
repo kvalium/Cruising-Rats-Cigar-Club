@@ -193,33 +193,34 @@ def enrich_news_pages():
         path.write_text(raw, encoding='utf-8')
 
 def install_album_control():
-    """An opt-in album button for the public headers, including news pages."""
-    album_button = ('<button class="crcc-album-toggle" type="button" '
-                    'data-crcc-album aria-pressed="false" '
-                    'title="Ouvrir l’album officiel du CRCC">♫ ALBUM · OFF</button>')
+    """Place the official album card on the home page only."""
+    page = DIST / 'index.html'
+    html = page.read_text(encoding='utf-8')
+    card = ('<section class="crcc-album-card" aria-labelledby="crcc-album-title">'
+            '<div class="crcc-album-kicker">FOND SONORE HOMOLOGUÉ</div>'
+            '<h2 id="crcc-album-title">L’album officiel du CRCC</h2>'
+            '<p>La bande originale des grandes décisions, des dégustations et des dossiers classés sans suite.</p>'
+            '<a class="crcc-album-link" href="https://suno.com/album/434de566-c9ba-4e71-ab21-dcc1e1eb3a77" '
+            'target="_blank" rel="noopener noreferrer">♫ Écouter l’album officiel du CRCC</a>'
+            '<p class="crcc-album-note">Écoute facultative. L’album s’ouvre dans un autre onglet pour '
+            'continuer pendant votre navigation sur le site.</p></section>')
     style = ('<style>'
-             '.site-header{position:relative}'
-             '.crcc-album-toggle{position:absolute;right:16px;top:14px;'
-             'font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:1px;'
-             'padding:9px 12px;color:#e8d9bb;background:#292722;'
-             'border:1px solid #9e8966;border-radius:2px;cursor:pointer;z-index:2}'
-             '.crcc-album-toggle[aria-pressed="true"]{color:#292722;background:#c7b186}'
-             '.crcc-album-toggle:focus-visible{outline:3px solid #c7b186;outline-offset:3px}'
-             '@media(max-width:560px){.crcc-album-toggle{position:static;'
-             'display:block;margin:12px auto 0}}'
+             '.crcc-album-card{margin:30px auto;padding:25px 28px;max-width:850px;'
+             'background:#eeebe3;border:1px solid #c9c1b4;border-left:4px solid #743c36;'
+             'text-align:center;color:#292722}'
+             '.crcc-album-card .crcc-album-kicker{font:700 11px Arial,sans-serif;'
+             'letter-spacing:1.6px;color:#743c36}'
+             '.crcc-album-card h2{font-family:Georgia,serif;font-weight:normal;margin:10px 0}'
+             '.crcc-album-card p{line-height:1.6}'
+             '.crcc-album-link{display:inline-block;margin:12px 0;padding:12px 18px;'
+             'background:#292722;color:#fff!important;border:1px solid #743c36;'
+             'font:700 13px Arial,sans-serif;text-decoration:none}'
+             '.crcc-album-link:hover,.crcc-album-link:focus-visible{background:#743c36}'
+             '.crcc-album-note{font-size:12px;color:#756e63;margin-bottom:0}'
              '</style>')
-    for page in DIST.rglob('*.html'):
-        if 'fiches-degustation' in page.parts or 'jeu' in page.parts:
-            continue
-        html = page.read_text(encoding='utf-8')
-        opening = re.search(r'<header[^>]*class=["\']site-header["\'][^>]*>', html, re.I)
-        if not opening:
-            continue
-        base = '../' if page.parent != DIST else ''
-        html = html[:opening.end()] + album_button + html[opening.end():]
-        html = html.replace('</head>', style + '</head>', 1)
-        html = html.replace('</body>', '<script defer src="' + base + 'js/crcc-album.js"></script></body>', 1)
-        page.write_text(html, encoding='utf-8')
+    html = html.replace('<main>', '<main>' + card, 1)
+    html = html.replace('</head>', style + '</head>', 1)
+    page.write_text(html, encoding='utf-8')
 
 def main():
     if DIST.exists():
