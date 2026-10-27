@@ -17,8 +17,17 @@ function personalizeOriginal(t,m){
  const grade=m.template_id==="ratDePassage"||m.template_id==="ratHomologue";
  if(grade){
    if(!m.observation.trim())throw Error("Observation obligatoire pour une notification de grade");
-   if(!h.includes("{{OBSERVATION_COMITE}}"))throw Error("Zone observation non paramétrée");
-   h=h.replace("{{OBSERVATION_COMITE}}",safe(m.observation).replace(/\n/g,"<br>"));
+   const note=safe(m.observation).replace(/\n/g,"<br>");
+   if(m.template_id==="ratDePassage"){
+      const title=h.indexOf("OBSERVATION DU COMITÉ EXÉCUTIF"),a=h.indexOf("<span style=",title),first=h.indexOf(">",a),end=h.indexOf("</span>",first);
+      if(title<0||a<0||first<0||end<0)throw Error("Bloc d'observation du Rat de Passage non retrouvé");
+      h=h.slice(0,first+1)+note+h.slice(end);
+   }else{
+      const box='<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;border-collapse:collapse;background:#eeebe3;border:1px solid #c9c1b4"><tr><td style="padding:12px;background:#292722;color:#fff;text-align:center;font:12px Arial;letter-spacing:1px">OBSERVATION DU COMITÉ EXÉCUTIF</td></tr><tr><td style="padding:20px;font:14px/23px Arial;color:#4b4740">'+note+'</td></tr></table>';
+      const marker=h.indexOf("DÉFINITION DU GRADE"),position=h.lastIndexOf("<div",marker);
+      if(marker<0||position<0)throw Error("Position de l'observation d'homologation non retrouvée");
+      h=h.slice(0,position)+box+h.slice(position);
+   }
  }
  if(m.reference){const at=h.toLowerCase().lastIndexOf("</td>");if(at>0)h=h.slice(0,at)+"<p>Réf. : "+safe(m.reference)+"</p>"+h.slice(at);}
  return h;
