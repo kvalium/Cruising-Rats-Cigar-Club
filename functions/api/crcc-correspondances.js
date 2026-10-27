@@ -10,22 +10,18 @@ function clean(input){const x={};for(const f of fields){if(typeof input[f]!=="st
 function authorized(req,env){const actual=req.headers.get("Authorization")||"";const expected=env.CRCC_MAIL_ADMIN_PASSWORD?"Basic "+btoa("comite:"+env.CRCC_MAIL_ADMIN_PASSWORD):"";if(!expected||actual.length!==expected.length)return false;let bad=0;for(let i=0;i<actual.length;i++)bad|=actual.charCodeAt(i)^expected.charCodeAt(i);return bad===0;}
 function htmlMail(m){const paragraphs=(m.body||"").split(/\n\s*\n/).filter(Boolean).map(x=>"<p>"+safe(x).replace(/\n/g,"<br>")+"</p>").join("");return '<!doctype html><html lang="fr"><head><meta charset="utf-8"></head><body style="margin:0;padding:22px;background:#e9e5dc;color:#292722;font-family:Arial,sans-serif"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center"><table role="presentation" style="max-width:620px;width:100%;background:#fffefa;border:1px solid #bfb8a8" cellpadding="0" cellspacing="0"><tr><td style="padding:26px 32px;background:#292722;color:white"><span style="font-size:11px;letter-spacing:2px">CRUISING RATS CIGAR CLUB — NOTIFICATION OFFICIELLE</span><h1 style="font:normal 27px Georgia,serif;color:#fff">'+safe(m.subject)+'</h1></td></tr><tr><td style="padding:28px 32px;font-size:14px;line-height:23px"><p style="font-family:Georgia,serif;font-size:17px">Cher '+safe(m.recipient_name||"membre")+',</p>'+paragraphs+(m.observation?'<table role="presentation" width="100%" style="border-collapse:collapse;margin:24px 0;background:#eeebe3;border:1px solid #c9c1b4"><tr><td style="background:#292722;color:white;font-size:12px;font-weight:bold;letter-spacing:1px;padding:12px">OBSERVATION DU COMITÉ EXÉCUTIF</td></tr><tr><td style="padding:20px;white-space:pre-wrap">'+safe(m.observation)+'</td></tr></table>':'')+(m.reference?'<p style="font-size:12px;color:#756e63">Référence du dossier : '+safe(m.reference)+'</p>':'')+'<p style="margin-top:26px">Pour le Comité exécutif,<br><strong>Le Président</strong></p><p style="padding-top:15px;border-top:1px solid #d0c8bc;text-align:center;font:italic 16px Georgia,serif">« On pipe rien, mais on a des fiches. »</p></td></tr></table></td></tr></table></body></html>';}
 
-function personalizeOriginal(template, m) {
- let html=template.original_html;
- if(!html||!/<html/i.test(html))throw Error("Modèle HTML historique indisponible");
- // Keep original layout, logos, typography and all substantive editorial text.
- // Replace only a generic salutation and append specifically requested dossier details.
- const name=safe(m.recipient_name||"membre");
- html=html.replace(/Cher\s+(?:Candidat|candidat|Membre|membre)\s*,/i,"Cher "+name+",");
- const additions=[];
- if(m.reference) additions.push('<p style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#756e63;line-height:20px">Référence du dossier : '+safe(m.reference)+'</p>');
- const extraObservation=m.observation||"";
- if(extraObservation) additions.push('<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #c9c1b4;border-collapse:collapse;background:#eeebe3;margin:20px 0"><tr><td style="padding:12px 15px;background:#292722;color:#fff;font:12px Arial;letter-spacing:1px">OBSERVATION COMPLÉMENTAIRE DU COMITÉ EXÉCUTIF</td></tr><tr><td style="padding:18px;font:14px/23px Arial;color:#4b4740">'+safe(extraObservation).replace(/\n/g,'<br>')+'</td></tr></table>');
- // Insert before the ending of the historic letter, retaining the rest intact.
- if(additions.length){const ix=html.toLowerCase().lastIndexOf('</td>');if(ix<0)throw Error("Structure HTML du modèle invalide");html=html.slice(0,ix)+additions.join('\n')+html.slice(ix);}
- // Fix outdated official-site link in the historical admission template.
- html=html.replace(/https:\/\/kvalium\.github\.io\/Cruising-Rats-Cigar-Club\/?/g,"https://cruising-rats-cigar-club.fr/");
- return html;
+function personalizeOriginal(t,m){
+ let h=t.original_html;
+ if(!h)throw Error("Modèle HTML manquant");
+ h=h.replace(/Cher\s+(?:Candidat|Membre)\s*,/i,"Cher "+safe(m.recipient_name||"membre")+",");
+ const grade=m.template_id==="ratDePassage"||m.template_id==="ratHomologue";
+ if(grade){
+   if(!m.observation.trim())throw Error("Observation obligatoire pour une notification de grade");
+   if(!h.includes("{{OBSERVATION_COMITE}}"))throw Error("Zone observation non paramétrée");
+   h=h.replace("{{OBSERVATION_COMITE}}",safe(m.observation).replace(/\n/g,"<br>"));
+ }
+ if(m.reference){const at=h.toLowerCase().lastIndexOf("</td>");if(at>0)h=h.slice(0,at)+"<p>Réf. : "+safe(m.reference)+"</p>"+h.slice(at);}
+ return h;
 }
 async function handle(req,env){
  if(!env.CRCC_MAIL_ADMIN_PASSWORD)return json({error:"Accréditation administrateur non configurée dans Cloudflare."},503);
