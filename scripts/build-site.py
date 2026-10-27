@@ -212,7 +212,7 @@ def install_album_control():
         if 'fiches-degustation' in page.parts or 'jeu' in page.parts:
             continue
         html = page.read_text(encoding='utf-8')
-        opening = re.search(r'<header\\b[^>]*class=["\\\'][^"\\\']*\\bsite-header\\b[^"\\\']*["\\\'][^>]*>', html, re.I)
+        opening = re.search(r'<header[^>]*class=["\']site-header["\'][^>]*>', html, re.I)
         if not opening:
             continue
         base = '../' if page.parent != DIST else ''
