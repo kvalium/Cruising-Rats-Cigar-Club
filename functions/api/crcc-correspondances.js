@@ -1,4 +1,4 @@
-/* CRCC — Bureau des correspondances v2: D1 + Resend.
+/* CRCC — Bureau des correspondances v3: D1 + Resend.
  * Private read and write API, separate administrative secret.
  * Messages are never sent unless the admin secret and Resend are configured.
  */
