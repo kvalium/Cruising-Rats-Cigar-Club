@@ -34,7 +34,7 @@ async function refresh(){const d=await api('init');templates=d.templates;message
 $('connect').onclick=async()=>{password=$('credential').value;try{await refresh();$('auth').classList.add('hide');$('application').classList.remove('hide');$('credential').value='';fillTemplate($('template').value);note('Bureau ouvert. '+(sendReady?'Resend est configuré.':'Resend n’est pas encore configuré : brouillons uniquement.'));}catch(e){password='';note(e.message,true);}};
 $('template').onchange=()=>fillTemplate($('template').value);$('memberSelect').onchange=()=>{const m=members.find(x=>x.id===$('memberSelect').value);if(m){$('recipient').value=m.email;$('recipient_name').value=m.name;preview();}};
 for(const f of fields)$(f).addEventListener('input',()=>{window.clearTimeout(window.crccPreviewDebounce);window.crccPreviewDebounce=window.setTimeout(preview,300);});
-for(const t of ['new','history','templates'])$('tab-'+t).onclick=()=>switchTab(t);
+for(const t of ['new','history','candidatures','templates'])$('tab-'+t).onclick=()=>switchTab(t);
 $('edit-template').onchange=fillEditor;
 $('template-save').onclick=async()=>{const t={id:$('edit-template').value};for(const k of ['label','subject','opening','body','observation','closing'])t[k]=$('t-'+k).value;try{await api('template','POST',t);await refresh();note('Modèle officiel mis à jour dans D1.');}catch(e){note(e.message,true);}};
 function wrapText(left,right=left){const e=$('body'),a=e.selectionStart,b=e.selectionEnd,selection=e.value.slice(a,b)||'votre texte';e.setRangeText(left+selection+right,a,b,'select');preview();}for(const [id,l,r] of [['strong','**','**'],['italic','*','*'],['heading','## ',''],['link','[','](https://exemple.fr)']])$(id).onclick=()=>wrapText(l,r);
