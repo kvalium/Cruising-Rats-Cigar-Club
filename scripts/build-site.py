@@ -203,6 +203,8 @@ def main():
             shutil.copytree(ROOT / directory, DIST / directory)
     for path in ROOT.glob('*.html'):
         shutil.copy2(path, DIST / path.name)
+    # Private, unlinked Committee correspondence office.
+    shutil.copy2(ROOT / 'fiches-degustation' / 'bureau-correspondances.html', DIST / 'fiches-degustation' / 'bureau-correspondances.html')
     for name in ('sitemap.xml', 'robots.txt', '_headers', 'llms.txt'):
         shutil.copy2(ROOT / name, DIST / name)
     # Rebuild tasting archives behind the shared-password Cloudflare middleware.
