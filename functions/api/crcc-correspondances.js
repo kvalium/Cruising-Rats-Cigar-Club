@@ -1,3 +1,5 @@
+import { EXAM_TEMPLATE_ID, EXAM_SUBJECT, EXAM_OPENING, EXAM_BODY, EXAM_CLOSING, EXAM_URL, EXAM_HTML, examPlainText } from "../lib/exam-convocation-template.js";
+
 /* CRCC — Bureau des correspondances v3: D1 + Resend.
  * Private read and write API, separate administrative secret.
  * Messages are never sent unless the admin secret and Resend are configured.
@@ -6,7 +8,28 @@ const json=(value,status=200)=>new Response(JSON.stringify(value),{status,header
 const safe=(s)=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const validEmail=s=>typeof s==="string"&&s.length<=254&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 const fields=["recipient","recipient_name","template_id","subject","body","observation","reference"];
-function clean(input){const x={};for(const f of fields){if(typeof input[f]!=="string"||input[f].length>15000)throw Error("Champ invalide : "+f);x[f]=input[f].trim();}if(!validEmail(x.recipient)||!x.subject||!x.body||!x.template_id)throw Error("Destinataire, sujet ou contenu invalide");return x;}
+function clean(input,preview=false){
+ const x={};
+ for(const f of fields){if(typeof input[f]!=="string"||input[f].length>15000)throw Error("Champ invalide : "+f);x[f]=input[f].trim();}
+ x.exam_code=typeof input.exam_code==="string"?input.exam_code.trim().toLowerCase():"";
+ if(!validEmail(x.recipient)||!x.subject||!x.body||!x.template_id)throw Error("Destinataire, sujet ou contenu invalide");
+ if(x.template_id===EXAM_TEMPLATE_ID && !(preview&&!x.exam_code) && !/^[a-f0-9]{64}$/.test(x.exam_code))throw Error("Code de convocation invalide : renseignez les 64 caractères hexadécimaux remis par le Bureau du Comité.");
+ if(x.template_id!==EXAM_TEMPLATE_ID)x.exam_code="";
+ return x;
+}
+// Backwards-compatible, idempotent migration for the existing correspondence D1 database.
+let examMailInitialized=false;
+async function ensureExamMailFeature(db){
+ if(examMailInitialized)return;
+ const columns=await db.prepare("PRAGMA table_info(mail_messages)").all();
+ if(!columns.results.some(col=>col.name==="exam_code")){
+  try{await db.prepare("ALTER TABLE mail_messages ADD COLUMN exam_code TEXT NOT NULL DEFAULT ''").run();}
+  catch(e){if(!String(e).includes("duplicate column name"))throw e;}
+ }
+ await db.prepare("INSERT OR IGNORE INTO mail_templates (id,label,subject,opening,body,observation,closing,original_html) VALUES (?,?,?,?,?,'',?,?)")
+  .bind(EXAM_TEMPLATE_ID,"Convocation à l'examen d'homologation",EXAM_SUBJECT,EXAM_OPENING,EXAM_BODY,EXAM_CLOSING,EXAM_HTML).run();
+ examMailInitialized=true;
+}
 function authorized(req,env){const actual=req.headers.get("Authorization")||"";const expected=env.CRCC_MAIL_ADMIN_PASSWORD?"Basic "+btoa("comite:"+env.CRCC_MAIL_ADMIN_PASSWORD):"";if(!expected||actual.length!==expected.length)return false;let bad=0;for(let i=0;i<actual.length;i++)bad|=actual.charCodeAt(i)^expected.charCodeAt(i);return bad===0;}
 function htmlMail(m){const paragraphs=(m.body||"").split(/\n\s*\n/).filter(Boolean).map(x=>"<p>"+safe(x).replace(/\n/g,"<br>")+"</p>").join("");return '<!doctype html><html lang="fr"><head><meta charset="utf-8"></head><body style="margin:0;padding:22px;background:#e9e5dc;color:#292722;font-family:Arial,sans-serif"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center"><table role="presentation" style="max-width:620px;width:100%;background:#fffefa;border:1px solid #bfb8a8" cellpadding="0" cellspacing="0"><tr><td style="padding:26px 32px;background:#292722;color:white"><span style="font-size:11px;letter-spacing:2px">CRUISING RATS CIGAR CLUB — NOTIFICATION OFFICIELLE</span><h1 style="font:normal 27px Georgia,serif;color:#fff">'+safe(m.subject)+'</h1></td></tr><tr><td style="padding:28px 32px;font-size:14px;line-height:23px"><p style="font-family:Georgia,serif;font-size:17px">Cher '+safe(m.recipient_name||"membre")+',</p>'+paragraphs+(m.observation?'<table role="presentation" width="100%" style="border-collapse:collapse;margin:24px 0;background:#eeebe3;border:1px solid #c9c1b4"><tr><td style="background:#292722;color:white;font-size:12px;font-weight:bold;letter-spacing:1px;padding:12px">OBSERVATION DU COMITÉ EXÉCUTIF</td></tr><tr><td style="padding:20px;white-space:pre-wrap">'+safe(m.observation)+'</td></tr></table>':'')+(m.reference?'<p style="font-size:12px;color:#756e63">Référence du dossier : '+safe(m.reference)+'</p>':'')+'<p style="margin-top:26px">Pour le Comité exécutif,<br><strong>Le Président</strong></p><p style="padding-top:15px;border-top:1px solid #d0c8bc;text-align:center;font:italic 16px Georgia,serif">« On pipe rien, mais on a des fiches. »</p></td></tr></table></td></tr></table></body></html>';}
 
@@ -20,6 +43,14 @@ function memberProfileUrl(m){
 }
 function personalizeOriginal(t,m){
  let h=t.original_html;
+ if(m.template_id===EXAM_TEMPLATE_ID){
+  if(!h.includes("{{EXAM_CODE}}")||!h.includes("{{RECIPIENT_NAME}}")||!h.includes("{{EXAM_URL}}"))throw Error("Le modèle de convocation doit contenir les trois champs de personnalisation réglementaires.");
+  const code=/^[a-f0-9]{64}$/.test(m.exam_code||"")?m.exam_code:(m._preview?"[CODE À RENSEIGNER AVANT L'ENVOI]":null);
+  if(!code)throw Error("Code de convocation absent ou invalide.");
+  h=h.replaceAll("{{EXAM_CODE}}",safe(code))
+    .replaceAll("{{RECIPIENT_NAME}}",safe(m.recipient_name||"Membre"))
+    .replaceAll("{{EXAM_URL}}",EXAM_URL);
+ }
  if(!h)throw Error("Modèle HTML manquant");
  if(m.template_id==="ratDePassage" && h.includes("{{MEMBER_PROFILE_URL}}"))h=h.replaceAll("{{MEMBER_PROFILE_URL}}",safe(memberProfileUrl(m)));
  h=h.replace(/Cher\s+(?:Candidat|Membre)\s*,/i,"Cher "+safe(m.recipient_name||"membre")+",");
@@ -61,6 +92,7 @@ async function handle(req,env){
  if(!env.CRCC_MAIL_DB)return json({error:"Base de données D1 indisponible."},503);
  const db=env.CRCC_MAIL_DB,url=new URL(req.url),op=url.searchParams.get("op")||"init";
  try{
+  await ensureExamMailFeature(db);
   if(req.method==="GET"){
    if(op==="init"){const [ts,ms]=await Promise.all([db.prepare("SELECT * FROM mail_templates ORDER BY rowid").all(),db.prepare("SELECT id,recipient,recipient_name,template_id,subject,status,created_at,updated_at,sent_at,provider_id,reply_received_at FROM mail_messages ORDER BY created_at DESC LIMIT 100").all()]);const contacts=await db.prepare("SELECT id,name,email FROM mail_members WHERE active=1 ORDER BY name").all();return json({templates:ts.results.map(({original_html,...t})=>({...t,has_original:!!original_html})),messages:ms.results,members:contacts.results,send_ready:Boolean(env.RESEND_API_KEY&&env.CRCC_MAIL_FROM)});}
    if(op==="original"){const t=await db.prepare("SELECT original_html FROM mail_templates WHERE id=?").bind(url.searchParams.get("id")||"").first();return t?.original_html?json({html:t.original_html}):json({error:"Modèle historique introuvable"},404);}
@@ -72,11 +104,11 @@ async function handle(req,env){
   }
   if(req.method!=="POST")return json({error:"Méthode non autorisée"},405);
   const input=await req.json();
-  if(op==="preview"){const previewInput={...input,recipient:input.recipient||"apercu@example.fr",body:input.body||"Aperçu"};const m=clean(previewInput);const t=await db.prepare("SELECT original_html,observation FROM mail_templates WHERE id=?").bind(m.template_id).first();if(!t?.original_html)return json({error:"Modèle historique introuvable"},404);if(!m.observation&&["ratDePassage","ratHomologue"].includes(m.template_id))m.observation=t.observation||"Observation du Comité à rédiger avant envoi.";return json({html:personalizeOriginal(t,m)});}
+  if(op==="preview"){const previewInput={...input,recipient:input.recipient||"apercu@example.fr",body:input.body||"Aperçu"};const m=clean(previewInput,true);m._preview=true;const t=await db.prepare("SELECT original_html,observation FROM mail_templates WHERE id=?").bind(m.template_id).first();if(!t?.original_html)return json({error:"Modèle historique introuvable"},404);if(!m.observation&&["ratDePassage","ratHomologue"].includes(m.template_id))m.observation=t.observation||"Observation du Comité à rédiger avant envoi.";return json({html:personalizeOriginal(t,m)});}
   if(op==="mark-replied"){const id=String(input.id||"");const q=await db.prepare("UPDATE mail_messages SET reply_received_at=CURRENT_TIMESTAMP WHERE id=? AND template_id='candidature'").bind(id).run();return json({ok:q.meta.changes>0});}
   if(op==="save"){const m=clean(input);const template=await db.prepare("SELECT id FROM mail_templates WHERE id=?").bind(m.template_id).first();if(!template)return json({error:"Modèle inconnu"},400);const id=(typeof input.id==="string"&&input.id)?input.id:crypto.randomUUID();const existing=await db.prepare("SELECT status FROM mail_messages WHERE id=?").bind(id).first();if(existing&&existing.status!=="draft")return json({error:"Un courrier expédié ne peut pas être modifié"},409);
-  if(existing){await db.prepare("UPDATE mail_messages SET recipient=?,recipient_name=?,template_id=?,subject=?,body=?,observation=?,reference=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(m.recipient,m.recipient_name,m.template_id,m.subject,m.body,m.observation,m.reference,id).run();}
-  else{await db.prepare("INSERT INTO mail_messages (id,recipient,recipient_name,template_id,subject,body,observation,reference) VALUES (?,?,?,?,?,?,?,?)").bind(id,m.recipient,m.recipient_name,m.template_id,m.subject,m.body,m.observation,m.reference).run();}
+  if(existing){await db.prepare("UPDATE mail_messages SET recipient=?,recipient_name=?,template_id=?,subject=?,body=?,observation=?,reference=?,exam_code=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(m.recipient,m.recipient_name,m.template_id,m.subject,m.body,m.observation,m.reference,m.exam_code,id).run();}
+  else{await db.prepare("INSERT INTO mail_messages (id,recipient,recipient_name,template_id,subject,body,observation,reference,exam_code) VALUES (?,?,?,?,?,?,?,?,?)").bind(id,m.recipient,m.recipient_name,m.template_id,m.subject,m.body,m.observation,m.reference,m.exam_code).run();}
   await db.prepare("INSERT INTO mail_events (message_id,event_type,details) VALUES (?,?,?)").bind(id,"draft.saved","Brouillon enregistré").run();return json({ok:true,id});}
   if(op==="template"){
    const id=String(input.id||""),label=String(input.label||""),subject=String(input.subject||""),html=String(input.original_html||"");
@@ -90,7 +122,7 @@ async function handle(req,env){
    await db.batch([db.prepare("DELETE FROM mail_events WHERE message_id=?").bind(id),db.prepare("DELETE FROM mail_messages WHERE id=?").bind(id)]);
    return json({ok:true,was_sent:found.status!=="draft"});
   }
-  if(op==="send"){if(!env.RESEND_API_KEY||!env.CRCC_MAIL_FROM)return json({error:"Resend non configuré : aucun message envoyé."},503);const id=String(input.id||"");const pre=await db.prepare("SELECT * FROM mail_messages WHERE id=? AND status='draft'").bind(id).first();if(!pre)return json({error:"Courrier introuvable ou déjà envoyé."},409);const t0=await db.prepare("SELECT original_html FROM mail_templates WHERE id=?").bind(pre.template_id).first();if(!t0?.original_html)return json({error:"Modèle indisponible"},503);let finalHTML;try{finalHTML=personalizeOriginal(t0,pre)}catch(e){return json({error:e.message},400)}const claim=await db.prepare("UPDATE mail_messages SET status='sending',updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='draft'").bind(id).run();if(claim.meta.changes!==1)return json({error:"Envoi non autorisé : ce brouillon n'est plus disponible."},409);const m=await db.prepare("SELECT * FROM mail_messages WHERE id=?").bind(id).first();const template=await db.prepare("SELECT original_html FROM mail_templates WHERE id=?").bind(m.template_id).first();if(!template?.original_html)return json({error:"Modèle HTML original introuvable. Aucun envoi effectué."},503);const payload={from:env.CRCC_MAIL_FROM,to:[m.recipient],subject:m.subject,html:finalHTML,text:"Cher "+(m.recipient_name||"membre")+",\n\n"+m.body+"\n\n"+(m.observation||"")+"\n\nPour le Comité exécutif — Le Président",headers:{"X-Entity-Ref-ID":id}};if(env.CRCC_MAIL_REPLY_TO)payload.reply_to=env.CRCC_MAIL_REPLY_TO;
+  if(op==="send"){if(!env.RESEND_API_KEY||!env.CRCC_MAIL_FROM)return json({error:"Resend non configuré : aucun message envoyé."},503);const id=String(input.id||"");const pre=await db.prepare("SELECT * FROM mail_messages WHERE id=? AND status='draft'").bind(id).first();if(!pre)return json({error:"Courrier introuvable ou déjà envoyé."},409);const t0=await db.prepare("SELECT original_html FROM mail_templates WHERE id=?").bind(pre.template_id).first();if(!t0?.original_html)return json({error:"Modèle indisponible"},503);let finalHTML;try{finalHTML=personalizeOriginal(t0,pre)}catch(e){return json({error:e.message},400)}const claim=await db.prepare("UPDATE mail_messages SET status='sending',updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='draft'").bind(id).run();if(claim.meta.changes!==1)return json({error:"Envoi non autorisé : ce brouillon n'est plus disponible."},409);const m=await db.prepare("SELECT * FROM mail_messages WHERE id=?").bind(id).first();const template=await db.prepare("SELECT original_html FROM mail_templates WHERE id=?").bind(m.template_id).first();if(!template?.original_html)return json({error:"Modèle HTML original introuvable. Aucun envoi effectué."},503);const payload={from:env.CRCC_MAIL_FROM,to:[m.recipient],subject:m.subject,html:finalHTML,text:m.template_id===EXAM_TEMPLATE_ID?examPlainText(m):"Cher "+(m.recipient_name||"membre")+",\n\n"+m.body+"\n\n"+(m.observation||"")+"\n\nPour le Comité exécutif — Le Président",headers:{"X-Entity-Ref-ID":id}};if(env.CRCC_MAIL_REPLY_TO)payload.reply_to=env.CRCC_MAIL_REPLY_TO;
   let result;try{result=await fetch("https://api.resend.com/emails",{method:"POST",headers:{"Authorization":"Bearer "+env.RESEND_API_KEY,"Content-Type":"application/json","Idempotency-Key":"crcc-"+id},body:JSON.stringify(payload)})}catch(err){return json({error:"Réponse Resend incertaine : vérifier Resend avant de réessayer.",id},502)}
   if(!result.ok){const reason=(await result.text()).slice(0,400);await db.prepare("UPDATE mail_messages SET status='draft',updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='sending'").bind(id).run();await db.prepare("INSERT INTO mail_events (message_id,event_type,details) VALUES (?,?,?)").bind(id,"resend.rejected",reason).run();return json({error:"Resend a refusé l'envoi : "+reason},502)}
   const accepted=await result.json();await db.prepare("UPDATE mail_messages SET status='sent',provider_id=?,sent_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(accepted.id||null,id).run();await db.prepare("INSERT INTO mail_events (message_id,event_type,details) VALUES (?,?,?)").bind(id,"email.sent",accepted.id||"Accepté par Resend").run();return json({ok:true,id,provider_id:accepted.id||null});}
