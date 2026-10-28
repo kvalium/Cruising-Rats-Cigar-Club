@@ -48,7 +48,15 @@
 <div class="office-eyebrow" style="margin:24px 0 10px">Service des convocations</div>
 <label for="exam_code">Code personnel de convocation <span style="color:#743c36">*</span></label>
 <input id="exam_code" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" maxlength="64" placeholder="Coller le code hexadécimal de 64 caractères" aria-describedby="examCodeHelp" style="font:14px/1.65 'Courier New',monospace;letter-spacing:.35px;overflow-wrap:anywhere">
-<p id="examCodeHelp" class="muted">Collez ici le code nominatif généré dans le <a href="/examen?comite=1" target="_blank" rel="noopener noreferrer">Bureau du Comité</a>. Le code sera reproduit dans le courrier officiel. Ce formulaire <strong>ne crée pas</strong> de convocation et ne démarre pas le chronomètre.</p>
+<p id="examCodeHelp" class="muted">Collez un code nominatif généré dans le <a href="/examen?comite=1" target="_blank" rel="noopener noreferrer">Bureau du Comité</a>. Pour effectuer un essai, vous pouvez aussi créer un code de test ci-dessous. Le chronomètre démarre seulement sur la page de l'examen.</p>
+<div class="office-exam-test" style="margin:19px 0;padding:17px;background:#eeebe3;border-left:4px solid #743c36">
+<div class="office-eyebrow">Essai technique réservé au Comité</div>
+<p class="muted" style="margin:9px 0 12px">Le code de test n'est rattaché à aucun membre réel et ne permet aucune homologation. L'accréditation du Bureau du Comité reste nécessaire.</p>
+<label for="committeeTestPassword">Mot de passe du Bureau du Comité</label>
+<input id="committeeTestPassword" type="password" autocomplete="off" placeholder="Accréditation distincte du Bureau des correspondances">
+<button id="generateCommitteeTestCode" class="secondary" type="button">Générer un code de test du Comité</button>
+<p id="committeeTestCodeStatus" class="muted" role="status" aria-live="polite">Le code créé sera automatiquement reporté dans le champ ci-dessus. Aucun courrier ne sera envoyé.</p>
+</div>
 </div>
 <div id="referenceBlock"><label for="reference">Référence du dossier</label><input id="reference" placeholder="CRCC / ADM / 2026">
 </div><label for="subject">Objet du courrier</label><input id="subject">
@@ -76,6 +84,26 @@ async function renderDue(){try{const d=await api('due');$('dueList').innerHTML=d
 async function refresh(){const d=await api('init');templates=d.templates;messages=d.messages;sendReady=d.send_ready;members=d.members||[];$('memberSelect').innerHTML='<option value="">— Saisie libre / nouveau candidat —</option>'+members.map(m=>'<option value="'+E(m.id)+'">'+E(m.name)+'</option>').join('');updateSelects();renderHistory();}
 $('connect').onclick=async()=>{password=$('credential').value;const button=$('connect');button.disabled=true;button.textContent='Vérification…';try{await refresh();$('auth').classList.add('hide');$('application').classList.remove('hide');$('credential').value='';fillTemplate($('template').value);note('Bureau ouvert. '+(sendReady?'Resend est configuré.':'Resend n’est pas encore configuré : brouillons uniquement.'));}catch(e){password='';note(e.message,true);}finally{button.disabled=false;button.textContent='Ouvrir le Bureau';}};
 $('credential').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('connect').click();}});
+$('generateCommitteeTestCode').onclick=async function(){
+ if($('template').value!=='convocation_examen')return;
+ const secret=$('committeeTestPassword').value,output=$('committeeTestCodeStatus');
+ if(!secret){output.textContent='Saisissez le mot de passe du Bureau du Comité.';return;}
+ if(!confirm('Créer un code de TEST (sans membre réel) ? Ce code ne devra pas être adressé à un candidat pour une homologation.'))return;
+ const button=this;button.disabled=true;output.textContent='Génération sécurisée en cours…';
+ try{
+  const response=await fetch('/examen/api/admin/test-invitation',{
+   method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json','Authorization':'Bearer '+secret},body:'{}',credentials:'same-origin',cache:'no-store'
+  });
+  let data;try{data=await response.json();}catch(e){throw Error('Réponse du Bureau du Comité illisible.');}
+  if(!response.ok)throw Error(data.error||'Impossible de créer un code de test.');
+  if(!data.isTest||!/^[a-f0-9]{64}$/.test(data.code||''))throw Error('Le Bureau du Comité a retourné un code de test non valide.');
+  $('exam_code').value=data.code;
+  $('committeeTestPassword').value='';
+  output.textContent='Code de test créé et renseigné dans le champ. Copiez-le si nécessaire : il ne sera plus visible après fermeture avant enregistrement du brouillon. Ne l’envoyez pas à un membre réel.';
+  preview();
+ }catch(e){output.textContent='Échec : '+e.message;}
+ finally{button.disabled=false;}
+};
 $('template').onchange=()=>fillTemplate($('template').value);$('memberSelect').onchange=()=>{const m=members.find(x=>x.id===$('memberSelect').value);if(m){$('recipient').value=m.email;$('recipient_name').value=m.name;preview();}};
 for(const f of fields)$(f).addEventListener('input',()=>{window.clearTimeout(window.crccPreviewDebounce);window.crccPreviewDebounce=window.setTimeout(preview,300);});
 for(const t of ['new','history','candidatures','templates'])$('tab-'+t).onclick=()=>switchTab(t);
