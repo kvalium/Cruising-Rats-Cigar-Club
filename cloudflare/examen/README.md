@@ -25,7 +25,7 @@ Contrôler ensuite le bureau privé et créer une convocation, en choisissant un
 
 Un Rat de passage doit avoir au moins **3 fiches archivées** (contrôle serveur sur `crcc-archives`). Le Comité crée un code unique de 64 caractères et doit le transmettre en privé : seul son SHA-256 est conservé, il n'est affiché qu'une seule fois.
 
-Le candidat échange son code contre une session via un cookie `HttpOnly; Secure; SameSite=Strict`, puis démarre lui-même l'examen. Son heure serveur de début et son échéance `+900` secondes (15 minutes) sont figées en D1 pour toute nouvelle session. Les tentatives commencées sous le précédent délai de 30 minutes conservent leur échéance initiale. Les réponses enregistrées avant cette échéance sont retenues ; les modifications tardives sont refusées. Le navigateur affiche le temps restant, mais n'est jamais l'autorité. Déconnexion et rafraîchissement n'interrompent pas le délai.
+Le candidat échange son code contre une session via un cookie `HttpOnly; Secure; SameSite=Strict`, puis démarre lui-même l'examen. Son heure serveur de début et son échéance `+1200` secondes (20 minutes) sont figées en D1 pour toute nouvelle session. Les tentatives déjà commencées sous les précédents délais (15 ou 30 minutes) conservent l'échéance enregistrée lors du démarrage. Les réponses enregistrées avant cette échéance sont retenues ; les modifications tardives sont refusées. Le navigateur affiche le temps restant, mais n'est jamais l'autorité. Déconnexion et rafraîchissement n'interrompent pas le délai.
 
 Correction : 1 point par bonne réponse, parties 1–15 et 16–30. Proposition de seuil : 24/30 dont 10/15 à chaque partie. Les notes ne sont montrées qu'au Comité. La décision `homologue` ou `ajourne` est consignée, sans modifier le grade du membre.
 
@@ -43,11 +43,11 @@ Pour redéployer le Worker via API, conserver le secret `CRCC_EXAM_ADMIN_PASSWOR
 
 Le Bureau du Comité (`/examen?comite=1`) propose **Générer un code de test du Comité**. Cet appel authentifié utilise `POST /examen/api/admin/test-invitation`, retourne un code cryptographiquement aléatoire de 64 caractères (32 octets) et le montre **une seule fois**.
 
-La convocation créée suit le même parcours que celle d'un membre : code à usage unique, session privée, 30 questions, 15 minutes, réponses et correction. Les codes de test ne nécessitent **aucune fiche ni aucun profil membre**. Leur `member_id` technique unique commence par `crcc-test-` ; seul le SHA-256 du code est conservé, sans modifier le schéma D1.
+La convocation créée suit le même parcours que celle d'un membre : code à usage unique, session privée, 30 questions, 20 minutes, réponses et correction. Les codes de test ne nécessitent **aucune fiche ni aucun profil membre**. Leur `member_id` technique unique commence par `crcc-test-` ; seul le SHA-256 du code est conservé, sans modifier le schéma D1.
 
 Ces essais sont distingués dans un **registre technique séparé**. Ils ne figurent pas parmi les convocations des membres, ne sont pas comptés dans leur appréciation, ne produisent aucune décision d'homologation et ne modifient jamais les grades. La route `admin/decision` refuse explicitement une décision sur un test. Les essais peuvent être consultés, corrigés et révoqués par le Comité.
 
-Pour faire le test : ouvrir le Bureau du Comité, cliquer sur **Générer un code de test du Comité**, copier le code, ouvrir `/examen` dans un autre navigateur ou une fenêtre privée, échanger le code puis cliquer sur **Commencer l'épreuve**. Les 15 minutes démarrent seulement à ce clic. Il n'est pas nécessaire de déployer un nouveau Worker pour chaque code.
+Pour faire le test : ouvrir le Bureau du Comité, cliquer sur **Générer un code de test du Comité**, copier le code, ouvrir `/examen` dans un autre navigateur ou une fenêtre privée, échanger le code puis cliquer sur **Commencer l'épreuve**. Les 20 minutes démarrent seulement à ce clic. Il n'est pas nécessaire de déployer un nouveau Worker pour chaque code.
 
 ## Points de vigilance
 
