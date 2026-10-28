@@ -179,11 +179,11 @@ def build_members(archive, data):
                     + '</ul></section><section class="card"><h2>Réserve du Comité</h2>'
                     f'<p>{esc(classified["reserve"])}</p></section>'
                     '<p class="archive-footer"><a href="registre-membres.html">← Registre des membres</a></p>')
-            (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Dossier classifié',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css"></head>'))
+            (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Dossier classifié',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css?v=20261028-2"></head>'))
             continue
         if not rows:
             body += '<section class="card"><h2>Première dégustation à venir</h2><p>Aucune dégustation ni fiche n’est encore enregistrée pour ce membre. Son historique et ses statistiques apparaîtront après sa première contribution.</p></section><p class="archive-footer"><a href="registre-membres.html">← Registre des membres</a> · <a href="index.html">Toutes les séances de dégustation</a></p>'
-            (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Registre du membre',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css"></head>'))
+            (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Registre du membre',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css?v=20261028-2"></head>'))
             continue
         if rows:
             last_session,last_fiche=max(((s,f) for s in sessions for f in s['sheets'] if f['member_id']==member_id),key=lambda pair:(pair[0]['date'],pair[1]['number']))
@@ -203,7 +203,7 @@ def build_members(archive, data):
         # Escape the script terminator even when future member input contains HTML.
         payload=json.dumps({'rows':rows},ensure_ascii=False).replace('<','\\u003c').replace('>','\\u003e').replace('&','\\u0026')
         body+=f'<script type="application/json" id="member-data">{payload}</script><script src="../js/member-stats.js" defer></script>'
-        (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Registre du membre',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css"></head>'))
+        (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Registre du membre',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css?v=20261028-2"></head>'))
     directory = '<p class="breadcrumbs"><a href="index.html">Dégustations</a> / Registre des membres</p><p class="lead">Les membres, leurs contributions et les pièces qui les accompagnent. Chaque nom ouvre un dossier personnel ; le Comité n’égare personne volontairement.</p><p>Retrouvez les profils enregistrés, leurs fiches et leurs statistiques de dégustation. Les membres sont classés par ordre alphabétique.</p>'
     directory += f'<p class="archive-meta">{len(people)} profil' + ('s enregistrés' if len(people)>1 else ' enregistré') + '.</p><ul class="member-directory">'
     for person in sorted(people.values(), key=lambda m:(m['name'].casefold(),m['id'])):
@@ -221,5 +221,5 @@ def build_members(archive, data):
     directory += '</ul>'+hierarchy_html()+record_html(people,sessions,archive)
     directory += distinctions_directory_html()
     directory += '<p class="archive-meta">Les grades affichés correspondent aux dernières informations documentées. Les statistiques portent sur les contributions archivées.</p><p class="archive-footer"><a href="index.html">← Toutes les séances de dégustation</a></p>'
-    (root/'fiches-degustation/registre-membres.html').write_text(archive.shell('Registre des membres','registre-membres.html',directory))
+    (root/'fiches-degustation/registre-membres.html').write_text(archive.shell('Registre des membres','registre-membres.html',directory).replace('</head>', '<link rel="stylesheet" href="../css/members.css?v=20261028-2"></head>'))
     return pages + ['registre-membres.html']
