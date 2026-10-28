@@ -80,6 +80,11 @@
 .exam-answer-save:before{content:"";height:7px;width:7px;background:#72957c;border-radius:50%}
 .exam-number:focus-visible,.exam-button:focus-visible{outline:3px solid #a88478;outline-offset:3px}
 .exam-main.exam-admin-view{max-width:1160px}
+.exam-test-panel{border-left:4px solid #85634f!important;background:#fffdf8!important}
+.exam-test-panel .exam-eyebrow{color:#85634f}
+.exam-test-panel strong{color:#743c36}
+.exam-test-panel .exam-success{overflow-wrap:anywhere}
+.exam-test-panel .exam-code{font:13px/1.6 'Courier New',monospace;letter-spacing:.35px;overflow-wrap:anywhere}
 .exam-review{scroll-margin-top:20px}
 .exam-review-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .exam-review-summary{display:flex;gap:11px;flex-wrap:wrap;margin:16px 0 27px}
@@ -259,8 +264,8 @@ function renderReview(dossier){
  var ended=dossier.finished_at?'Copie clôturée le '+date(dossier.finished_at):dossier.started_at?'Épreuve en cours depuis le '+date(dossier.started_at):'Épreuve non commencée';
  var total=dossier.score_cigare===null?'En cours':(dossier.score_cigare+dossier.score_club)+'/30';
  place.hidden=false;
- place.innerHTML='<div class="exam-review-header"><div><div class="exam-eyebrow">Inspection confidentielle des copies</div><h2>'+esc(dossier.name)+'</h2><p class="exam-muted">'+esc(ended)+'</p></div><button class="exam-button secondary" id="review-close">Fermer</button></div>'+
- '<div class="exam-review-summary"><div class="exam-review-stat"><strong>'+total+'</strong><span>Note officielle</span></div><div class="exam-review-stat"><strong>'+answered+'/30</strong><span>Réponses données</span></div><div class="exam-review-stat"><strong>'+correct+'</strong><span>Bonnes réponses constatées</span></div><div class="exam-review-stat"><strong>'+wrong+'</strong><span>Erreurs constatées</span></div></div>'+
+ place.innerHTML='<div class="exam-review-header"><div><div class="exam-eyebrow">'+(dossier.isTest?'Inspection · essai technique du Comité':'Inspection confidentielle des copies')+'</div><h2>'+esc(dossier.name)+'</h2><p class="exam-muted">'+esc(ended)+'</p></div><button class="exam-button secondary" id="review-close">Fermer</button></div>'+
+ '<div class="exam-review-summary"><div class="exam-review-stat"><strong>'+total+'</strong><span>'+(dossier.isTest?'Score du test':'Note officielle')+'</span></div><div class="exam-review-stat"><strong>'+answered+'/30</strong><span>Réponses données</span></div><div class="exam-review-stat"><strong>'+correct+'</strong><span>Bonnes réponses constatées</span></div><div class="exam-review-stat"><strong>'+wrong+'</strong><span>Erreurs constatées</span></div></div>'+
  '<div class="exam-review-questions">'+answers+'</div>'+
  '<div class="exam-review-opinion"><h3>Avis du Comité</h3><p class="exam-muted">Observation libre, archivée dans le dossier de cette tentative. Elle est distincte de la décision d’homologation et n’est pas visible du candidat.</p>'+
  '<label class="exam-field" for="committee-opinion">Observations et avis du Comité</label><textarea id="committee-opinion" rows="6" maxlength="2500" placeholder="Le Comité constate que…"></textarea>'+
@@ -281,19 +286,40 @@ function renderReview(dossier){
  place.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+
+function examAdminRow(a,isTest){
+ var total=a.score_cigare===null?'—':(a.score_cigare+a.score_club)+'/30 ('+a.score_cigare+' + '+a.score_club+')';
+ var status=a.revoked_at?'Révoquée':a.finished_at?'Terminée':a.started_at?'En cours':a.claimed_at?'Code utilisé':'Non démarrée';
+ var decision=isTest?'Sans objet — test':a.decision==='homologue'?'Homologation approuvée':a.decision==='ajourne'?'Ajournement':'À délibérer';
+ var actions=a.revoked_at?'':a.finished_at?(isTest?'':'<div class="exam-buttons"><button class="exam-button secondary" data-decision="homologue" data-id="'+esc(a.id)+'">Homologuer</button><button class="exam-button secondary" data-decision="ajourne" data-id="'+esc(a.id)+'">Ajourner</button></div>'):'<button class="exam-button danger" data-revoke="'+esc(a.id)+'">Révoquer</button>';
+ return '<tr><td><strong>'+esc(a.member_name)+'</strong>'+(isTest?'<div class="exam-admin-note">ESSAI TECHNIQUE · HORS HOMOLOGATION</div>':'')+(a.opinion_updated_at?'<div class="exam-admin-note">Avis du Comité enregistré</div>':'')+'</td><td>'+esc(status)+'</td><td>'+esc(total)+'</td><td>'+esc(isTest?'Non évalué pour une homologation':a.passed?'Seuil atteint':a.score_cigare===null?'—':'Seuil non atteint')+'</td><td>'+esc(decision)+'</td><td>'+esc(date(a.created_at))+'</td><td><button type="button" class="exam-button secondary" data-review="'+esc(a.id)+'">Voir la copie / avis</button>'+actions+'</td></tr>';
+}
+function examAdminTable(rows,label){
+ return '<div class="exam-table-wrap"><table class="exam-table"><thead><tr><th>Membre</th><th>État</th><th>Résultat</th><th>Barème</th><th>Décision</th><th>Convocation</th><th>Visa</th></tr></thead><tbody>'+(rows||'<tr><td colspan="7">'+esc(label)+'</td></tr>')+'</tbody></table></div>';
+}
+function showAdminCode(invite,targetId){
+ var target=byId(targetId),test=invite.isTest===true;
+ target.innerHTML='<div class="exam-success" role="status"><strong>'+(test?'Code de test du Comité créé':'Convocation créée pour '+esc(invite.memberName))+'</strong><p>'+(test?'Essai isolé des membres et des décisions d’homologation. Il suit le même questionnaire et le même chronomètre de 15 minutes.':'Transmettez le lien et le code au candidat par un canal privé.')+' Le code ne sera plus consultable après fermeture ou actualisation du bureau.</p><p><a href="'+esc(invite.url)+'" target="_blank" rel="noopener noreferrer">Ouvrir la page de l’examen</a></p><label class="exam-field" for="'+targetId+'-value">Code personnel de 64 caractères</label><textarea id="'+targetId+'-value" class="exam-code" rows="2" readonly spellcheck="false"></textarea><div class="exam-buttons"><button type="button" class="exam-button secondary" id="'+targetId+'-copy">Copier le code</button></div></div>';
+ byId(targetId+'-value').value=invite.code;
+ byId(targetId+'-copy').onclick=async function(){
+  try{await navigator.clipboard.writeText(invite.code);this.textContent='Code copié';}
+  catch(e){byId(targetId+'-value').focus();byId(targetId+'-value').select();this.textContent='Sélectionné — copiez le code';}
+ };
+}
+
 async function loadAdmin(){
  var members=await request('admin/members','GET',undefined,true);
  var records=await request('admin/invitations','GET',undefined,true);
  byId('committee-login-panel').hidden=true;byId('committee-content').hidden=false;alertMessage('');
  var choices=members.members.map(function(m){return '<option value="'+esc(m.id)+'" '+(m.eligible?'':'disabled')+'>'+esc(m.name)+' — '+m.fiches+' fiche(s)'+(m.eligible?'':' — non éligible')+'</option>';}).join('');
- var rows=records.invitations.map(function(a){
-  var total=a.score_cigare===null?'—':(a.score_cigare+a.score_club)+'/30 ('+a.score_cigare+' + '+a.score_club+')';
-  var status=a.revoked_at?'Révoquée':a.finished_at?'Terminée':a.started_at?'En cours':a.claimed_at?'Convoqué (code utilisé)':'Convoqué';
-  var decision=a.decision==='homologue'?'Homologation approuvée':a.decision==='ajourne'?'Ajournement':'À délibérer';
-  var actions=a.revoked_at?'':a.finished_at?'<div class="exam-buttons"><button class="exam-button secondary" data-decision="homologue" data-id="'+esc(a.id)+'">Homologuer</button><button class="exam-button secondary" data-decision="ajourne" data-id="'+esc(a.id)+'">Ajourner</button></div>':'<button class="exam-button danger" data-revoke="'+esc(a.id)+'">Révoquer</button>';
-  return '<tr><td><strong>'+esc(a.member_name)+'</strong>'+(a.opinion_updated_at?'<div class="exam-admin-note">Avis du Comité enregistré</div>':'')+'</td><td>'+esc(status)+'</td><td>'+esc(total)+'</td><td>'+esc(a.passed?'Seuil atteint':a.score_cigare===null?'—':'Seuil non atteint')+'</td><td>'+esc(decision)+'</td><td>'+esc(date(a.created_at))+'</td><td><button type="button" class="exam-button secondary" data-review="'+esc(a.id)+'">Voir la copie / avis</button>'+actions+'</td></tr>';
- }).join('');
- byId('committee-content').innerHTML='<section class="exam-panel"><div class="exam-eyebrow">Commission d’homologation</div><h2>Émettre une convocation</h2><p>Seuls les Rats de passage possédant au moins trois fiches archivées peuvent être convoqués. Le serveur contrôle ce seuil avant de délivrer un code.</p><label class="exam-field" for="admin-member">Dossier membre</label><select id="admin-member" class="exam-select">'+choices+'</select><div class="exam-buttons"><button class="exam-button" id="admin-issue">Émettre le code à usage unique</button><button class="exam-button secondary" id="admin-refresh">Actualiser le registre</button></div><div id="admin-code"></div></section><section class="exam-panel"><h2>Registre des examens</h2><p class="exam-muted">Seuil proposé : 24/30, dont au moins 10/15 par partie. Toute homologation reste une décision humaine. Aucun grade n’est modifié automatiquement.</p><div class="exam-table-wrap"><table class="exam-table"><thead><tr><th>Membre</th><th>État</th><th>Résultat</th><th>Barème</th><th>Décision</th><th>Convocation</th><th>Visa</th></tr></thead><tbody>'+(rows||'<tr><td colspan="7">Aucune convocation à ce jour.</td></tr>')+'</tbody></table></div></section>';
+
+ var rows=records.invitations.map(function(a){return examAdminRow(a,false);}).join('');
+ var testRows=(records.testInvitations||[]).map(function(a){return examAdminRow(a,true);}).join('');
+ byId('committee-content').innerHTML=
+ '<section class="exam-panel"><div class="exam-eyebrow">Commission d’homologation</div><h2>Émettre une convocation</h2><p>Seuls les Rats de passage possédant au moins trois fiches archivées peuvent être convoqués. Le serveur contrôle ce seuil avant de délivrer un code.</p><label class="exam-field" for="admin-member">Dossier membre</label><select id="admin-member" class="exam-select">'+choices+'</select><div class="exam-buttons"><button class="exam-button" id="admin-issue">Émettre le code à usage unique</button><button class="exam-button secondary" id="admin-refresh">Actualiser le registre</button></div><div id="admin-code"></div></section>'+
+ '<section class="exam-panel exam-test-panel"><div class="exam-eyebrow">Procédures d’essai · Comité uniquement</div><h2>Émettre un code de test</h2><p>Créer une convocation technique nominative au Comité, utilisable immédiatement pour essayer les 30 questions, les réponses enregistrées et le chronomètre de 15 minutes. <strong>Ce test n’est rattaché à aucun membre et ne peut entraîner aucune homologation.</strong></p><div class="exam-buttons"><button class="exam-button secondary" id="admin-test-issue" type="button">Générer un code de test du Comité</button></div><div id="admin-test-code"></div></section>'+
+ '<section class="exam-panel"><h2>Registre des examens</h2><p class="exam-muted">Seuil proposé : 24/30, dont au moins 10/15 par partie. Toute homologation reste une décision humaine. Aucun grade n’est modifié automatiquement.</p>'+examAdminTable(rows,'Aucune convocation de membre à ce jour.')+'</section>'+
+ '<section class="exam-panel"><div class="exam-eyebrow">Registre technique séparé</div><h2>Essais du Comité</h2><p class="exam-muted">Ces copies sont archivées à part des convocations des membres. Aucun test ne compte dans les statistiques ou les décisions de grade.</p>'+examAdminTable(testRows,'Aucun code de test émis à ce jour.')+'</section>';
  byId('committee-content').insertAdjacentHTML('beforeend','<section class="exam-panel exam-review" id="committee-review" hidden></section>');
  document.querySelectorAll('[data-review]').forEach(function(btn){btn.onclick=async function(){
    btn.disabled=true;btn.textContent='Chargement…';
@@ -308,10 +334,18 @@ async function loadAdmin(){
   this.disabled=true;
   try{
    var r=await request('admin/invitations','POST',{memberId:id},true);
-   byId('admin-code').innerHTML='<div class="exam-success"><strong>Convocation créée pour '+esc(r.memberName)+'</strong><p>Transmettez le lien et le code par un canal privé. Le code ne pourra plus être récupéré après fermeture de cette page.</p><p><strong>'+esc(r.url)+'</strong></p><textarea id="admin-issued-code" class="exam-code" rows="2" readonly></textarea><div class="exam-buttons"><button type="button" class="exam-button secondary" id="admin-copy">Copier le code</button></div></div>';
-   byId('admin-issued-code').value=r.code;
-   byId('admin-copy').onclick=async function(){try{await navigator.clipboard.writeText(r.code);this.textContent='Copié';}catch(e){byId('admin-issued-code').select();}};
+   showAdminCode(r,'admin-code');
   }catch(e){alertMessage(e.message);}finally{this.disabled=false;}
+ };
+ byId('admin-test-issue').onclick=async function(){
+  if(!confirm('Générer un code de test pour le Comité ? Le code ne sera affiché qu’une seule fois.'))return;
+  this.disabled=true;
+  try{
+   var r=await request('admin/test-invitation','POST',{},true);
+   showAdminCode(r,'admin-test-code');
+   alertMessage('Code de test créé. Copiez-le avant de quitter ou actualiser le bureau.','success');
+  }catch(e){alertMessage(e.message);}
+  finally{this.disabled=false;}
  };
  document.querySelectorAll('[data-decision]').forEach(function(btn){btn.onclick=async function(){
   var d=btn.getAttribute('data-decision'),id=btn.getAttribute('data-id');
