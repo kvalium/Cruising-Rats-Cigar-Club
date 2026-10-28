@@ -23,3 +23,8 @@ CREATE TABLE IF NOT EXISTS exam_audit(
  invite_id TEXT NOT NULL REFERENCES exam_invites(id) ON DELETE CASCADE,
  action TEXT NOT NULL, at INTEGER NOT NULL DEFAULT (unixepoch())
 );
+CREATE TABLE IF NOT EXISTS exam_opinions(
+ invite_id TEXT PRIMARY KEY REFERENCES exam_invites(id) ON DELETE CASCADE,
+ opinion TEXT NOT NULL DEFAULT '',
+ updated_at INTEGER NOT NULL DEFAULT (unixepoch())
+);
