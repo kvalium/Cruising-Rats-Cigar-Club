@@ -54,12 +54,34 @@ for page in pages:
             continue
         if target.is_dir():
             target /= 'index.html'
+        # Cloudflare Pages serves /examen as examen.html and preserves ?comite=1.
+        # Accept these extensionless links while still checking that the real asset exists.
+        if not target.is_file() and not target.suffix:
+            html_target = target.with_suffix('.html')
+            if html_target.is_file():
+                target = html_target
         if not target.is_file():
             errors.append(f'Broken local link: {rel} -> {href}')
     if rel.startswith('fiches-degustation/') and 'noindex,nofollow' not in html:
         errors.append('Private archive missing noindex: ' + rel)
     if not rel.startswith('fiches-degustation/') and any(('/fiches-degustation/' in ref or ref.startswith('fiches-degustation/')) and not (ref.endswith('/fiches-degustation/') or ref == 'fiches-degustation/') for ref in p.references):
         errors.append('Public link to private archive: ' + rel)
+
+# The members' landing page must expose the institutional directory.
+members_home = root / 'fiches-degustation' / 'index.html'
+directory = root / 'fiches-degustation' / 'bureaux-commissions.html'
+correspondence = root / 'fiches-degustation' / 'bureau-correspondances.html'
+if not directory.is_file():
+    errors.append('Missing private Bureaux et Commissions directory')
+if not correspondence.is_file():
+    errors.append('Missing private Bureau des correspondances')
+if not members_home.is_file() or 'href="bureaux-commissions.html"' not in members_home.read_text(encoding='utf-8'):
+    errors.append('Missing Bureaux et Commissions link on members home')
+if directory.is_file():
+    directory_html = directory.read_text(encoding='utf-8')
+    for expected_link in ('href="bureau-correspondances.html"', 'href="/examen?comite=1"'):
+        if expected_link not in directory_html:
+            errors.append('Missing Bureau directory link: ' + expected_link)
 
 tree = ET.parse(root / 'sitemap.xml')
 urlset = {n.text for n in tree.iter() if n.tag.endswith('loc') and n.text}
