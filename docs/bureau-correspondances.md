@@ -34,7 +34,7 @@ L'envoi, les brouillons, les modèles HTML, les aperçus et le registre D1 conse
 
 ## Convocation à l'examen d'homologation
 
-Nouveau modèle « Convocation à l'examen d'homologation » (`convocation_examen`), avec l'habillage institutionnel CRCC, une épreuve de **30 questions en 15 minutes**, les règles de non-interruption, un lien vers `https://cruising-rats-cigar-club.fr/examen` et un encadré pour le **code individuel à usage unique**.
+Nouveau modèle « Convocation à l'examen d'homologation » (`convocation_examen`), avec l'habillage institutionnel CRCC, une épreuve de **30 questions en 20 minutes**, les règles de non-interruption, un lien vers `https://cruising-rats-cigar-club.fr/examen` et un encadré pour le **code individuel à usage unique**.
 
 Dans « Nouveau courrier », sélectionner ce type : un champ « Code personnel de convocation » apparaît. Coller le code de **64 caractères hexadécimaux** obtenu via le Bureau du Comité, vérifier le destinataire et prévisualiser. L'aperçu tolère un code encore absent en affichant un rappel ; l'enregistrement du brouillon et l'envoi exigent un code valide.
 
