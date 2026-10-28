@@ -11,6 +11,25 @@ def grade_badge(person, compact=False):
         return f'<img class="grade-portrait" src="../images/badges/rat-de-passage-{size}.webp" srcset="../images/badges/rat-de-passage-{size*2}.webp 2x" decoding="async" alt="Badge Rat de Passage : jeune rat avec une tétine" width="{size}" height="{size}">'
     return ''
 
+def special_badge(person, compact=False):
+    """Validated special-person badges are stored on the CRCC public S3 assets host."""
+    from unicodedata import normalize
+    name = normalize('NFKD', str(person.get('name') or '')).encode('ascii','ignore').decode().casefold()
+    ident = str(person.get('id') or '').casefold()
+    if 'cigarolo' in (name, ident) or name == 'cigarolo':
+        slug, label = 'cigarolo', 'Cigarolo'
+    elif 'pipa' in (name, ident) or name == 'pipa':
+        slug, label = 'pipa', 'Pipa'
+    elif 'president' in name or 'president' in ident:
+        slug, label = 'president', 'M. le Président'
+    else:
+        return ''
+    size = 64 if compact else 128
+    base = 'https://assets.cruising-rats-cigar-club.fr/images/badges/badge-'+slug+'-'
+    return (f'<img class="grade-portrait special-portrait" src="{base}{size}.webp" '
+            f'srcset="{base}{size}.webp 1x, {base}{size*2}.webp 2x" '
+            f'width="{size}" height="{size}" loading="lazy" decoding="async" alt="Badge officiel de {esc(label)}">')
+
 def people_for(data):
     people = {m['id']:dict(m) for m in data.get('members', [])}
     for s in sorted(data['sessions'], key=lambda s:(s['date'],s['id'])):
@@ -161,7 +180,7 @@ def build_members(archive, data):
         page=archive.member_url(person)
         pages.append(page)
         introduction = 'Un palais, des observations, un dossier qui s’épaissit. Le Comité suit les pièces ; les courbes font le reste.' if rows else 'Un membre inscrit, un dossier ouvert. Le Comité attend la première fiche.'
-        body=f'<p class="breadcrumbs"><a href="registre-membres.html">Registre des membres</a> / {esc(person["name"])}</p><section class="member-identity">{grade_badge(person)}<div><p class="member-grade">{esc(person.get("grade") or "Grade non renseigné")}</p><p class="archive-meta">Dernier grade documenté.</p><p>{introduction}</p></div></section>'
+        body=f'<p class="breadcrumbs"><a href="registre-membres.html">Registre des membres</a> / {esc(person["name"])}</p><section class="member-identity">{special_badge(person) or grade_badge(person)}<div><p class="member-grade">{esc(person.get("grade") or "Grade non renseigné")}</p><p class="archive-meta">Dernier grade documenté.</p><p>{introduction}</p></div></section>'
         facts=facts_for(person,sessions)
         if not person.get('classified_profile'):
             body+='<section class="card"><h2>Progression</h2><p><strong>Grade attribué : '+esc(person.get('grade') or 'Non renseigné')+'</strong></p><p>'+str(len(facts['sheets']))+' fiches · '+str(len(facts['attendance']))+' séances · Éligibilité documentaire estimée : '+esc(grade_progress(person,facts))+'. Une décision du Comité reste nécessaire.</p></section>'
@@ -172,7 +191,7 @@ def build_members(archive, data):
             # Keep the generator in the public repository free of dossier content.
             body = (f'<p class="breadcrumbs"><a href="registre-membres.html">Registre des membres</a> / {esc(person["name"])}</p>'
                     f'<section class="card accent"><p class="member-grade">SECRET DÉFENSE · DOSSIER RÉSERVÉ</p>'
-                    f'<h2>{esc(person["name"])}</h2><p>{esc(classified["role"])}</p>'
+                    f'{special_badge(person)}<h2>{esc(person["name"])}</h2><p>{esc(classified["role"])}</p>'
                     f'<p>{esc(classified["summary"])}</p></section>'
                     '<section class="card"><h2>Observations autorisées</h2><ul>'
                     + ''.join(f'<li>{esc(item)}</li>' for item in classified['observations'])
@@ -211,13 +230,13 @@ def build_members(archive, data):
         sheets = [f for s in sessions for f in s['sheets'] if f['member_id']==person['id']]
         first = f'Première séance archivée : {archive.long_date(attended[0]["date"])}' if attended else 'Aucune séance archivée pour le moment.'
         if person.get('classified_profile'):
-            directory += (f'<li class="card member-directory-card"><div class="directory-details"><div class="directory-heading">'
+            directory += (f'<li class="card member-directory-card">{special_badge(person, compact=True)}<div class="directory-details"><div class="directory-heading">'
                           f'<h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2>'
                           '<span class="badge">Secret défense</span></div>'
                           '<p class="archive-meta">Dossier réservé · Consultation après identification.</p>'
                           f'<a class="directory-profile" href="{archive.member_url(person)}">Consulter le dossier →</a></div></li>')
             continue
-        directory += f'<li class="card member-directory-card">{grade_badge(person, compact=True)}<div class="directory-details"><div class="directory-heading"><h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2><span class="badge">{esc(person.get("grade") or "Grade non renseigné")}</span></div><p class="archive-meta">{len(attended)} séance' + ('s' if len(attended)>1 else '') + f' · {len(sheets)} fiche' + ('s' if len(sheets)>1 else '') + f'<br>{first}</p><a class="directory-profile" href="{archive.member_url(person)}" aria-label="Consulter le profil de {esc(person["name"])}">Profil et statistiques →</a></div></li>'
+        directory += f'<li class="card member-directory-card">{special_badge(person, compact=True) or grade_badge(person, compact=True)}<div class="directory-details"><div class="directory-heading"><h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2><span class="badge">{esc(person.get("grade") or "Grade non renseigné")}</span></div><p class="archive-meta">{len(attended)} séance' + ('s' if len(attended)>1 else '') + f' · {len(sheets)} fiche' + ('s' if len(sheets)>1 else '') + f'<br>{first}</p><a class="directory-profile" href="{archive.member_url(person)}" aria-label="Consulter le profil de {esc(person["name"])}">Profil et statistiques →</a></div></li>'
     directory += '</ul>'+hierarchy_html()+record_html(people,sessions,archive)
     directory += distinctions_directory_html()
     directory += '<p class="archive-meta">Les grades affichés correspondent aux dernières informations documentées. Les statistiques portent sur les contributions archivées.</p><p class="archive-footer"><a href="index.html">← Toutes les séances de dégustation</a></p>'
