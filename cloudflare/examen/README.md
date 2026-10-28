@@ -25,9 +25,19 @@ Contrôler ensuite le bureau privé et créer une convocation, en choisissant un
 
 Un Rat de passage doit avoir au moins **3 fiches archivées** (contrôle serveur sur `crcc-archives`). Le Comité crée un code unique de 64 caractères et doit le transmettre en privé : seul son SHA-256 est conservé, il n'est affiché qu'une seule fois.
 
-Le candidat échange son code contre une session via un cookie `HttpOnly; Secure; SameSite=Strict`, puis démarre lui-même l'examen. Son heure serveur de début et son échéance `+1800` secondes sont figées en D1. Les réponses enregistrées avant cette échéance sont retenues ; les modifications tardives sont refusées. Le navigateur affiche le temps restant, mais n'est jamais l'autorité. Déconnexion et rafraîchissement n'interrompent pas le délai.
+Le candidat échange son code contre une session via un cookie `HttpOnly; Secure; SameSite=Strict`, puis démarre lui-même l'examen. Son heure serveur de début et son échéance `+900` secondes (15 minutes) sont figées en D1 pour toute nouvelle session. Les tentatives commencées sous le précédent délai de 30 minutes conservent leur échéance initiale. Les réponses enregistrées avant cette échéance sont retenues ; les modifications tardives sont refusées. Le navigateur affiche le temps restant, mais n'est jamais l'autorité. Déconnexion et rafraîchissement n'interrompent pas le délai.
 
 Correction : 1 point par bonne réponse, parties 1–15 et 16–30. Proposition de seuil : 24/30 dont 10/15 à chaque partie. Les notes ne sont montrées qu'au Comité. La décision `homologue` ou `ajourne` est consignée, sans modifier le grade du membre.
+
+## Consultation des copies et avis du Comité
+
+Depuis le bureau privé, chaque convocation dispose du bouton **Voir la copie / avis**. Cette vue confidentielle présente les 30 questions, la réponse choisie par le candidat, la réponse attendue et son état (correcte, incorrecte ou absente). L'ordre des choix est restitué tel qu'affiché au candidat, même lorsque les propositions ont été permutées.
+
+Le Comité peut saisir jusqu'à **2 500 caractères** dans **Avis du Comité**, puis cliquer **Enregistrer l'avis**. L'avis est enregistré dans la base D1 des examens, distinct de la note, du grade et de la décision d'homologation ; il est inaccessible au candidat.
+
+La table `exam_opinions` est définie dans `schema.sql`. Sur une base existante, les nouvelles routes administratives l'initialisent automatiquement au premier accès authentifié (`CREATE TABLE IF NOT EXISTS`). Cette table est incluse dans les sauvegardes de `crcc-examens`.
+
+Pour redéployer le Worker via API, conserver le secret `CRCC_EXAM_ADMIN_PASSWORD` en utilisant `keep_bindings: ["secret_text"]` dans les métadonnées de l'upload et vérifier sa présence après le déploiement.
 
 ## Points de vigilance
 
