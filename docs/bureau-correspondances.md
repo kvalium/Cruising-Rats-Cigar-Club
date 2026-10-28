@@ -30,3 +30,14 @@ Le bureau des correspondances utilise maintenant les feuilles de style `css/styl
 La protection de l'espace membres par HTTP Basic, appliquée par `functions/_middleware.js`, reste active sur le répertoire et les correspondances. Cette première authentification membre est suivie du formulaire d'accréditation administrateur déjà en place : `CRCC_MAIL_ADMIN_PASSWORD` demeure indépendant de `CRCC_MEMBERS_PASSWORD` et `CRCC_EXAM_ADMIN_PASSWORD`.
 
 L'envoi, les brouillons, les modèles HTML, les aperçus et le registre D1 conservent leur logique et leurs API existantes. La mise à jour porte sur la présentation, la navigation et les interactions de connexion (dont la touche Entrée).
+
+
+## Convocation à l'examen d'homologation
+
+Nouveau modèle « Convocation à l'examen d'homologation » (`convocation_examen`), avec l'habillage institutionnel CRCC, une épreuve de **30 questions en 15 minutes**, les règles de non-interruption, un lien vers `https://cruising-rats-cigar-club.fr/examen` et un encadré pour le **code individuel à usage unique**.
+
+Dans « Nouveau courrier », sélectionner ce type : un champ « Code personnel de convocation » apparaît. Coller le code de **64 caractères hexadécimaux** obtenu via le Bureau du Comité, vérifier le destinataire et prévisualiser. L'aperçu tolère un code encore absent en affichant un rappel ; l'enregistrement du brouillon et l'envoi exigent un code valide.
+
+Le code est conservé dans le champ `mail_messages.exam_code` de la base `CRCC_MAIL_DB` afin que le brouillon puisse être rouvert sans perte. Le modèle `mail_templates.convocation_examen` est inséré sans écraser une personnalisation existante (`INSERT OR IGNORE`). L'API effectue au besoin une migration idempotente de la table `mail_messages`. L'HTML est défini côté serveur dans `functions/lib/exam-convocation-template.js` ; les marqueurs `{{RECIPIENT_NAME}}`, `{{EXAM_CODE}}` et `{{EXAM_URL}}` ne sont remplacés qu'en construisant l'aperçu ou l'email. La version texte envoyée par Resend comporte également le code et le lien.
+
+La préparation d'un courrier ne crée **aucune invitation dans la base des examens** et ne lance pas le chronomètre : la convocation doit préalablement être créée dans le Bureau du Comité. Ne communiquer un code qu'au destinataire nominatif ; le message et son registre sont réservés aux administrateurs. Aucun email n'est envoyé sans confirmation explicite depuis le bureau.
