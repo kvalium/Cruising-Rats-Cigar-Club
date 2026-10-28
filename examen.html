@@ -77,8 +77,7 @@
 .exam-option.chosen .exam-choice-letter{background:#743c36;color:#fffefa;border-color:#743c36}
 .exam-answer-text{flex:1;font-size:16px;line-height:1.55;color:#35312e}
 .exam-option.chosen .exam-answer-text{font-weight:400} /* La sélection ne modifie jamais la largeur ni le retour à la ligne. */
-.exam-answer-save{margin:20px 0 0!important;display:flex;align-items:center;gap:7px;min-height:23px}
-.exam-answer-save:before{content:"";height:7px;width:7px;background:#72957c;border-radius:50%}
+.exam-question-panel .exam-legal{margin-top:34px;padding-top:16px}
 .exam-number:focus-visible,.exam-button:focus-visible{outline:3px solid #a88478;outline-offset:3px}
 .exam-main.exam-admin-view{max-width:1160px}
 .exam-test-panel{border-left:4px solid #85634f!important;background:#fffdf8!important}
@@ -194,7 +193,7 @@ async function loadState(quiet){
 function panel(html){byId('exam-login').hidden=true;byId('exam-content').hidden=false;byId('exam-content').innerHTML=html;}
 function stopClock(){if(clockTimer)clearInterval(clockTimer);if(syncTimer)clearInterval(syncTimer);clockTimer=null;syncTimer=null;}
 
-function updateAnswerIndicators(no, saving){
+function updateAnswerIndicators(no){
  if(!state||state.phase!=='en_cours')return;
  var current=state.questions[index];
  var count=Object.keys(state.selected).length;
@@ -211,8 +210,6 @@ function updateAnswerIndicators(no, saving){
    label.classList.toggle('chosen',isChosen);
    radio.checked=isChosen;
   });
-  var save=byId('exam-save');
-  if(save)save.textContent=saving?'Enregistrement en cours…':'Réponses enregistrées individuellement • '+count+'/30';
  }
 }
 
@@ -235,7 +232,7 @@ function render(){
  var options=q.options.map(function(text,i){return '<label class="exam-option'+(choice===i?' chosen':'')+'"><input type="radio" name="answer" value="'+i+'" '+(choice===i?'checked':'')+'><span class="exam-choice-letter" aria-hidden="true">'+String.fromCharCode(65+i)+'</span><span class="exam-answer-text">'+esc(text)+'</span></label>';}).join('');
  var numbers=state.questions.map(function(item,i){return '<button type="button" class="exam-number'+(state.selected[item.no]!==undefined?' answered':'')+(i===index?' active':'')+'" data-go="'+i+'" aria-label="Question '+(i+1)+'">'+(i+1)+'</button>';}).join('');
  var phase=index<15?'I — Le monde du cigare':'II — Le Cruising Rats Cigar Club';
- panel('<div class="exam-timer"><div><span>CRCC — TEMPS RESTANT</span><br><strong>'+esc(state.name)+'</strong></div><div class="exam-clock" id="exam-clock" aria-live="off">20:00</div></div><div class="exam-progress"><div class="exam-progress-inner" style="width:'+(answered/30*100)+'%"></div></div><section class="exam-panel exam-question-panel"><div class="exam-q-meta"><span>QUESTION '+String(index+1).padStart(2,'0')+' / 30</span><span>'+esc(phase)+'</span></div><h2 class="exam-q-text">'+esc(q.text)+'</h2><div id="exam-options">'+options+'</div><p class="exam-muted exam-answer-save" id="exam-save">Réponses enregistrées individuellement • '+answered+'/30</p><div class="exam-nav"><button class="exam-button secondary" id="exam-prev" type="button" '+(index===0?'disabled':'')+'>← Précédente</button><button class="exam-button secondary" id="exam-next" type="button" '+(index===29?'disabled':'')+'>Suivante →</button></div><div class="exam-numbers">'+numbers+'</div><div class="exam-buttons"><button type="button" class="exam-button danger" id="exam-submit">Remettre la copie maintenant</button></div><p class="exam-legal">La remise est définitive. Les questions sans réponse ne donnent aucun point. Le chronomètre continue jusqu’à l’enregistrement définitif.</p></section>');
+ panel('<div class="exam-timer"><div><span>CRCC — TEMPS RESTANT</span><br><strong>'+esc(state.name)+'</strong></div><div class="exam-clock" id="exam-clock" aria-live="off">20:00</div></div><div class="exam-progress"><div class="exam-progress-inner" style="width:'+(answered/30*100)+'%"></div></div><section class="exam-panel exam-question-panel"><div class="exam-q-meta"><span>QUESTION '+String(index+1).padStart(2,'0')+' / 30</span><span>'+esc(phase)+'</span></div><h2 class="exam-q-text">'+esc(q.text)+'</h2><div id="exam-options">'+options+'</div><div class="exam-nav"><button class="exam-button secondary" id="exam-prev" type="button" '+(index===0?'disabled':'')+'>← Précédente</button><button class="exam-button secondary" id="exam-next" type="button" '+(index===29?'disabled':'')+'>Suivante →</button></div><div class="exam-numbers">'+numbers+'</div><div class="exam-buttons"><button type="button" class="exam-button danger" id="exam-submit">Remettre la copie maintenant</button></div><p class="exam-legal">La remise est définitive. Les questions sans réponse ne donnent aucun point. Le chronomètre continue jusqu’à l’enregistrement définitif.</p></section>');
  byId('exam-options').querySelectorAll('input').forEach(function(input){input.addEventListener('change',async function(){
   if(working){updateAnswerIndicators(q.no);return;}
   var value=Number(input.value);
@@ -244,8 +241,6 @@ function render(){
   byId('exam-options').querySelectorAll('.exam-option').forEach(function(label){
    label.classList.toggle('chosen',label.querySelector('input')===input);
   });
-  var save=byId('exam-save');
-  if(save)save.textContent='Enregistrement en cours…';
   try{
    await request('answer','POST',{no:q.no,choice:value});
    state.selected[q.no]=value;
