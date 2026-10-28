@@ -10,9 +10,18 @@ function clean(input){const x={};for(const f of fields){if(typeof input[f]!=="st
 function authorized(req,env){const actual=req.headers.get("Authorization")||"";const expected=env.CRCC_MAIL_ADMIN_PASSWORD?"Basic "+btoa("comite:"+env.CRCC_MAIL_ADMIN_PASSWORD):"";if(!expected||actual.length!==expected.length)return false;let bad=0;for(let i=0;i<actual.length;i++)bad|=actual.charCodeAt(i)^expected.charCodeAt(i);return bad===0;}
 function htmlMail(m){const paragraphs=(m.body||"").split(/\n\s*\n/).filter(Boolean).map(x=>"<p>"+safe(x).replace(/\n/g,"<br>")+"</p>").join("");return '<!doctype html><html lang="fr"><head><meta charset="utf-8"></head><body style="margin:0;padding:22px;background:#e9e5dc;color:#292722;font-family:Arial,sans-serif"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center"><table role="presentation" style="max-width:620px;width:100%;background:#fffefa;border:1px solid #bfb8a8" cellpadding="0" cellspacing="0"><tr><td style="padding:26px 32px;background:#292722;color:white"><span style="font-size:11px;letter-spacing:2px">CRUISING RATS CIGAR CLUB — NOTIFICATION OFFICIELLE</span><h1 style="font:normal 27px Georgia,serif;color:#fff">'+safe(m.subject)+'</h1></td></tr><tr><td style="padding:28px 32px;font-size:14px;line-height:23px"><p style="font-family:Georgia,serif;font-size:17px">Cher '+safe(m.recipient_name||"membre")+',</p>'+paragraphs+(m.observation?'<table role="presentation" width="100%" style="border-collapse:collapse;margin:24px 0;background:#eeebe3;border:1px solid #c9c1b4"><tr><td style="background:#292722;color:white;font-size:12px;font-weight:bold;letter-spacing:1px;padding:12px">OBSERVATION DU COMITÉ EXÉCUTIF</td></tr><tr><td style="padding:20px;white-space:pre-wrap">'+safe(m.observation)+'</td></tr></table>':'')+(m.reference?'<p style="font-size:12px;color:#756e63">Référence du dossier : '+safe(m.reference)+'</p>':'')+'<p style="margin-top:26px">Pour le Comité exécutif,<br><strong>Le Président</strong></p><p style="padding-top:15px;border-top:1px solid #d0c8bc;text-align:center;font:italic 16px Georgia,serif">« On pipe rien, mais on a des fiches. »</p></td></tr></table></td></tr></table></body></html>';}
 
+function memberProfileUrl(m){
+ const name=String(m.recipient_name||"").trim();
+ if(!name)throw Error("Nom du membre requis pour le lien du dossier personnel");
+ const slug=name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+ const id=slug==="m-crevette"?"m-crevette":slug;
+ if(!id)throw Error("Identifiant de membre indisponible");
+ return "https://cruising-rats-cigar-club.fr/fiches-degustation/membre-"+id+".html";
+}
 function personalizeOriginal(t,m){
  let h=t.original_html;
  if(!h)throw Error("Modèle HTML manquant");
+ if(m.template_id==="ratDePassage" && h.includes("{{MEMBER_PROFILE_URL}}"))h=h.replaceAll("{{MEMBER_PROFILE_URL}}",safe(memberProfileUrl(m)));
  h=h.replace(/Cher\s+(?:Candidat|Membre)\s*,/i,"Cher "+safe(m.recipient_name||"membre")+",");
  if(m.template_id==="candidature" && m.observation.trim()){
    const marker=h.indexOf("PROPOSITION DU COMITÉ EXÉCUTIF");
