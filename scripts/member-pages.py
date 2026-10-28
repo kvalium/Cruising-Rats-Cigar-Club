@@ -88,7 +88,7 @@ def medal_html(person,facts):
     earned=awards_for(person,facts)
     return ('<section class="card"><h2>Distinctions du membre</h2><p class="archive-meta">'
             'Distinctions automatiques calculées à partir des archives et distinctions honorifiques décidées par le Comité.</p>'
-            +(''.join('<span class="badge" title="'+esc(desc)+'">✦ '+esc(name)+'</span> '
+            +(''.join('<div class="member-distinction"><span class="badge">✦ '+esc(name)+'</span><p>'+esc(desc)+'</p></div>'
                       for key,name,desc,kind in DISTINCTIONS if key in earned) if earned else
               '<p>Aucune distinction encore attribuée. Les dossiers sont suivis.</p>')
             +'</section>')
@@ -140,7 +140,6 @@ def build_members(archive, data):
         body=f'<p class="breadcrumbs"><a href="registre-membres.html">Registre des membres</a> / {esc(person["name"])}</p><section class="member-identity">{grade_badge(person)}<div><p class="member-grade">{esc(person.get("grade") or "Grade non renseigné")}</p><p class="archive-meta">Dernier grade documenté.</p><p>{introduction}</p></div></section>'
         facts=facts_for(person,sessions)
         if not person.get('classified_profile'):
-            body+=hierarchy_html()
             body+='<section class="card"><h2>Progression</h2><p><strong>Grade attribué : '+esc(person.get('grade') or 'Non renseigné')+'</strong></p><p>'+str(len(facts['sheets']))+' fiches · '+str(len(facts['attendance']))+' séances · Éligibilité documentaire estimée : '+esc(grade_progress(person,facts))+'. Une décision du Comité reste nécessaire.</p></section>'
             body+=medal_html(person,facts)
         classified = person.get('classified_profile')
