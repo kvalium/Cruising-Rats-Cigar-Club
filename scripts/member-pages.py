@@ -173,9 +173,9 @@ def build_members(archive, data):
             for f in s['sheets']:
                 if f['member_id'] != member_id:
                     continue
-                row = {key:f.get(key) for key in ('id','number','first','brand','cigar','module','origin','reference_exact','aromas','duration_minutes','ash_max_cm','technique','pairing','pairings','cigar_score','criteria','rubric_label')}
+                row = {key:f.get(key) for key in ('id','number','first','brand','cigar','module','origin','reference_exact','aromas','duration_minutes','ash_max_cm','technique','pairing','pairings','cigar_score','criteria','rubric_label','price','strength_score','richness_score','minutes_contribution')}
                 # Unknown schemas are isolated per fiche, never assumed comparable.
-                row.update(date=s['date'], session_id=s['id'], session_title=s['title'], session_url=archive.session_url(s), participant_count=len(s['participants']), committee_score=archive.score(f), rubric_id=f.get('rubric_id') or 'Barème non identifié — '+f['id'], url=archive.sheet_url(f), full_title=archive.title(s,f))
+                row.update(date=s['date'], session_id=s['id'], session_title=s['title'], session_url=archive.session_url(s), participant_count=len(s['participants']), committee_score=archive.score(f), rubric_id=f.get('rubric_id') or 'Barème non identifié — '+f['id'], url=archive.sheet_url(f), full_title=archive.title(s,f), minutes_pdf=s.get('minutes_pdf'))
                 rows.append(row)
         page=archive.member_url(person)
         pages.append(page)
@@ -200,10 +200,6 @@ def build_members(archive, data):
                     '<p class="archive-footer"><a href="registre-membres.html">← Registre des membres</a></p>')
             (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Dossier classifié',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css?v=20261028-2"></head>'))
             continue
-        if not rows:
-            body += '<section class="card"><h2>Première dégustation à venir</h2><p>Aucune dégustation ni fiche n’est encore enregistrée pour ce membre. Son historique et ses statistiques apparaîtront après sa première contribution.</p></section><p class="archive-footer"><a href="registre-membres.html">← Registre des membres</a> · <a href="index.html">Toutes les séances de dégustation</a></p>'
-            (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Registre du membre',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css?v=20261028-2"></head>'))
-            continue
         if rows:
             last_session,last_fiche=max(((s,f) for s in sessions for f in s['sheets'] if f['member_id']==member_id),key=lambda pair:(pair[0]['date'],pair[1]['number']))
             body+='<section class="card accent"><h2>Dernière appréciation du Comité</h2>'
@@ -213,16 +209,19 @@ def build_members(archive, data):
             if last_fiche.get('next_steps'):
                 body+='<h3>Prochains axes de progression</h3><ul>'+''.join(f'<li>{esc(p)}</li>' for p in last_fiche['next_steps'])+'</ul>'
             body+='</section>'
-        options=lambda values:''.join(f'<option value="{esc(v)}">{esc(v)}</option>' for v in sorted({v for v in values if v}))
-        body+=f'''<form class="archive-filters member-filters" data-member-filters hidden><label>À partir du<input type="date" name="start"></label><label>Jusqu’au<input type="date" name="end"></label><label>Marque<select name="brand"><option value="">Toutes les marques</option>{options(r['brand'] for r in rows)}</select></label><label>Module<select name="module"><option value="">Tous les modules</option>{options(r['module'] for r in rows)}</select></label><button type="reset">Réinitialiser les filtres</button></form><p class="archive-meta" data-member-count aria-live="polite">{len(rows)} fiche(s) dans la sélection</p><noscript><p>Les statistiques complètes restent consultables. Activez JavaScript pour utiliser les filtres.</p></noscript>'''
-        result=subprocess.run(['node',str(root/'js/member-stats.js'),'--render'],input=json.dumps(rows),capture_output=True,text=True,check=True)
-        body+='<div data-member-dashboard>'+result.stdout+'</div>'
-        body+='''<details class="card"><summary>Lire ces statistiques avec mesure</summary><p>Les statistiques portent sur les fiches archivées, sans déduire les dégustations non documentées. Une donnée absente reste non renseignée, jamais zéro. Chaque moyenne indique son effectif.</p><p>Les arômes sont relevés dans les observations attribuées au membre ; les remarques collectives des minutes ne sont pas attribuées automatiquement. Leurs fréquences décrivent les fiches, sans mesurer des goûts ou une expertise.</p><p>Les origines, modules et références sont conservés avec leurs réserves. Les notes du Comité sont comparées seulement au sein d’un même barème identifié. Les critères proposés n’ont pas valeur de règlement préexistant.</p><p>Les filtres portent sur les statistiques et la liste des fiches. La dernière appréciation du Comité reste celle du dossier complet.</p></details>'''
+        # Render statistics from archive data; no date, brand or module filters.
+        result=subprocess.run(['node',str(root/'js/member-observatory.js'),'--render'],
+                              input=json.dumps(rows,ensure_ascii=False),capture_output=True,text=True,check=True)
+        body+=result.stdout
+        body+='''<details class="card"><summary>Lire ces statistiques avec mesure</summary>
+        <p>Les graphiques utilisent uniquement les fiches et minutes archivées. Une donnée absente reste non renseignée et n'est jamais interprétée comme zéro.</p>
+        <p>Les arômes sont attribués aux membres seulement lorsqu'ils apparaissent dans leurs fiches. Les incidents collectifs des minutes ne leur sont pas imputés.</p>
+        <p>Les évaluations du Comité décrivent la qualité documentaire des dossiers, indépendamment des notes personnelles. Les comparaisons entre membres sont réservées aux pages de séances.</p></details>'''
         body+='<p class="archive-footer"><a href="registre-membres.html">← Registre des membres</a> · <a href="index.html">Toutes les séances de dégustation</a></p>'
         # Escape the script terminator even when future member input contains HTML.
         payload=json.dumps({'rows':rows},ensure_ascii=False).replace('<','\\u003c').replace('>','\\u003e').replace('&','\\u0026')
-        body+=f'<script type="application/json" id="member-data">{payload}</script><script src="../js/member-stats.js" defer></script>'
-        (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Registre du membre',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css?v=20261028-2"></head>'))
+        body+=f'<script type="application/json" id="member-data">{payload}</script><script src="https://cdn.jsdelivr.net/npm/chart.js@4.6.1/dist/chart.umd.min.js" defer></script><script src="../js/member-observatory.js?v=20261028" defer></script>'
+        (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Registre du membre',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css?v=20261028-2"><link rel="stylesheet" href="../css/member-observatory.css?v=20261028"></head>'))
     directory = '<p class="breadcrumbs"><a href="index.html">Dégustations</a> / Registre des membres</p><p class="lead">Les membres, leurs contributions et les pièces qui les accompagnent. Chaque nom ouvre un dossier personnel ; le Comité n’égare personne volontairement.</p><p>Retrouvez les profils enregistrés, leurs fiches et leurs statistiques de dégustation. Les membres sont classés par ordre alphabétique.</p>'
     directory += f'<p class="archive-meta">{len(people)} profil' + ('s enregistrés' if len(people)>1 else ' enregistré') + '.</p><ul class="member-directory">'
     for person in sorted(people.values(), key=lambda m:(m['name'].casefold(),m['id'])):
