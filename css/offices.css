@@ -1,0 +1,67 @@
+/* CRCC / Direction des Bureaux & Commissions
+   Shared presentation for the member office directory and correspondence office. */
+.office-shell{--max:1200px}
+.office-shell .site-header{padding-bottom:30px}
+.office-shell main{padding:36px clamp(20px,4vw,52px) 55px}
+.office-shell .office-breadcrumb{font:700 12px/1.6 Arial,sans-serif;letter-spacing:.7px;color:var(--muted);margin:0 0 28px}
+.office-shell .office-breadcrumb a{color:var(--red);text-decoration:none}
+.office-shell .office-breadcrumb a:hover{text-decoration:underline}
+.office-shell .office-eyebrow{font:700 11px/1.4 Arial,sans-serif;letter-spacing:1.8px;text-transform:uppercase;color:var(--red)}
+.office-shell .office-lead{max-width:860px;font:19px/1.7 Georgia,serif;margin:11px 0 27px;color:var(--ink)}
+.office-shell .office-intro{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:30px}
+.office-shell .office-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:23px}
+.office-shell .office-entry{display:flex;flex-direction:column;background:var(--white);border:1px solid var(--line);padding:29px;margin:0;min-height:275px;transition:box-shadow .16s,border-color .16s}
+.office-shell .office-entry:hover{border-color:var(--red);box-shadow:0 9px 25px rgba(41,39,34,.07)}
+.office-shell .office-entry .office-number{font:700 12px Arial,sans-serif;color:var(--red);letter-spacing:1.5px;margin-bottom:18px}
+.office-shell .office-entry h2{font:28px/1.2 Georgia,serif;margin:0 0 14px}
+.office-shell .office-entry p{font-size:15px;line-height:1.7;margin:0 0 26px}
+.office-shell .office-entry .office-entry-link{display:inline-flex;justify-content:space-between;align-items:center;gap:15px;align-self:start;margin-top:auto;padding:11px 16px;background:var(--red);color:var(--white);font:700 12px/1.5 Arial,sans-serif;text-decoration:none;letter-spacing:.5px}
+.office-shell .office-entry .office-entry-link:hover{background:var(--ink);color:var(--white)}
+.office-shell .office-disclaimer{margin:28px 0 0;background:var(--paper-alt);padding:16px 20px;border-left:4px solid var(--red);color:var(--muted);font-size:13px;line-height:1.7}
+.office-shell .office-login{max-width:665px;margin:10px auto 28px;padding:34px 40px;background:var(--white);border:1px solid var(--line)}
+.office-shell .office-login h2{font:29px Georgia,serif;margin:10px 0 16px}
+.office-shell .office-login p{font-size:15px;line-height:1.8}
+.office-shell label{display:block;font:700 12px Arial,sans-serif;letter-spacing:.3px;color:var(--ink);margin:18px 0 7px}
+.office-shell input,.office-shell select,.office-shell textarea{display:block;box-sizing:border-box;width:100%;background:var(--white);color:var(--ink);border:1px solid #b7aea0;border-radius:0;padding:12px 13px;font:15px/1.45 Arial,sans-serif;max-width:100%}
+.office-shell textarea{resize:vertical;min-height:120px;line-height:1.55}
+.office-shell input:focus,.office-shell select:focus,.office-shell textarea:focus{outline:2px solid var(--red);outline-offset:1px}
+.office-shell input::placeholder,.office-shell textarea::placeholder{color:#817970}
+.office-shell button{border:1px solid var(--red);background:var(--red);color:var(--white);padding:12px 17px;min-height:43px;font:700 12px/1.4 Arial,sans-serif;letter-spacing:.45px;text-transform:uppercase;cursor:pointer;margin:5px 7px 5px 0}
+.office-shell button:hover{background:var(--ink);border-color:var(--ink)}
+.office-shell button.secondary{background:var(--white);color:var(--ink);border-color:var(--line)}
+.office-shell button.secondary:hover{border-color:var(--red);background:var(--paper-alt)}
+.office-shell button:disabled{opacity:.45;cursor:default}
+.office-shell .office-login button{margin-top:22px}
+.office-shell .muted{font-size:13px;line-height:1.65;color:var(--muted)}
+.office-shell .hide{display:none!important}
+.office-shell .notice{margin:21px 0 25px;padding:15px 18px;background:var(--paper-alt);border-left:4px solid var(--red);font:14px/1.65 Arial,sans-serif;color:var(--ink)}
+.office-shell .notice.error{background:#f7e9e6;border-color:#9c413b;color:#7c2c28}
+.office-shell .tabs{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px;margin:12px 0 27px}
+.office-shell .tabs button{background:var(--white);border-color:var(--line);color:var(--ink)}
+.office-shell .tabs button.active{background:var(--ink);border-color:var(--ink);color:var(--white)}
+.office-shell .tabs button.active:hover{background:var(--red);border-color:var(--red)}
+.office-shell .grid{display:grid;grid-template-columns:minmax(340px,.9fr) minmax(400px,1.1fr);gap:22px;align-items:start}
+.office-shell .panel{background:var(--white);border:1px solid var(--line);padding:26px 27px;margin-bottom:20px;min-width:0}
+.office-shell .panel h2{font:26px/1.3 Georgia,serif;margin:0 0 17px}
+.office-shell .panel p{font-size:14px;line-height:1.7}
+.office-shell .panel .row{display:flex;gap:13px}
+.office-shell .panel .row>*{flex:1;min-width:0}
+.office-shell .mail{background:var(--white);color:var(--ink);padding:27px;font:15px/1.65 Georgia,serif;min-height:450px;overflow-wrap:anywhere}
+.office-shell .mail .over{font:700 11px Arial,sans-serif;color:var(--red);letter-spacing:2px}
+.office-shell .mail .obs{padding:17px;background:var(--paper-alt);border:1px solid var(--line);margin:18px 0}
+.office-shell .mail .obs strong{display:block;background:var(--ink);color:var(--white);margin:-17px -17px 15px;padding:11px;font:700 12px Arial,sans-serif;letter-spacing:.9px}
+.office-shell iframe{width:100%;border:1px solid var(--line)!important;background:var(--white);display:block}
+.office-shell #richToolbar{display:flex;flex-wrap:wrap;gap:2px;margin-bottom:9px}
+.office-shell #richToolbar button{margin:2px;padding:8px 11px;min-height:36px}
+.office-shell #archive{overflow-x:auto}
+.office-shell table{border-collapse:collapse;width:100%;font:13px/1.55 Arial,sans-serif}
+.office-shell th,.office-shell td{padding:12px 11px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.office-shell th{color:var(--red);font:700 11px Arial,sans-serif;text-transform:uppercase;letter-spacing:.5px;background:var(--paper-alt)}
+.office-shell td button{padding:7px 9px;min-height:32px;font-size:10px;margin:3px}
+.office-shell .status{display:inline;background:none;border:0;text-align:left;padding:0;margin:0;color:var(--red);font:700 12px Arial,sans-serif}
+.office-shell #dueList>div{border-bottom:1px solid var(--line)!important;padding:16px 0!important}
+.office-shell .office-subnav{display:flex;gap:10px;flex-wrap:wrap;background:var(--ink);padding:10px 22px;justify-content:center}
+.office-shell .office-subnav a{color:var(--paper);font:700 11px Arial,sans-serif;letter-spacing:1px;text-decoration:none;padding:8px 11px}
+.office-shell .office-subnav a:hover,.office-shell .office-subnav a[aria-current=page]{background:var(--red)}
+@media(max-width:980px){.office-shell .grid{grid-template-columns:1fr}.office-shell .office-grid{grid-template-columns:1fr}.office-shell .office-entry{min-height:auto}}
+@media(max-width:650px){.office-shell main{padding:26px 18px 37px}.office-shell .office-login{padding:24px 20px}.office-shell .panel{padding:20px 16px}.office-shell .panel .row{display:block}.office-shell .tabs button{flex:1 1 calc(50% - 8px);margin:2px}.office-shell .office-entry{padding:23px}.office-shell .office-entry h2{font-size:25px}.office-shell .office-subnav{justify-content:start;padding:8px 11px}}
