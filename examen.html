@@ -70,13 +70,13 @@
 .exam-option{position:relative;align-items:center;gap:15px;padding:18px 19px;margin:13px 0;border-radius:8px;transition:border-color .16s,background-color .16s,box-shadow .16s;min-height:69px}
 .exam-option:hover{background:#f7f2eb;border-color:#aa8b80}
 .exam-option:focus-within{outline:3px solid #a88478;outline-offset:2px}
-.exam-option.chosen{padding:17px 18px;border-color:#743c36;background:#f4eae4;box-shadow:inset 4px 0 0 #743c36}
+.exam-option.chosen{border-width:1px;padding:18px 19px;border-color:#743c36;background:#f4eae4;box-shadow:inset 4px 0 0 #743c36}
 .exam-option input{width:19px;height:19px;flex:0 0 19px;margin:0;accent-color:#743c36;cursor:pointer}
 .exam-choice-letter{display:inline-grid;place-items:center;flex:0 0 37px;width:37px;height:37px;border:1px solid #ddd2c5;border-radius:7px;background:#f1ebe2;color:#743c36;font:700 14px Arial,sans-serif}
 .exam-option.chosen .exam-choice-letter{background:#743c36;color:#fffefa;border-color:#743c36}
 .exam-answer-text{flex:1;font-size:16px;line-height:1.55;color:#35312e}
-.exam-option.chosen .exam-answer-text{font-weight:600}
-.exam-answer-save{margin:20px 0 0!important;display:flex;align-items:center;gap:7px}
+.exam-option.chosen .exam-answer-text{font-weight:400} /* La sélection ne modifie jamais la largeur ni le retour à la ligne. */
+.exam-answer-save{margin:20px 0 0!important;display:flex;align-items:center;gap:7px;min-height:23px}
 .exam-answer-save:before{content:"";height:7px;width:7px;background:#72957c;border-radius:50%}
 .exam-number:focus-visible,.exam-button:focus-visible{outline:3px solid #a88478;outline-offset:3px}
 .exam-main.exam-admin-view{max-width:1160px}
@@ -109,7 +109,7 @@
 .exam-review-opinion h3{margin:0 0 8px;font:22px Georgia,serif}
 .exam-review-opinion .exam-buttons{align-items:center}
 .exam-admin-note{font-size:12px;color:#746b61;font-weight:600;margin-top:5px}
-@media(max-width:760px){.exam-review-questions{grid-template-columns:1fr}.exam-panel.exam-question-panel{padding:27px 19px}.exam-question-panel .exam-q-text{margin:28px 0 28px!important}.exam-option{padding:15px 12px;gap:10px}.exam-option.chosen{padding:14px 11px}.exam-choice-letter{flex-basis:31px;width:31px;height:31px}.exam-answer-text{font-size:15px}}
+@media(max-width:760px){.exam-review-questions{grid-template-columns:1fr}.exam-panel.exam-question-panel{padding:27px 19px}.exam-question-panel .exam-q-text{margin:28px 0 28px!important}.exam-option{padding:15px 12px;gap:10px}.exam-option.chosen{padding:15px 12px}.exam-choice-letter{flex-basis:31px;width:31px;height:31px}.exam-answer-text{font-size:15px}}
 
 #exam-alert:empty{display:none}
 [hidden]{display:none!important}
@@ -176,11 +176,45 @@ async function request(action,method,data,admin){
  if(!resp.ok)throw new Error(payload.error||'Erreur '+resp.status);
  return payload;
 }
-async function loadState(){
- try{state=await request('state');alertMessage('');index=Math.max(0,Math.min(index,29));render();}catch(e){state=null;if(!String(e.message).includes('Session absente'))alertMessage(e.message);byId('exam-time-warning').hidden=false;byId('exam-login').hidden=false;byId('exam-content').hidden=true;}
+async function loadState(quiet){
+ try{
+  var next=await request('state');
+  var sameQuestion=quiet&&state&&state.phase==='en_cours'&&next.phase==='en_cours'&&state.questions[index]?.no===next.questions[index]?.no;
+  state=next;
+  alertMessage('');
+  index=Math.max(0,Math.min(index,29));
+  if(sameQuestion){
+   // Periodic server clock sync must not replace the focused radio or scroll the page.
+   deadlineAnchor={deadline:state.deadlineAt,serverNow:state.serverNow,at:performance.now()};
+   updateAnswerIndicators(state.questions[index].no);
+  } else render();
+ }catch(e){state=null;if(!String(e.message).includes('Session absente'))alertMessage(e.message);byId('exam-time-warning').hidden=false;byId('exam-login').hidden=false;byId('exam-content').hidden=true;}
 }
 function panel(html){byId('exam-login').hidden=true;byId('exam-content').hidden=false;byId('exam-content').innerHTML=html;}
 function stopClock(){if(clockTimer)clearInterval(clockTimer);if(syncTimer)clearInterval(syncTimer);clockTimer=null;syncTimer=null;}
+
+function updateAnswerIndicators(no, saving){
+ if(!state||state.phase!=='en_cours')return;
+ var current=state.questions[index];
+ var count=Object.keys(state.selected).length;
+ var progress=document.querySelector('.exam-progress-inner');
+ if(progress)progress.style.width=(count/30*100)+'%';
+ var badge=document.querySelector('.exam-number[data-go="'+(no-1)+'"]');
+ if(badge)badge.classList.toggle('answered',state.selected[no]!==undefined);
+ if(current&&current.no===no){
+  var selected=state.selected[no];
+  var options=byId('exam-options');
+  if(options)options.querySelectorAll('.exam-option').forEach(function(label){
+   var radio=label.querySelector('input');
+   var isChosen=selected===Number(radio.value);
+   label.classList.toggle('chosen',isChosen);
+   radio.checked=isChosen;
+  });
+  var save=byId('exam-save');
+  if(save)save.textContent=saving?'Enregistrement en cours…':'Réponses enregistrées individuellement • '+count+'/30';
+ }
+}
+
 function render(){
  stopClock();
  if(!state)return;
@@ -202,11 +236,20 @@ function render(){
  var phase=index<15?'I — Le monde du cigare':'II — Le Cruising Rats Cigar Club';
  panel('<div class="exam-timer"><div><span>CRCC — TEMPS RESTANT</span><br><strong>'+esc(state.name)+'</strong></div><div class="exam-clock" id="exam-clock" aria-live="off">20:00</div></div><div class="exam-progress"><div class="exam-progress-inner" style="width:'+(answered/30*100)+'%"></div></div><section class="exam-panel exam-question-panel"><div class="exam-q-meta"><span>QUESTION '+String(index+1).padStart(2,'0')+' / 30</span><span>'+esc(phase)+'</span></div><h2 class="exam-q-text">'+esc(q.text)+'</h2><div id="exam-options">'+options+'</div><p class="exam-muted exam-answer-save" id="exam-save">Réponses enregistrées individuellement • '+answered+'/30</p><div class="exam-nav"><button class="exam-button secondary" id="exam-prev" type="button" '+(index===0?'disabled':'')+'>← Précédente</button><button class="exam-button secondary" id="exam-next" type="button" '+(index===29?'disabled':'')+'>Suivante →</button></div><div class="exam-numbers">'+numbers+'</div><div class="exam-buttons"><button type="button" class="exam-button danger" id="exam-submit">Remettre la copie maintenant</button></div><p class="exam-legal">La remise est définitive. Les questions sans réponse ne donnent aucun point. Le chronomètre continue jusqu’à l’enregistrement définitif.</p></section>');
  byId('exam-options').querySelectorAll('input').forEach(function(input){input.addEventListener('change',async function(){
-  if(working)return;
+  if(working){updateAnswerIndicators(q.no);return;}
+  var value=Number(input.value);
   working=true;
-  byId('exam-save').textContent='Enregistrement en cours…';
-  try{await request('answer','POST',{no:q.no,choice:Number(input.value)});state.selected[q.no]=Number(input.value);render();}
-  catch(e){alertMessage(e.message);await loadState();}
+  // Keep the original DOM, focus and scroll position: just mark the selected card.
+  byId('exam-options').querySelectorAll('.exam-option').forEach(function(label){
+   label.classList.toggle('chosen',label.querySelector('input')===input);
+  });
+  var save=byId('exam-save');
+  if(save)save.textContent='Enregistrement en cours…';
+  try{
+   await request('answer','POST',{no:q.no,choice:value});
+   state.selected[q.no]=value;
+   updateAnswerIndicators(q.no);
+  }catch(e){alertMessage(e.message);await loadState();}
   finally{working=false;}
  });});
  byId('exam-prev').onclick=function(){index=Math.max(0,index-1);render();};
@@ -227,7 +270,7 @@ function render(){
    if(remain===0&&!working){working=true;loadState().finally(function(){working=false;});}
  }
  clockTimer=setInterval(tick,250);
- syncTimer=setInterval(function(){if(!working)loadState();},15000);
+ syncTimer=setInterval(function(){if(!working)loadState(true);},15000);
  tick();
 }
 byId('exam-login-form').addEventListener('submit',async function(evt){
