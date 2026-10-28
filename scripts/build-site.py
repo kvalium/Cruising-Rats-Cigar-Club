@@ -286,8 +286,10 @@ def main():
     tasting_data.write_text(json.dumps(payload,ensure_ascii=False))
     env = {**os.environ, 'CRCC_SITE_URL': SITE + '/'}
     subprocess.run([sys.executable, 'scripts/build-degustations.py'], cwd=DIST, env=env, check=True)
-    # Private, unlinked Committee correspondence office.
-    shutil.copy2(ROOT / 'fiches-degustation' / 'bureau-correspondances.html', DIST / 'fiches-degustation' / 'bureau-correspondances.html')
+    # Private institutional directory and correspondence office, linked from the generated members' landing page.
+    for office_page in ('bureaux-commissions.html', 'bureau-correspondances.html'):
+        shutil.copy2(ROOT / 'fiches-degustation' / office_page,
+                     DIST / 'fiches-degustation' / office_page)
     sitemap = DIST / 'sitemap.xml'
     sitemap.write_text(re.sub(r'\s*<url><loc>[^<]*/fiches-degustation/[^<]*</loc>.*?</url>', '', sitemap.read_text(), flags=re.S))
     for page in (DIST / 'fiches-degustation').glob('*.html'):
