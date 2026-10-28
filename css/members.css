@@ -3,3 +3,31 @@
 .member-session-list{list-style:none;padding:0;margin:18px 0}.member-session-list li{display:grid;grid-template-columns:110px minmax(0,1fr);gap:18px;border-bottom:1px solid var(--line);padding:17px 0}.member-session-list time{font-size:13px;color:var(--muted);padding-top:3px}.member-session-list a{font:21px/1.4 Georgia,serif;text-decoration:none}.member-session-list a:hover{text-decoration:underline}@media(max-width:600px){.member-session-list li{grid-template-columns:1fr;gap:5px}.member-session-list a{font-size:20px}}
 
 .timeline .point-value{font:600 12px Arial,sans-serif;fill:var(--red);paint-order:stroke;stroke:var(--white);stroke-width:4px;stroke-linejoin:round}
+
+
+/* CRCC honours and rank register */
+.grade-steps{padding:0;margin:22px 0 24px;list-style:none}
+.grade-step{display:flex;align-items:center;gap:18px;padding:13px 0;border-bottom:1px solid var(--line)}
+.grade-step:last-child{border-bottom:0}
+.grade-ordinal{flex:0 0 53px;height:53px;display:grid;place-items:center;background:var(--paper-alt);border:1px solid var(--line);font:24px Georgia,serif;color:var(--ink)}
+.grade-step-content{display:flex;flex-direction:column;gap:5px}
+.grade-step-content strong{font-size:19px;line-height:1.3}
+.grade-step-content span{font-size:14px;color:var(--muted);line-height:1.5}
+.grade-note{padding:18px 20px;margin:20px 0 0;background:var(--paper-alt);border-left:3px solid var(--red);font-size:14px;line-height:1.65}
+.distinction-group{margin-top:28px}
+.distinction-group h3{margin:0 0 15px;font:22px Georgia,serif}
+.distinction-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.distinction-card{display:flex;align-items:flex-start;gap:13px;padding:18px;border:1px solid var(--line);background:var(--white);min-width:0}
+.distinction-icon{flex:0 0 39px;height:39px;display:grid;place-items:center;background:var(--paper-alt);border:1px solid var(--line);font:23px Georgia,serif;color:var(--red)}
+.distinction-card h4{font-size:16px;line-height:1.4;margin:0 0 6px}
+.distinction-card p{font-size:14px;line-height:1.5;margin:0 0 9px;color:var(--text)}
+.distinction-card small,.honour-type{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.honour-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.honour-heading h2{margin-bottom:4px}
+.honour-heading-symbol{font:32px Georgia,serif;color:var(--red)}
+.honour-list{display:grid;gap:12px;margin-top:22px}
+.honour-card{display:flex;align-items:center;gap:19px;padding:19px 22px;background:var(--paper-alt);border:1px solid var(--line)}
+.honour-emblem{flex:0 0 70px;height:70px;border-radius:50%;display:grid;place-items:center;background:var(--white);border:2px double var(--line);font:32px Georgia,serif;color:var(--red)}
+.honour-copy h3{margin:5px 0;font:24px Georgia,serif}
+.honour-copy p{margin:0;line-height:1.55;font-size:15px}
+@media(max-width:700px){.distinction-grid{grid-template-columns:1fr}.honour-card{padding:15px;gap:12px}.honour-emblem{flex-basis:55px;height:55px;font-size:24px}.honour-copy h3{font-size:20px}.grade-step-content strong{font-size:17px}}
