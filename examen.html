@@ -62,6 +62,50 @@
 .exam-table .exam-buttons{margin:0;gap:4px}
 .exam-table .exam-button{min-height:0;padding:8px;font-size:10px}
 .exam-table-wrap{overflow-x:auto}
+
+/* Questionnaire — breathing room, clear hierarchy and accessible choice cards */
+.exam-panel.exam-question-panel{padding:36px 38px 32px;border-color:#d0c6ba;box-shadow:0 9px 28px rgba(41,39,34,.055)}
+.exam-question-panel .exam-q-meta{padding-bottom:18px;border-bottom:1px solid #e2dbd1;gap:15px;align-items:baseline;flex-wrap:wrap}
+.exam-question-panel .exam-q-text{font:clamp(25px,3vw,34px)/1.32 Georgia,serif!important;margin:32px 0 34px!important;letter-spacing:-.35px;max-width:32ch}
+.exam-option{position:relative;align-items:center;gap:15px;padding:18px 19px;margin:13px 0;border-radius:8px;transition:border-color .16s,background-color .16s,box-shadow .16s;min-height:69px}
+.exam-option:hover{background:#f7f2eb;border-color:#aa8b80}
+.exam-option:focus-within{outline:3px solid #a88478;outline-offset:2px}
+.exam-option.chosen{padding:17px 18px;border-color:#743c36;background:#f4eae4;box-shadow:inset 4px 0 0 #743c36}
+.exam-option input{width:19px;height:19px;flex:0 0 19px;margin:0;accent-color:#743c36;cursor:pointer}
+.exam-choice-letter{display:inline-grid;place-items:center;flex:0 0 37px;width:37px;height:37px;border:1px solid #ddd2c5;border-radius:7px;background:#f1ebe2;color:#743c36;font:700 14px Arial,sans-serif}
+.exam-option.chosen .exam-choice-letter{background:#743c36;color:#fffefa;border-color:#743c36}
+.exam-answer-text{flex:1;font-size:16px;line-height:1.55;color:#35312e}
+.exam-option.chosen .exam-answer-text{font-weight:600}
+.exam-answer-save{margin:20px 0 0!important;display:flex;align-items:center;gap:7px}
+.exam-answer-save:before{content:"";height:7px;width:7px;background:#72957c;border-radius:50%}
+.exam-number:focus-visible,.exam-button:focus-visible{outline:3px solid #a88478;outline-offset:3px}
+.exam-main.exam-admin-view{max-width:1160px}
+.exam-review{scroll-margin-top:20px}
+.exam-review-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.exam-review-summary{display:flex;gap:11px;flex-wrap:wrap;margin:16px 0 27px}
+.exam-review-stat{padding:11px 15px;background:#f2eee7;border:1px solid #e0d7cd;min-width:116px}
+.exam-review-stat strong{display:block;font:700 22px Georgia,serif;color:#743c36}
+.exam-review-stat span{font:12px Arial,sans-serif;color:#635b54}
+.exam-review-questions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:28px}
+.exam-review-item{border:1px solid #ded5ca;background:#fffefa;padding:18px;border-radius:7px}
+.exam-review-item.correct{border-left:4px solid #6b8d73}
+.exam-review-item.incorrect{border-left:4px solid #ae6257}
+.exam-review-item.unanswered{border-left:4px solid #c8b89e}
+.exam-review-item h3{font:600 16px/1.45 Georgia,serif;margin:9px 0 13px}
+.exam-review-item small{font:700 11px Arial,sans-serif;color:#743c36;letter-spacing:1px}
+.exam-review-item p{margin:7px 0!important;font-size:13px;line-height:1.5}
+.exam-review-label{color:#635b54;font-size:12px}
+.exam-review-choice{font-weight:600}
+.exam-review-item.correct .exam-review-choice{color:#426b4c}
+.exam-review-item.incorrect .exam-review-choice{color:#964539}
+.exam-review textarea{box-sizing:border-box;width:100%;min-height:160px;padding:15px;font:15px/1.6 Arial,sans-serif;border:1px solid #b7aea0;background:#fffefa;color:#292722;resize:vertical}
+.exam-review textarea:focus{outline:2px solid #a88478;outline-offset:2px}
+.exam-review-opinion{background:#f5f0e9;border:1px solid #e0d7cd;padding:20px;margin-top:20px}
+.exam-review-opinion h3{margin:0 0 8px;font:22px Georgia,serif}
+.exam-review-opinion .exam-buttons{align-items:center}
+.exam-admin-note{font-size:12px;color:#746b61;font-weight:600;margin-top:5px}
+@media(max-width:760px){.exam-review-questions{grid-template-columns:1fr}.exam-panel.exam-question-panel{padding:27px 19px}.exam-question-panel .exam-q-text{margin:28px 0 28px!important}.exam-option{padding:15px 12px;gap:10px}.exam-option.chosen{padding:14px 11px}.exam-choice-letter{flex-basis:31px;width:31px;height:31px}.exam-answer-text{font-size:15px}}
+
 #exam-alert:empty{display:none}
 [hidden]{display:none!important}
 @media(max-width:700px){.exam-panel{padding:19px 17px}.exam-numbers{grid-template-columns:repeat(6,minmax(0,1fr))}.exam-timer{padding:13px 14px}.exam-clock{font-size:30px;min-width:115px}.exam-q-text{font-size:24px}.exam-table{font-size:12px}.exam-table th,.exam-table td{padding:7px 4px}}
@@ -79,12 +123,12 @@
 <main class="exam-main">
 <div class="exam-eyebrow" id="exam-eyebrow">Épreuve officielle de passage</div>
 <h1 id="exam-title">Examen de Rat Homologué</h1>
-<p class="exam-lead" id="exam-lead">Trente questions. Deux matières. Trente minutes. Une réponse sérieuse demeure possible, même au CRCC.</p>
+<p class="exam-lead" id="exam-lead">Trente questions. Deux matières. Quinze minutes. Une réponse sérieuse demeure possible, même au CRCC.</p>
 <div id="exam-alert" role="alert" aria-live="polite"></div>
 <div id="member-area">
 <aside class="exam-time-warning" id="exam-time-warning" aria-label="Avertissement sur le temps réglementaire">
   <div class="exam-time-warning-label">Attention — temps réglementaire</div>
-  <p><strong>30 minutes, sans aucune pause.</strong> Le chronomètre démarre uniquement lorsque vous cliquez sur « Commencer l’épreuve ». Une fois lancé, <strong>le temps continue de s’écouler</strong> même si vous actualisez la page, changez d’onglet ou fermez votre navigateur. À l’échéance, la copie est clôturée automatiquement : seules les réponses enregistrées avant la fin du temps sont prises en compte.</p>
+  <p><strong>15 minutes, sans aucune pause.</strong> Le chronomètre démarre uniquement lorsque vous cliquez sur « Commencer l’épreuve ». Une fois lancé, <strong>le temps continue de s’écouler</strong> même si vous actualisez la page, changez d’onglet ou fermez votre navigateur. À l’échéance, la copie est clôturée automatiquement : seules les réponses enregistrées avant la fin du temps sont prises en compte.</p>
 </aside>
 <section class="exam-panel" id="exam-login">
 <h2>Convocation personnelle</h2>
@@ -138,20 +182,20 @@ function render(){
  byId('exam-time-warning').hidden=state.phase!=='pret';
  if(state.phase==='revoque'){panel('<section class="exam-panel"><h2>Convocation révoquée</h2><p>Votre convocation a été retirée par décision du Comité. Contactez le secrétariat.</p></section>');return;}
  if(state.phase==='pret'){
-  panel('<section class="exam-panel"><div class="exam-eyebrow">Convocation vérifiée</div><h2>'+esc(state.name)+'</h2><p>Vous êtes admis à présenter l’épreuve de passage au rang de Rat Homologué.</p><p><strong>Durée maximale :</strong> 30 minutes après le clic sur « Commencer l’épreuve ». Prenez connaissance de l’avertissement ci-dessus avant de vous lancer.</p><p class="exam-muted">Vos réponses sont archivées au fur et à mesure. Les réponses exactes ne sont pas communiquées.</p><div class="exam-buttons"><button type="button" class="exam-button" id="exam-start">Commencer l’épreuve</button></div></section>');
+  panel('<section class="exam-panel"><div class="exam-eyebrow">Convocation vérifiée</div><h2>'+esc(state.name)+'</h2><p>Vous êtes admis à présenter l’épreuve de passage au rang de Rat Homologué.</p><p><strong>Durée maximale :</strong> 15 minutes après le clic sur « Commencer l’épreuve ». Prenez connaissance de l’avertissement ci-dessus avant de vous lancer.</p><p class="exam-muted">Vos réponses sont archivées au fur et à mesure. Les réponses exactes ne sont pas communiquées.</p><div class="exam-buttons"><button type="button" class="exam-button" id="exam-start">Commencer l’épreuve</button></div></section>');
   byId('exam-start').onclick=async function(){if(working)return;working=true;this.disabled=true;try{await request('start','POST',{});await loadState();}catch(e){alertMessage(e.message);this.disabled=false;}finally{working=false;}};
   return;
  }
  if(state.phase==='termine'){
-  panel('<section class="exam-panel"><div class="exam-eyebrow">Procès-verbal de remise</div><h2>Copie placée sous scellés</h2><p><strong>'+esc(state.name)+'</strong>, votre épreuve a été remise au Comité'+(state.reason==='timeout'?' à l’expiration des 30 minutes.':'.')+'</p><p>Les réponses et les horodatages ont été consignés. Le Comité examinera votre dossier et communiquera sa décision selon les usages internes.</p><p class="exam-legal">La note et les bonnes réponses sont réservées au Comité. Le simple fait de terminer l’épreuve n’entraîne aucune promotion automatique.</p></section>');
+  panel('<section class="exam-panel"><div class="exam-eyebrow">Procès-verbal de remise</div><h2>Copie placée sous scellés</h2><p><strong>'+esc(state.name)+'</strong>, votre épreuve a été remise au Comité'+(state.reason==='timeout'?' à l’expiration du temps imparti.':'.')+'</p><p>Les réponses et les horodatages ont été consignés. Le Comité examinera votre dossier et communiquera sa décision selon les usages internes.</p><p class="exam-legal">La note et les bonnes réponses sont réservées au Comité. Le simple fait de terminer l’épreuve n’entraîne aucune promotion automatique.</p></section>');
   return;
  }
  if(state.phase!=='en_cours')return;
  var q=state.questions[index],choice=state.selected[q.no],answered=Object.keys(state.selected).length;
- var options=q.options.map(function(text,i){return '<label class="exam-option'+(choice===i?' chosen':'')+'"><input type="radio" name="answer" value="'+i+'" '+(choice===i?'checked':'')+'><span><strong>'+String.fromCharCode(65+i)+'.</strong> '+esc(text)+'</span></label>';}).join('');
+ var options=q.options.map(function(text,i){return '<label class="exam-option'+(choice===i?' chosen':'')+'"><input type="radio" name="answer" value="'+i+'" '+(choice===i?'checked':'')+'><span class="exam-choice-letter" aria-hidden="true">'+String.fromCharCode(65+i)+'</span><span class="exam-answer-text">'+esc(text)+'</span></label>';}).join('');
  var numbers=state.questions.map(function(item,i){return '<button type="button" class="exam-number'+(state.selected[item.no]!==undefined?' answered':'')+(i===index?' active':'')+'" data-go="'+i+'" aria-label="Question '+(i+1)+'">'+(i+1)+'</button>';}).join('');
  var phase=index<15?'I — Le monde du cigare':'II — Le Cruising Rats Cigar Club';
- panel('<div class="exam-timer"><div><span>CRCC — TEMPS RESTANT</span><br><strong>'+esc(state.name)+'</strong></div><div class="exam-clock" id="exam-clock" aria-live="off">30:00</div></div><div class="exam-progress"><div class="exam-progress-inner" style="width:'+(answered/30*100)+'%"></div></div><section class="exam-panel"><div class="exam-q-meta"><span>QUESTION '+String(index+1).padStart(2,'0')+' / 30</span><span>'+esc(phase)+'</span></div><h2 class="exam-q-text">'+esc(q.text)+'</h2><div id="exam-options">'+options+'</div><p class="exam-muted" id="exam-save">Réponses enregistrées individuellement • '+answered+'/30</p><div class="exam-nav"><button class="exam-button secondary" id="exam-prev" type="button" '+(index===0?'disabled':'')+'>← Précédente</button><button class="exam-button secondary" id="exam-next" type="button" '+(index===29?'disabled':'')+'>Suivante →</button></div><div class="exam-numbers">'+numbers+'</div><div class="exam-buttons"><button type="button" class="exam-button danger" id="exam-submit">Remettre la copie maintenant</button></div><p class="exam-legal">La remise est définitive. Les questions sans réponse ne donnent aucun point. Le chronomètre continue jusqu’à l’enregistrement définitif.</p></section>');
+ panel('<div class="exam-timer"><div><span>CRCC — TEMPS RESTANT</span><br><strong>'+esc(state.name)+'</strong></div><div class="exam-clock" id="exam-clock" aria-live="off">15:00</div></div><div class="exam-progress"><div class="exam-progress-inner" style="width:'+(answered/30*100)+'%"></div></div><section class="exam-panel exam-question-panel"><div class="exam-q-meta"><span>QUESTION '+String(index+1).padStart(2,'0')+' / 30</span><span>'+esc(phase)+'</span></div><h2 class="exam-q-text">'+esc(q.text)+'</h2><div id="exam-options">'+options+'</div><p class="exam-muted exam-answer-save" id="exam-save">Réponses enregistrées individuellement • '+answered+'/30</p><div class="exam-nav"><button class="exam-button secondary" id="exam-prev" type="button" '+(index===0?'disabled':'')+'>← Précédente</button><button class="exam-button secondary" id="exam-next" type="button" '+(index===29?'disabled':'')+'>Suivante →</button></div><div class="exam-numbers">'+numbers+'</div><div class="exam-buttons"><button type="button" class="exam-button danger" id="exam-submit">Remettre la copie maintenant</button></div><p class="exam-legal">La remise est définitive. Les questions sans réponse ne donnent aucun point. Le chronomètre continue jusqu’à l’enregistrement définitif.</p></section>');
  byId('exam-options').querySelectorAll('input').forEach(function(input){input.addEventListener('change',async function(){
   if(working)return;
   working=true;
@@ -190,12 +234,53 @@ byId('exam-login-form').addEventListener('submit',async function(evt){
 });
 var adminMode=new URLSearchParams(location.search).get('comite')==='1';
 if(adminMode){
+ document.querySelector('.exam-main').classList.add('exam-admin-view');
  byId('member-area').hidden=true;byId('committee-area').hidden=false;
  byId('exam-eyebrow').textContent='Registre confidentiel';
  byId('exam-title').textContent='Bureau de la commission';
  byId('exam-lead').textContent='Convocations, résultats et décisions : la discrétion du Comité n’est pas une option.';
 } else loadState();
 function date(sec){return sec?new Intl.DateTimeFormat('fr-FR',{dateStyle:'short',timeStyle:'short',timeZone:'Europe/Paris'}).format(new Date(sec*1000)):'—';}
+
+function renderReview(dossier){
+ var place=byId('committee-review');
+ if(!place)return;
+ var answered=dossier.questions.filter(function(q){return q.selected!==null;}).length;
+ var correct=dossier.questions.filter(function(q){return q.isCorrect===true;}).length;
+ var wrong=dossier.questions.filter(function(q){return q.isCorrect===false;}).length;
+ var answers=dossier.questions.map(function(q){
+  var status=q.selected===null?'unanswered':q.isCorrect?'correct':'incorrect';
+  var letter=function(i){return String.fromCharCode(65+i)+'. '+q.options[i];};
+  return '<article class="exam-review-item '+status+'"><small>QUESTION '+q.no+' / 30 · '+(q.no<=15?'CIGARE':'CRCC')+'</small><h3>'+esc(q.text)+'</h3>'+
+   '<p><span class="exam-review-label">Réponse du candidat :</span> <span class="exam-review-choice">'+(q.selected===null?'Non renseignée':esc(letter(q.selected)))+'</span></p>'+
+   '<p><span class="exam-review-label">Réponse attendue :</span> <strong>'+esc(letter(q.correct))+'</strong></p>'+
+   '<p class="exam-review-label">'+(q.selected===null?'— Non répondu':q.isCorrect?'✓ Bonne réponse':'✕ Réponse incorrecte')+'</p></article>';
+ }).join('');
+ var ended=dossier.finished_at?'Copie clôturée le '+date(dossier.finished_at):dossier.started_at?'Épreuve en cours depuis le '+date(dossier.started_at):'Épreuve non commencée';
+ var total=dossier.score_cigare===null?'En cours':(dossier.score_cigare+dossier.score_club)+'/30';
+ place.hidden=false;
+ place.innerHTML='<div class="exam-review-header"><div><div class="exam-eyebrow">Inspection confidentielle des copies</div><h2>'+esc(dossier.name)+'</h2><p class="exam-muted">'+esc(ended)+'</p></div><button class="exam-button secondary" id="review-close">Fermer</button></div>'+
+ '<div class="exam-review-summary"><div class="exam-review-stat"><strong>'+total+'</strong><span>Note officielle</span></div><div class="exam-review-stat"><strong>'+answered+'/30</strong><span>Réponses données</span></div><div class="exam-review-stat"><strong>'+correct+'</strong><span>Bonnes réponses constatées</span></div><div class="exam-review-stat"><strong>'+wrong+'</strong><span>Erreurs constatées</span></div></div>'+
+ '<div class="exam-review-questions">'+answers+'</div>'+
+ '<div class="exam-review-opinion"><h3>Avis du Comité</h3><p class="exam-muted">Observation libre, archivée dans le dossier de cette tentative. Elle est distincte de la décision d’homologation et n’est pas visible du candidat.</p>'+
+ '<label class="exam-field" for="committee-opinion">Observations et avis du Comité</label><textarea id="committee-opinion" rows="6" maxlength="2500" placeholder="Le Comité constate que…"></textarea>'+
+ '<p class="exam-muted" id="opinion-last-save">'+(dossier.opinionUpdatedAt?'Dernier enregistrement : '+esc(date(dossier.opinionUpdatedAt)):'Aucun avis enregistré à ce jour.')+'</p>'+
+ '<div class="exam-buttons"><button type="button" class="exam-button" id="committee-opinion-save">Enregistrer l’avis</button><span id="committee-opinion-status" role="status" class="exam-muted"></span></div></div>';
+ byId('committee-opinion').value=dossier.opinion||'';
+ byId('review-close').onclick=function(){place.hidden=true;};
+ byId('committee-opinion-save').onclick=async function(){
+  var button=this,field=byId('committee-opinion'),status=byId('committee-opinion-status');
+  button.disabled=true;status.textContent='Enregistrement en cours…';
+  try{
+   var result=await request('admin/opinion','POST',{id:dossier.id,opinion:field.value},true);
+   status.textContent='✓ Avis enregistré dans les archives du Comité.';
+   byId('opinion-last-save').textContent='Dernier enregistrement : '+date(result.updatedAt);
+  }catch(e){status.textContent='Échec : '+e.message;}
+  finally{button.disabled=false;}
+ };
+ place.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
 async function loadAdmin(){
  var members=await request('admin/members','GET',undefined,true);
  var records=await request('admin/invitations','GET',undefined,true);
@@ -206,9 +291,16 @@ async function loadAdmin(){
   var status=a.revoked_at?'Révoquée':a.finished_at?'Terminée':a.started_at?'En cours':a.claimed_at?'Convoqué (code utilisé)':'Convoqué';
   var decision=a.decision==='homologue'?'Homologation approuvée':a.decision==='ajourne'?'Ajournement':'À délibérer';
   var actions=a.revoked_at?'':a.finished_at?'<div class="exam-buttons"><button class="exam-button secondary" data-decision="homologue" data-id="'+esc(a.id)+'">Homologuer</button><button class="exam-button secondary" data-decision="ajourne" data-id="'+esc(a.id)+'">Ajourner</button></div>':'<button class="exam-button danger" data-revoke="'+esc(a.id)+'">Révoquer</button>';
-  return '<tr><td>'+esc(a.member_name)+'</td><td>'+esc(status)+'</td><td>'+esc(total)+'</td><td>'+esc(a.passed?'Seuil atteint':a.score_cigare===null?'—':'Seuil non atteint')+'</td><td>'+esc(decision)+'</td><td>'+esc(date(a.created_at))+'</td><td>'+actions+'</td></tr>';
+  return '<tr><td><strong>'+esc(a.member_name)+'</strong>'+(a.opinion_updated_at?'<div class="exam-admin-note">Avis du Comité enregistré</div>':'')+'</td><td>'+esc(status)+'</td><td>'+esc(total)+'</td><td>'+esc(a.passed?'Seuil atteint':a.score_cigare===null?'—':'Seuil non atteint')+'</td><td>'+esc(decision)+'</td><td>'+esc(date(a.created_at))+'</td><td><button type="button" class="exam-button secondary" data-review="'+esc(a.id)+'">Voir la copie / avis</button>'+actions+'</td></tr>';
  }).join('');
  byId('committee-content').innerHTML='<section class="exam-panel"><div class="exam-eyebrow">Commission d’homologation</div><h2>Émettre une convocation</h2><p>Seuls les Rats de passage possédant au moins trois fiches archivées peuvent être convoqués. Le serveur contrôle ce seuil avant de délivrer un code.</p><label class="exam-field" for="admin-member">Dossier membre</label><select id="admin-member" class="exam-select">'+choices+'</select><div class="exam-buttons"><button class="exam-button" id="admin-issue">Émettre le code à usage unique</button><button class="exam-button secondary" id="admin-refresh">Actualiser le registre</button></div><div id="admin-code"></div></section><section class="exam-panel"><h2>Registre des examens</h2><p class="exam-muted">Seuil proposé : 24/30, dont au moins 10/15 par partie. Toute homologation reste une décision humaine. Aucun grade n’est modifié automatiquement.</p><div class="exam-table-wrap"><table class="exam-table"><thead><tr><th>Membre</th><th>État</th><th>Résultat</th><th>Barème</th><th>Décision</th><th>Convocation</th><th>Visa</th></tr></thead><tbody>'+(rows||'<tr><td colspan="7">Aucune convocation à ce jour.</td></tr>')+'</tbody></table></div></section>';
+ byId('committee-content').insertAdjacentHTML('beforeend','<section class="exam-panel exam-review" id="committee-review" hidden></section>');
+ document.querySelectorAll('[data-review]').forEach(function(btn){btn.onclick=async function(){
+   btn.disabled=true;btn.textContent='Chargement…';
+   try{var dossier=await request('admin/responses?id='+encodeURIComponent(btn.getAttribute('data-review')),'GET',undefined,true);renderReview(dossier);}
+   catch(e){alertMessage(e.message);}
+   finally{btn.disabled=false;btn.textContent='Voir la copie / avis';}
+ };});
  byId('admin-refresh').onclick=function(){loadAdmin().catch(function(e){alertMessage(e.message);});};
  byId('admin-issue').onclick=async function(){
   var id=byId('admin-member').value;if(!id){alertMessage('Aucun membre éligible.');return;}
