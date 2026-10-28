@@ -86,12 +86,32 @@ def grade_progress(person,facts):
 
 def medal_html(person,facts):
     earned=awards_for(person,facts)
-    return ('<section class="card"><h2>Distinctions du membre</h2><p class="archive-meta">'
-            'Distinctions automatiques calculées à partir des archives et distinctions honorifiques décidées par le Comité.</p>'
-            +(''.join('<div class="member-distinction"><span class="badge">✦ '+esc(name)+'</span><p>'+esc(desc)+'</p></div>'
-                      for key,name,desc,kind in DISTINCTIONS if key in earned) if earned else
-              '<p>Aucune distinction encore attribuée. Les dossiers sont suivis.</p>')
-            +'</section>')
+    cards=''.join(
+        '<article class="honour-card"><div class="honour-emblem" aria-hidden="true">✦</div>'
+        '<div class="honour-copy"><span class="honour-type">'+
+        ('Décision du Comité' if kind=='committee' else 'Record' if kind=='record' else 'Distinction statistique')+
+        '</span><h3>'+esc(name)+'</h3><p>'+esc(desc)+'</p></div></article>'
+        for key,name,desc,kind in DISTINCTIONS if key in earned)
+    return ('<section class="card member-honours"><header class="honour-heading"><div><h2>Distinctions du membre</h2>'
+            '<p class="archive-meta">Décorations officiellement acquises</p></div><span class="honour-heading-symbol" aria-hidden="true">✦</span></header>'
+            + ('<div class="honour-list">'+cards+'</div>' if cards else
+               '<p>Aucune distinction encore attribuée. Les dossiers sont suivis.</p>')+'</section>')
+
+def distinctions_directory_html():
+    labels={'auto':'Statistiques','record':'Record','committee':'Comité'}
+    symbols={'poumon-bronze':'✦','collectionneur-vitoles':'▦','cendre-longue':'↟',
+             'coupeur-emerite':'✂','rat-metronome':'◷','rat-centenaire':'100',
+             'quatre-saisons':'❀','rat-encyclopedique':'▤','rat-de-fer':'◆',
+             'rat-au-repos':'◡','sous-surveillance':'⌕','tres-administratif':'≡',
+             'palmes-coupe-cigare':'✧','silence-observateur':'…','rat-emerite':'★'}
+    groups=[('Statistiques','auto'),('Records','record'),('Honneurs du Comité','committee')]
+    sections=[]
+    for title,kind in groups:
+        items=''.join('<article class="distinction-card"><span class="distinction-icon" aria-hidden="true">'+symbols.get(key,'✦')+'</span>'
+                      '<div><h4>'+esc(name)+'</h4><p>'+esc(desc)+'</p><small>'+labels[kind]+'</small></div></article>'
+                      for key,name,desc,k in DISTINCTIONS if k==kind)
+        sections.append('<div class="distinction-group"><h3>'+title+'</h3><div class="distinction-grid">'+items+'</div></div>')
+    return '<section class="card distinction-directory"><h2>Répertoire des distinctions</h2><p class="archive-meta">Décorations et reconnaissances officielles</p>'+''.join(sections)+'</section>'
 
 def record_html(people,sessions,archive):
     metrics=[('Cendre la plus longue','ashes','cm'),('Dégustation la plus longue','minutes','minutes'),
@@ -113,11 +133,15 @@ def record_html(people,sessions,archive):
     return '<section class="card"><h2>Registre des records homologables</h2><p class="archive-meta">Calculé uniquement à partir des informations archivées ; les mesures absentes ne sont pas estimées.</p><div class="table-scroll"><table><tbody>'+''.join(rows)+'</tbody></table></div></section>'
 
 def hierarchy_html():
-    return '<section class="card"><h2>Ordre des grades</h2><ol>'+''.join(
-        '<li><strong>'+esc(label)+'</strong> — '+str(fiches)+' fiches'+
-        (' · '+str(sessions)+' séances minimum' if sessions else '')+
-        (' · '+str(months)+' mois minimum' if months else '')+'</li>'
-        for label,fiches,sessions,months in GRADES)+'</ol><p>Les seuils ouvrent un droit à examen, jamais une promotion automatique. Le Comité valide chaque changement de grade. Le Président demeure hors hiérarchie.</p></section>'
+    rows=[]
+    for rank,(label,fiches,sessions,months) in enumerate(GRADES,1):
+        conditions=[str(fiches)+' fiche'+('s' if fiches!=1 else '')]
+        if sessions:conditions.append(str(sessions)+' séances minimum')
+        if months:conditions.append(str(months)+' mois minimum')
+        rows.append('<li class="grade-step"><span class="grade-ordinal" aria-hidden="true">'+('I','II','III','IV','V')[rank-1]+'</span>'
+                    '<div class="grade-step-content"><strong>'+esc(label)+'</strong><span>'+esc(' · '.join(conditions))+'</span></div></li>')
+    return ('<section class="card grade-order"><h2>Ordre des grades</h2><p class="archive-meta">Hiérarchie officielle du CRCC</p>'
+            '<ol class="grade-steps">'+''.join(rows)+'</ol><p class="grade-note">Les seuils ouvrent droit à un examen, jamais à une promotion automatique. Le Comité valide chaque changement de grade. Le Président demeure hors hiérarchie.</p></section>')
 
 def build_members(archive, data):
     root = archive.ROOT
@@ -195,7 +219,7 @@ def build_members(archive, data):
             continue
         directory += f'<li class="card member-directory-card">{grade_badge(person, compact=True)}<div class="directory-details"><div class="directory-heading"><h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2><span class="badge">{esc(person.get("grade") or "Grade non renseigné")}</span></div><p class="archive-meta">{len(attended)} séance' + ('s' if len(attended)>1 else '') + f' · {len(sheets)} fiche' + ('s' if len(sheets)>1 else '') + f'<br>{first}</p><a class="directory-profile" href="{archive.member_url(person)}" aria-label="Consulter le profil de {esc(person["name"])}">Profil et statistiques →</a></div></li>'
     directory += '</ul>'+hierarchy_html()+record_html(people,sessions,archive)
-    directory += '<section class="card"><h2>Répertoire des distinctions</h2><ul>'+''.join('<li><strong>'+esc(name)+'</strong> — '+esc(desc)+' <small>('+ ('Comité' if kind=='committee' else 'record' if kind=='record' else 'statistiques')+')</small></li>' for _,name,desc,kind in DISTINCTIONS)+'</ul></section>'
+    directory += distinctions_directory_html()
     directory += '<p class="archive-meta">Les grades affichés correspondent aux dernières informations documentées. Les statistiques portent sur les contributions archivées.</p><p class="archive-footer"><a href="index.html">← Toutes les séances de dégustation</a></p>'
     (root/'fiches-degustation/registre-membres.html').write_text(archive.shell('Registre des membres','registre-membres.html',directory))
     return pages + ['registre-membres.html']
