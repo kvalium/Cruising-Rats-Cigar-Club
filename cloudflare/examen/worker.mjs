@@ -46,7 +46,7 @@ async function redeem(request,env){
   const token=randomCode(), hash=await digest(token), codeHash=await digest(code);
   const res=await env.EXAMS_DB.prepare('UPDATE exam_invites SET session_hash=?,claimed_at=unixepoch() WHERE code_hash=? AND session_hash IS NULL AND revoked_at IS NULL RETURNING id').bind(hash,codeHash).first();
   if(!res)return error('Code inconnu, révoqué ou déjà utilisé. Contactez le Comité.',403);
-  return response({ok:true},{}, {'Set-Cookie':'crcc_exam='+token+'; HttpOnly; Secure; SameSite=Strict; Path=/examen; Max-Age=604800'});
+  return response({ok:true},200, {'Set-Cookie':'crcc_exam='+token+'; HttpOnly; Secure; SameSite=Strict; Path=/examen; Max-Age=604800'});
 }
 async function start(request,env){
   const invite=await session(request,env);
