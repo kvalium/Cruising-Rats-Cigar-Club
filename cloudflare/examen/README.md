@@ -17,7 +17,7 @@ Les secrets ne sont **jamais** placés dans le dépôt.
 
 **Indispensable avant toute émission de convocation :** configurer le secret `CRCC_EXAM_ADMIN_PASSWORD` dans Cloudflare > Workers & Pages > `crcc-examen` > Settings > Variables and Secrets > Add > Secret.
 
-Le mot de passe est conservé séparément dans le fichier remis au Comité `CRCC_Acces_Comite_Examen.txt` : ne jamais le publier dans GitHub ni communiquer à un candidat.
+Le mot de passe doit rester dans le gestionnaire de secrets du Comité : ne jamais le publier dans GitHub ni communiquer à un candidat.
 
 Contrôler ensuite le bureau privé et créer une convocation, en choisissant un membre éligible.
 
@@ -38,6 +38,16 @@ Le Comité peut saisir jusqu'à **2 500 caractères** dans **Avis du Comité**, 
 La table `exam_opinions` est définie dans `schema.sql`. Sur une base existante, les nouvelles routes administratives l'initialisent automatiquement au premier accès authentifié (`CREATE TABLE IF NOT EXISTS`). Cette table est incluse dans les sauvegardes de `crcc-examens`.
 
 Pour redéployer le Worker via API, conserver le secret `CRCC_EXAM_ADMIN_PASSWORD` en utilisant `keep_bindings: ["secret_text"]` dans les métadonnées de l'upload et vérifier sa présence après le déploiement.
+
+## Codes de test réservés au Comité
+
+Le Bureau du Comité (`/examen?comite=1`) propose **Générer un code de test du Comité**. Cet appel authentifié utilise `POST /examen/api/admin/test-invitation`, retourne un code cryptographiquement aléatoire de 64 caractères (32 octets) et le montre **une seule fois**.
+
+La convocation créée suit le même parcours que celle d'un membre : code à usage unique, session privée, 30 questions, 15 minutes, réponses et correction. Les codes de test ne nécessitent **aucune fiche ni aucun profil membre**. Leur `member_id` technique unique commence par `crcc-test-` ; seul le SHA-256 du code est conservé, sans modifier le schéma D1.
+
+Ces essais sont distingués dans un **registre technique séparé**. Ils ne figurent pas parmi les convocations des membres, ne sont pas comptés dans leur appréciation, ne produisent aucune décision d'homologation et ne modifient jamais les grades. La route `admin/decision` refuse explicitement une décision sur un test. Les essais peuvent être consultés, corrigés et révoqués par le Comité.
+
+Pour faire le test : ouvrir le Bureau du Comité, cliquer sur **Générer un code de test du Comité**, copier le code, ouvrir `/examen` dans un autre navigateur ou une fenêtre privée, échanger le code puis cliquer sur **Commencer l'épreuve**. Les 15 minutes démarrent seulement à ce clic. Il n'est pas nécessaire de déployer un nouveau Worker pour chaque code.
 
 ## Points de vigilance
 
