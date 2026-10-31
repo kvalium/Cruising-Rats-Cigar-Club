@@ -33,6 +33,7 @@ async function loadQueue() {
 }
 async function openDossier(id) {
   clearInterval(poll);current=await call('/'+id);const row=current,editable=['pending','needs_info'].includes(row.status);
+  $('analysis-prompt').value='';$('prompt-output').hidden=true;
   $('review-dossier').hidden=false;$('review-title').textContent=row.payload.title+' · '+(catalog.states[row.status]||row.status);
   $('review-files').innerHTML=attachmentsHtml(row.files,id);
   $('review-files').querySelectorAll('a').forEach(link=>link.onclick=async event=>{
@@ -63,3 +64,12 @@ $('review-form').onsubmit=event=>{event.preventDefault();action(async()=>{if(!$(
 for(const [button,status]of [['request-info','needs_info'],['reject','rejected']])$(button).onclick=()=>action(async()=>{const feedback=$('decision-feedback').value.trim();if(!feedback)throw Error('Renseigner le motif ou les compléments attendus.');await call('/'+current.id+'/decision','POST',{status,feedback,version:current.version});message(status==='needs_info'?'Le déposant peut compléter son dossier.':'Dossier refusé ; les pièces et le motif sont conservés.');await openDossier(current.id);await loadQueue();});
 $('check-publication').onclick=()=>action(checkPublication);
 $('retry-publication').onclick=()=>action(async()=>{await call('/'+current.id+'/retry','POST',{});await openDossier(current.id);message('Publication relancée.');});
+$('prepare-prompt').onclick=()=>action(async()=>{
+  const result=await call('/'+current.id+'/prompt');$('analysis-prompt').value=result.prompt;$('prompt-output').hidden=false;
+  message('Prompt préparé depuis la version enregistrée du dossier. Copiez-le dans la conversation CRCC pour lancer l’analyse.');
+});
+$('copy-prompt').onclick=async()=>{
+  const area=$('analysis-prompt');
+  try{await navigator.clipboard.writeText(area.value);message('Prompt copié. Collez-le dans la conversation CRCC.');}
+  catch{area.focus();area.select();message('Le prompt est sélectionné. Utilisez la commande Copier de votre navigateur.');}
+};

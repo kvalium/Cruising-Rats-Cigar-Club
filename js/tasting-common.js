@@ -16,20 +16,22 @@ export function field(label,name,value='',options={}) {
   const attrs=`id="${id}" name="${esc(name)}" ${options.required?'required':''} ${options.type==='number'?'min="0" step="'+(options.integer?'1':'any')+'"':''} ${options.max!=null?'max="'+options.max+'"':''} ${options.readonly?'readonly':''}`;
   return `<label class="tasting-field ${options.wide?'wide':''}" for="${id}"><span>${esc(label)}${options.required?' *':''}</span>${options.area?`<textarea ${attrs} rows="${options.rows||3}" maxlength="${options.limit||10000}">${esc(value)}</textarea>`:`<input ${attrs} type="${options.type||'text'}" value="${esc(value)}" maxlength="${options.limit||500}">`}${options.hint?`<small>${esc(options.hint)}</small>`:''}</label>`;
 }
-export function sessionFields(data={}) {
+export function sessionFields(data={},compact=false) {
   return `<section class="card"><p class="office-eyebrow">01 · La séance</p><h2>Repères communs</h2><div class="tasting-grid">`+
-    field('Date de dégustation','date',data.date,{type:'date',required:true})+field('Titre de la séance','title',data.title,{required:true,limit:180})+
-    field('Lieu','place',data.place)+field('Fond sonore','music',data.music)+field('Heure de début','start_time',data.start_time,{type:'time'})+field('Heure de fin','end_time',data.end_time,{type:'time'})+
+    field('Date de dégustation','date',data.date,{type:'date',required:true})+(compact?'':field('Titre de la séance','title',data.title,{required:true,limit:180})+field('Lieu','place',data.place)+field('Fond sonore','music',data.music))+field('Heure de début','start_time',data.start_time,{type:'time'})+field('Heure de fin','end_time',data.end_time,{type:'time'})+
     field('Contexte de la dégustation','context',data.context,{area:true,wide:true,limit:4000})+
-    field('Prospects et invités présents','prospects',data.prospects,{area:true,wide:true,limit:1000,hint:'Une personne par ligne. Utiliser les initiales souhaitées pour les archives.'})+
+    field('Invités présents','prospects',data.prospects,{area:true,wide:true,limit:1000,hint:'Une personne par ligne. Utiliser les initiales souhaitées pour les archives.'})+
     field('Notes complémentaires sur la séance','notes',data.notes,{area:true,wide:true,limit:10000,hint:'Événements, météo, ambiance, précisions absentes des fiches. Attribuer les propos et les mesures à leur auteur.'})+'</div></section>';
 }
 const numbers=[['Note personnelle du cigare /10','cigar_score',10],['Durée de dégustation (min)','duration_minutes',1440,true],['Cendre maximale (cm)','ash_max_cm',60],['Rallumages','relights',100,true],['Retouches','touchups',100,true],['Puissance ressentie /10','strength_score',10],['Richesse ressentie /10','richness_score',10],['Longueur mesurée (mm)','length_mm',1000],['Calibre / cepo','ring_gauge',200],['Humidité de conservation (%)','humidity',100],['Température de conservation (°C)','temperature',80]];
 export function memberFields(m,roster,index,admin=false) {
   const prefix=`m-${index}-`,known=roster.some(p=>p.id===m.id),options=roster.map(p=>`<option value="${esc(p.id)}" ${p.id===m.id?'selected':''}>${esc(p.name)}</option>`).join('');
-  return `<section class="card tasting-member" data-member-index="${index}" data-member-id="${esc(m.id||'')}"><div class="tasting-heading"><div><p class="office-eyebrow">Participant ${index+1}</p><h3>${esc(m.name||'Membre présent')}</h3></div>${admin?'':`<button class="secondary remove-member" type="button">Retirer</button>`}</div><div class="tasting-grid">`+
-    `<label class="tasting-field"><span>Membre *</span><select name="member-select" ${admin?'disabled':''}><option value="">Sélectionner un membre</option>${options}<option value="new" ${m.id&&!known?'selected':''}>Nouveau membre</option></select></label>`+
-    field('Nom du nouveau membre',prefix+'name',m.name,{readonly:known||admin})+
+  const opening=`<section class="card tasting-member" data-member-index="${index}" data-member-id="${esc(m.id||'')}"><div class="tasting-heading"><div><p class="office-eyebrow">Participant ${index+1}</p><h3>${esc(m.name||'Membre présent')}</h3></div>${admin?'':`<button class="secondary remove-member" type="button">Retirer</button>`}</div><div class="tasting-grid">`;
+  const select=`<label class="tasting-field"><span>Membre *</span><select name="member-select" ${admin?'disabled':''}><option value="">Sélectionner un membre</option>${options}</select></label>`;
+  const hasSheet=`<label class="tasting-check"><input name="has_sheet" type="checkbox" ${m.has_sheet===false?'':'checked'}> Une fiche est jointe pour ce membre</label>`;
+  if(!admin)return opening+select+hasSheet+'</div><div class="member-details" '+(m.has_sheet===false?'hidden':'')+'><label class="tasting-field"><span>Fiche de dégustation</span><input class="sheet-file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" multiple><small>Un PDF ou plusieurs scans (15 Mo maximum pour le PDF final).</small></label></div></section>';
+  return opening+select+
+    field('Nom du membre',prefix+'name',m.name,{readonly:known||admin})+
     field('Grade lors de la séance',prefix+'grade',m.grade,{hint:admin?'À confirmer au vu des pièces. Aucun changement automatique de grade.':'Grade historique, à confirmer par le Comité.'})+
     `<label class="tasting-check"><input name="has_sheet" type="checkbox" ${m.has_sheet===false?'':'checked'}> Une fiche est jointe pour ce membre</label></div>`+
     `<div class="member-details" ${m.has_sheet===false?'hidden':''}><div class="tasting-grid">`+
@@ -47,7 +49,7 @@ export function readForm(form) {
   data.members=[...form.querySelectorAll('[data-member-index]')].map(section=>{
     const index=section.dataset.memberIndex,prefix=`m-${index}-`,val=k=>String(fd.get(prefix+k)||'').trim();
     const id=section.dataset.memberId;
-    if(!id)throw Error('Sélectionner chaque membre présent et saisir le nom des nouveaux membres.');
+    if(!id)throw Error('Sélectionner chaque membre présent dans le registre.');
     const m={id,name:val('name'),grade:val('grade'),has_sheet:section.querySelector('[name=has_sheet]').checked};
     for(const key of ['brand','cigar','reference_exact','module','origin','sheet_title','cut','draw','storage','stop_reason','price','notes'])m[key]=val(key);
     for(const [,key]of numbers)m[key]=val(key)===''?null:Number(val(key));
@@ -57,15 +59,26 @@ export function readForm(form) {
   return data;
 }
 export function wireMember(section,roster) {
-  const name=section.querySelector('input[name$="-name"]'),grade=section.querySelector('input[name$="-grade"]'),select=section.querySelector('select');
+  const select=section.querySelector('select');
   select.addEventListener('change',()=>{
     const p=roster.find(p=>p.id===select.value);
-    section.dataset.memberId=p?.id||'';name.readOnly=Boolean(p);name.value=p?.name||'';grade.value=p?.grade||'';
-    section.querySelector('h3').textContent=p?.name||'Nouveau membre';
+    section.dataset.memberId=p?.id||'';
+    section.querySelector('h3').textContent=p?.name||'Membre présent';
   });
-  name.addEventListener('input',()=>{if(select.value==='new'){section.dataset.memberId=name.value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');section.querySelector('h3').textContent=name.value||'Nouveau membre';}});
   section.querySelector('[name=has_sheet]').addEventListener('change',event=>{section.querySelector('.member-details').hidden=!event.target.checked;});
   section.querySelector('.remove-member')?.addEventListener('click',()=>section.remove());
+}
+export function readSubmissionForm(form,roster,previous={}) {
+  const fd=new FormData(form),data={...previous};
+  for(const key of ['date','start_time','end_time','context','prospects','notes'])data[key]=String(fd.get(key)||'').trim();
+  data.title=/^Dégustation du \d{2}\/\d{2}\/\d{4}$/.test(previous.title||'')?'':previous.title||'';
+  data.members=[...form.querySelectorAll('[data-member-index]')].map(section=>{
+    const person=roster.find(p=>p.id===section.dataset.memberId);
+    if(!person)throw Error('Sélectionner chaque membre présent dans le registre.');
+    const old=previous.members?.find(m=>m.id===person.id)||{};
+    return {...old,id:person.id,name:person.name,grade:old.grade||person.grade||'',has_sheet:section.querySelector('[name=has_sheet]').checked};
+  });
+  return data;
 }
 export async function imageCanvas(file,max) {
   if(file.size>25*1024*1024)throw Error('Image trop volumineuse : 25 Mo maximum par original.');

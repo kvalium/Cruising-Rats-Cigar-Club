@@ -6,6 +6,7 @@ import {spawnSync} from 'node:child_process';
 import {handleTasting} from '../functions/lib/tasting-api.js';
 import {cleanSubmission,validateUpload} from '../functions/lib/tasting-model.js';
 import {signedRequest} from '../functions/lib/tasting-storage.js';
+import {sessionFields,memberFields} from '../js/tasting-common.js';
 
 const root=resolve(import.meta.dirname,'..'),temporary=mkdtempSync(join(tmpdir(),'crcc-tastings-')),database=join(temporary,'test.db');
 function sqlite(request) {
@@ -46,11 +47,22 @@ async function request(path,method='GET',body,options={}) {
 const person={id:'test-rat',name:'Rat de contrôle',grade:'Rat de Passage',has_sheet:true,cigar:'Cigare déclaré',brand:'Marque',cigar_score:0,duration_minutes:0,relights:0,aromas:['Bois','Bois'],pairings:['Rhum','Verveine'],notes:'Observation personnelle'};
 const original={date:'2026-10-31',title:'Séance de contrôle',context:'Pièces synthétiques',members:[person,{id:'witness',name:'Témoin',grade:'Rat de Passage',has_sheet:false}]};
 const normalized=cleanSubmission(original);assert.equal(normalized.members[0].cigar_score,0);assert.equal(normalized.members[0].relights,0);assert.equal(normalized.members[0].touchups,null);assert.deepEqual(normalized.members[0].aromas,['Bois']);
+const compact=sessionFields({},true);
+assert.deepEqual([...compact.matchAll(/name="([^"]+)"/g)].map(m=>m[1]),['date','start_time','end_time','context','prospects','notes']);
+const memberMarkup=memberFields(person,[person],0);
+assert.ok(!memberMarkup.includes('Nouveau membre')&&!memberMarkup.includes('value="new"'));
+assert.ok(!memberMarkup.includes('m-0-cigar')&&!memberMarkup.includes('m-0-grade'));
+assert.ok(memberMarkup.includes('sheet-file')&&memberMarkup.includes('has_sheet'));
+assert.equal(cleanSubmission({...original,title:undefined}).title,'Dégustation du 31/10/2026');
 assert.throws(()=>cleanSubmission({...original,date:'2026-02-31'}));
 assert.equal((await request('/catalog','GET',undefined,{headers:{Authorization:''}})).status,401);
 assert.equal((await request('/admin/list')).status,403);
 assert.equal((await request('/draft','POST',{}, {headers:{Origin:'https://evil.test'}})).status,403);
 const client_id=crypto.randomUUID();let r=await request('/draft','POST',{client_id,data:original});assert.equal(r.status,201);const id=r.data.id;
+const invalidMember=await request('/draft','POST',{client_id:crypto.randomUUID(),data:{...original,members:[{...person,id:'unregistered',name:'Nouveau membre'}]}});
+assert.equal(invalidMember.status,400);
+assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM members').first()).n,2);
+assert.equal((await request('/admin/'+id+'/prompt')).status,403);
 assert.equal((await request('/draft','POST',{client_id,data:original})).data.id,id);
 assert.equal((await request('/draft/'+id,'GET',undefined,{headers:{Cookie:''}})).status,403);
 assert.equal((await request('/draft/'+id+'/submit','POST',{version:1})).status,400);
@@ -68,6 +80,13 @@ const photo=new Uint8Array(image.stdout);assert.deepEqual(validateUpload(photo.b
 assert.throws(()=>validateUpload(new TextEncoder().encode('<svg/>').buffer,'photo'));
 assert.equal((await request('/draft/'+id+'/files','POST',{kind:'photo',slot:'photo-11',alt:'x',name:'x'})).status,400);
 await attach('photo','photo-1',photo);await attach('thumbnail','photo-1-thumb',photo);
+const prepared=await request('/admin/'+id+'/prompt','GET',undefined,{admin:true});
+assert.equal(prepared.status,200);assert.ok(prepared.data.prompt.includes(id));
+assert.ok(prepared.data.prompt.includes('Fiche')||prepared.data.prompt.includes('fiche.pdf'));
+assert.ok(prepared.data.prompt.includes('Ne valide pas le dossier'));
+assert.ok(prepared.data.prompt.includes('membres existants'));
+assert.ok(!prepared.data.prompt.includes('owner_hash')&&!prepared.data.prompt.includes(env.CRCC_S3_SECRET_ACCESS_KEY));
+assert.equal((await request('/draft/'+id)).data.version,1,'Prompt preparation must not change the dossier');
 r=await request('/draft/'+id+'/submit','POST',{version:1});assert.equal(r.status,200);
 assert.equal((await request('/draft/'+id,'PUT',{data:original,version:2})).status,409);
 assert.equal((await request('/draft/'+id+'/files/'+file.id,'DELETE')).status,409);

@@ -1,4 +1,4 @@
-import {api,API,esc,uuid,sessionFields,memberFields,wireMember,readForm,documentPdf,optimizePhoto,attachmentsHtml} from './tasting-common.js';
+import {api,API,esc,uuid,sessionFields,memberFields,wireMember,readSubmissionForm,documentPdf,optimizePhoto,attachmentsHtml} from './tasting-common.js';
 const $=id=>document.getElementById(id),form=$('tasting-form');
 let roster=[],states={},current=null,index=0,busy=false,clientId=uuid(),photoUrls=[],photoUploads=new Map();
 const message=(text,error=false)=>{$('tasting-message').textContent=text;$('tasting-message').dataset.error=error;};
@@ -7,7 +7,7 @@ function lock(value){busy=value;form.querySelectorAll('button').forEach(b=>b.dis
 function render(data={members:[{has_sheet:true}]}) {
   photoUrls.forEach(URL.revokeObjectURL);photoUrls=[];
   photoUploads.clear();
-  $('session-fields').innerHTML=sessionFields(data);$('member-fields').innerHTML='';index=0;
+  $('session-fields').innerHTML=sessionFields(data,true);$('member-fields').innerHTML='';index=0;
   for(const m of data.members||[])addMember(m);
   $('photos').value='';$('minutes').value='';$('photo-captions').innerHTML='';
   $('existing-files').innerHTML=attachmentsHtml(current?.files||[],current?.id,['draft','needs_info'].includes(current?.status));
@@ -27,7 +27,7 @@ async function loadMine(){const r=await api('/mine');$('my-submissions').innerHT
 async function loadDraft(id){if(busy)return;current=await api('/draft/'+id);sessionStorage.setItem('crcc-tasting-draft',id);render(current.payload);message('');form.scrollIntoView({behavior:'smooth'});}
 async function save() {
   if(!form.reportValidity())throw Error('Compléter les champs obligatoires.');
-  const data=readForm(form);
+  const data=readSubmissionForm(form,roster,current?.payload||{});
   if(current){const r=await api('/draft/'+current.id,'PUT',{data,version:current.version});current={...current,payload:data,version:r.version};}
   else{current=await api('/draft','POST',{data,client_id:clientId});sessionStorage.setItem('crcc-tasting-draft',current.id);}
   $('draft-reference').textContent=`Dossier ${current.id.slice(0,8).toUpperCase()} · Brouillon`;return data;
@@ -51,7 +51,7 @@ async function uploadSelected(data) {
     if(photoUploads.get(i)?.done)continue;
     progress(`Optimisation et transfert de la photo ${i+1}/${photos.length}…`);
     const optimized=await optimizePhoto(photos[i]);let n=1;while(used.has(`photo-${n}`))n++;const slot=photoUploads.get(i)?.slot||`photo-${n}`;n=Number(slot.split('-')[1]);used.add(slot);photoUploads.set(i,{slot,done:false});
-    const alt=$('photo-captions').querySelector(`[name="photo-alt-${i}"]`).value,caption=$('photo-captions').querySelector(`[name="photo-caption-${i}"]`).value;
+    const alt=`Photo ${n} de la séance du ${data.date}`,caption='';
     await upload(optimized.full,{kind:'photo',slot,name:`Photo ${n}.webp`,alt,caption});
     await upload(optimized.thumbnail,{kind:'thumbnail',slot:slot+'-thumb',name:`Miniature ${n}.webp`});
     photoUploads.set(i,{slot,done:true});
@@ -81,6 +81,6 @@ $('photos').onchange=()=>{
   photoUploads.clear();
   photoUrls.forEach(URL.revokeObjectURL);photoUrls=[];const photos=[...$('photos').files];
   if(photos.length+(current?.files||[]).filter(f=>f.kind==='photo').length>10){$('photos').value='';$('photo-captions').innerHTML='';message('Dix photos maximum par séance.',true);return;}
-  $('photo-captions').innerHTML=photos.map((f,i)=>{const url=URL.createObjectURL(f);photoUrls.push(url);return `<figure><img src="${url}" alt="Aperçu de la photo ${i+1}"><label class="tasting-field"><span>Description de la photo *</span><input name="photo-alt-${i}" required maxlength="500" placeholder="Ex. : cigares et fiches sur la table"></label><label class="tasting-field"><span>Légende (facultative)</span><input name="photo-caption-${i}" maxlength="1000"></label></figure>`;}).join('');
+  $('photo-captions').innerHTML=photos.map((f,i)=>{const url=URL.createObjectURL(f);photoUrls.push(url);return `<figure><img src="${url}" alt="Aperçu de la photo ${i+1}"><figcaption>Photo ${i+1}</figcaption></figure>`;}).join('');
 };
 (async()=>{try{const catalog=await api('/catalog');roster=catalog.members;states=catalog.states;render();if(!catalog.storage_ready)message('Le stockage des pièces est en cours de configuration. La saisie du brouillon reste disponible.');await loadMine();const saved=sessionStorage.getItem('crcc-tasting-draft');if(saved)await loadDraft(saved);}catch(e){message(e.message,true);}})();

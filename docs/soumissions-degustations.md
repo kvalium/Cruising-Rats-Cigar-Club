@@ -14,14 +14,17 @@ local. Fermer l’accréditation vide cette mémoire.
 
 ## Saisie et pièces
 
-La séance contient date, titre, lieu, horaires, contexte, ambiance sonore,
-prospects et notes complémentaires. Chaque membre peut déclarer sa présence avec
+Le formulaire conserve uniquement la date, les heures de début et de fin, le
+contexte, les invités présents et les notes complémentaires. Le titre provisoire
+est généré depuis la date et peut être précisé après l’analyse. Chaque membre déclare sa présence avec
 ou sans fiche ; au moins une fiche est nécessaire pour publier une séance.
-Les profils existants sont réutilisés. Les nouveaux noms sont contrôlés contre
-le registre pour éviter les doublons manifestes ; le Comité confirme les grades
-historiques avant publication. Aucune promotion n’est calculée à l’approbation.
+Seuls les profils existants sont sélectionnables ; le serveur refuse également
+un identifiant absent du registre. Aucun nouveau membre ne peut être créé dans
+ce circuit. Le Comité confirme les grades historiques avant publication.
+Aucune promotion n’est calculée à l’approbation.
 
-Les données individuelles comprennent référence, marque, origine, module, coupe,
+Les données individuelles ne sont plus ressaisies par le déposant : elles sont
+extraites par l’analyse ChatGPT des fiches, des minutes et des photos. Elles comprennent référence, marque, origine, module, coupe,
 tirage, durée, prix, note personnelle /10, arômes, accompagnements distincts,
 cendre, rallumages, retouches, puissance, richesse, dimensions, conservation et
 notes. Les valeurs absentes deviennent `null`, jamais zéro. Les observations
@@ -33,7 +36,8 @@ Les photos sont limitées à **10 par séance**, converties avant transfert en
 WebP : vue agrandie de 1920 px maximum, miniature de 640 px maximum. La conversion
 canvas retire les métadonnées et applique l’orientation. Le serveur contrôle le
 format, les dimensions, la taille, les métadonnées interdites et les dix
-emplacements autorisés ; une description est requise, une légende facultative.
+emplacements autorisés ; une description neutre est générée automatiquement
+pour chaque photo, sans imposer de champ supplémentaire au déposant.
 Le transfert s’effectue fichier par fichier pour éviter un formulaire géant.
 
 ## Stockage et configuration
@@ -62,6 +66,20 @@ droit de suppression ni d’accès aux autres préfixes. La rotation des clés p
 par les secrets Pages, sans modification du code.
 
 ## Examen, décisions et publication
+
+Depuis un dossier ouvert dans le Bureau du Comité, **Préparer le prompt ChatGPT**
+produit un texte prêt à copier dans la conversation CRCC. Le prompt est préparé
+côté serveur à partir de la dernière version enregistrée et de l’inventaire des
+pièces reçues, avec l’identifiant complet du dossier, les règles d’extraction,
+la vérification factuelle et le barème. Il ne contient aucune clé ni URL d’accès
+temporaire et ne lance pas d’appel à l’API OpenAI.
+
+Le prompt demande à ChatGPT de récupérer les pièces via les connexions autorisées,
+ou de demander les documents si elles sont indisponibles, puis de préparer et,
+si autorisé, enregistrer un brouillon `payload`/`review` dans ce même dossier,
+en conservant l’original et l’historique avec contrôle de version. Il interdit
+toute validation ou publication automatique. Actualiser et rouvrir le dossier
+après l’analyse pour relire les champs détaillés et décider de la publication.
 
 Les états sont : brouillon, à examiner, compléments demandés, refusée, validation
 en cours, publication en cours, publication à relancer, publiée.

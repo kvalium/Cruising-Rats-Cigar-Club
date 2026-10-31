@@ -28,9 +28,10 @@ export function cleanSubmission(input) {
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date))||new Date(date).toISOString().slice(0,10)!==date) fail('Date de séance invalide.');
   const out={date};
   for(const [key,label,max,required] of [
-    ['title','titre',180,true],['place','lieu',250],['start_time','début',5],['end_time','fin',5],
+    ['title','titre',180],['place','lieu',250],['start_time','début',5],['end_time','fin',5],
     ['context','contexte',4000],['notes','notes complémentaires',10000],['prospects','prospects',1000],['music','ambiance sonore',400],
   ]) out[key]=text(input[key],label,max,required);
+  if(!out.title)out.title='Dégustation du '+date.split('-').reverse().join('/');
   for(const k of ['start_time','end_time']) if(out[k]&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(out[k])) fail('Horaire invalide.');
   if(!Array.isArray(input.members)||!input.members.length||input.members.length>20) fail('Déclarer entre 1 et 20 membres.');
   const ids=new Set();

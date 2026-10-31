@@ -1,6 +1,7 @@
 import {publish} from '../../cloudflare/worker.mjs';
 import {sha256,s3,copyAsset,storageReady} from './tasting-storage.js';
 import {cleanSubmission,cleanReview,validateUpload,EDITABLE,STATES,RUBRIC,slug,safe,text,fail} from './tasting-model.js';
+import {analysisPrompt} from './tasting-analysis-prompt.js';
 
 const COOKIE='crcc_tasting_owner';
 const cookie=value=>`${COOKIE}=${value}; Path=/fiches-degustation/; Secure; HttpOnly; SameSite=Strict; Max-Age=2592000`;
@@ -39,8 +40,9 @@ async function validatePeople(db,data) {
   const roster=await members(db);
   for(const m of data.members){
     const existing=roster.find(p=>p.id===m.id);
-    if(existing)m.name=existing.name;
-    else if(roster.some(p=>slug(p.name)===slug(m.name)))fail('Ce membre existe déjà : sélectionner son profil.');
+    if(!existing)fail('Sélectionner un membre existant du registre. Aucun nouveau membre ne peut être créé depuis une dégustation.');
+    m.name=existing.name;
+    if(!m.grade)m.grade=existing.grade||'';
   }
 }
 function checkFiles(data,attachments) {
@@ -137,9 +139,10 @@ export async function handleTasting({request,env}) {
     return new Response(r.body,{headers:{'Content-Type':file.type,'Content-Disposition':`inline; filename="${file.kind==='sheet'?'fiche':file.kind==='minutes'?'minutes':'photo'}.${file.type==='application/pdf'?'pdf':'webp'}"`,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"sandbox; frame-ancestors 'self'",'X-Robots-Tag':'noindex,nofollow'}});
   }
   if(path==='/admin/list'&&request.method==='GET')return json({submissions:(await db.prepare("SELECT id,status,payload,version,feedback,session_id,created_at,updated_at,submitted_at FROM tasting_submissions WHERE status<>'draft' ORDER BY updated_at DESC LIMIT 100").all()).results.map(r=>({...r,payload:JSON.parse(r.payload)}))});
-  const match=/^\/(draft|admin)\/([a-f0-9-]{36})(?:\/(files|submit|decision|approve|check|retry)(?:\/([a-f0-9-]{36}))?)?$/.exec(path);
+  const match=/^\/(draft|admin)\/([a-f0-9-]{36})(?:\/(files|submit|decision|approve|check|retry|prompt)(?:\/([a-f0-9-]{36}))?)?$/.exec(path);
   if(!match)fail('Route inconnue.',404);
   const [,scope,id,action,fileId]=match,row=await getSubmission(db,id,request,env,scope==='admin');
+  if(action==='prompt'&&scope==='admin'&&request.method==='GET')return json({prompt:analysisPrompt(row,await files(db,id)),version:row.version});
   if(!action&&request.method==='GET')return json(publicRow(row,await files(db,id),(await db.prepare('SELECT event,details,created_at FROM tasting_submission_events WHERE submission_id=? ORDER BY id').bind(id).all()).results));
   if(!action&&request.method==='PUT') {
     if(scope==='admin'?!['pending','needs_info'].includes(row.status):!EDITABLE.has(row.status))fail('Ce dossier n’est plus modifiable.',409);
