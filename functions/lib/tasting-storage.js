@@ -23,11 +23,15 @@ export async function signedRequest(env, bucket, key, method='GET', body=null, e
   const canonical = [method, path, '', names.map(k=>`${k}:${String(headers[k]).trim()}\n`).join(''), names.join(';'), headers['x-amz-content-sha256']].join('\n');
   const signing = await hmac(await hmac(await hmac(await hmac('AWS4'+env.CRCC_S3_SECRET_ACCESS_KEY, day), region), 's3'), 'aws4_request');
   headers.authorization = `AWS4-HMAC-SHA256 Credential=${env.CRCC_S3_ACCESS_KEY_ID}/${scope}, SignedHeaders=${names.join(';')}, Signature=${hex(await hmac(signing, `AWS4-HMAC-SHA256\n${stamp}\n${scope}\n${await sha256(canonical)}`))}`;
-  return {url:`https://${host}${path}`, init:{method, headers, ...(body ? {body} : {}), redirect:'error'}};
+  // Workers supports only manual/follow. Reject redirect responses ourselves,
+  // so signed credentials are never forwarded to another destination.
+  return {url:`https://${host}${path}`, init:{method, headers, ...(body ? {body} : {}), redirect:'manual'}};
 }
 export async function s3(env, bucket, key, method='GET', body=null, extra={}) {
   const signed = await signedRequest(env,bucket,key,method,body,extra);
-  const response = await fetch(signed.url,signed.init);
+  let response;
+  try { response = await fetch(signed.url,signed.init); }
+  catch { throw Object.assign(Error('Le transfert S3 a été interrompu. Les pièces déjà reçues sont conservées ; vous pouvez réessayer.'), {status:502}); }
   if (!response.ok) throw Object.assign(Error('Échec du transfert S3. Les pièces conservées peuvent être réessayées.'), {status:502});
   return response;
 }

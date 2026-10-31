@@ -5,7 +5,7 @@ import {join,resolve} from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {handleTasting} from '../functions/lib/tasting-api.js';
 import {cleanSubmission,validateUpload} from '../functions/lib/tasting-model.js';
-import {signedRequest} from '../functions/lib/tasting-storage.js';
+import {signedRequest,s3} from '../functions/lib/tasting-storage.js';
 import {sessionFields,memberFields} from '../js/tasting-common.js';
 
 const root=resolve(import.meta.dirname,'..'),temporary=mkdtempSync(join(tmpdir(),'crcc-tastings-')),database=join(temporary,'test.db');
@@ -27,6 +27,7 @@ globalThis.fetch=async(url,init={})=>{
   if(url==='https://test.invalid/deploy')return new Response('',{status:hookFailure?500:200});
   if(url.includes('/fiches-degustation/seance-')){const row=await db.prepare('SELECT publication_marker FROM tasting_submissions WHERE status IN (\'publishing\',\'publish_failed\') LIMIT 1').first();return new Response(showPublished?`<meta name="crcc-publication" content="${row.publication_marker}">`:'Old release');}
   const u=new URL(url),key=u.host+u.pathname;
+  assert.equal(init.redirect,'manual','Workers supports manual/follow only; never forward S3 credentials through redirects');
   assert.match(init.headers.authorization,/AWS4-HMAC-SHA256 Credential=TESTACCESS\//);
   if(init.method==='PUT') {
     if(init.headers['x-amz-copy-source']){if(copyFailure)return new Response('<Error>Failure</Error>');const source='private-test-bucket.s3.eu-west-3.amazonaws.com'+init.headers['x-amz-copy-source'].replace('/private-test-bucket','');objects.set(key,objects.get(source));return new Response('<CopyObjectResult/>');}
@@ -134,5 +135,13 @@ with tempfile.TemporaryDirectory() as temporary:
 assert.equal(generation.status,0,generation.stderr||generation.stdout);
 const signed=await signedRequest(env,env.CRCC_S3_SUBMISSIONS_BUCKET,'soumissions-degustations/test.pdf','PUT',pdf,{'content-type':'application/pdf'},new Date('2026-10-31T12:00:00Z'));
 assert.equal(signed.init.headers['x-amz-date'],'20261031T120000Z');assert.match(signed.init.headers.authorization,/SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date/);
+const previousFetch=globalThis.fetch;
+let redirectCalls=0;
+globalThis.fetch=async(_url,init)=>{redirectCalls++;assert.equal(init.redirect,'manual');return new Response('',{status:307,headers:{Location:'https://different-host.invalid/'}});};
+await assert.rejects(s3(env,env.CRCC_S3_SUBMISSIONS_BUCKET,'soumissions-degustations/test.pdf'),error=>error.status===502);
+assert.equal(redirectCalls,1,'A signed S3 request must never follow redirects');
+globalThis.fetch=async()=>{throw new TypeError('Internal transport detail');};
+await assert.rejects(s3(env,env.CRCC_S3_SUBMISSIONS_BUCKET,'soumissions-degustations/test.pdf'),error=>error.status===502&&!error.message.includes('Internal transport detail'));
+globalThis.fetch=previousFetch;
 rmSync(temporary,{recursive:true,force:true});
 console.log('Tasting submission integration checks passed: access, CSRF, ownership, drafts, uploads, 10-photo limit, zero/null values, complements, preserved originals, rubric, approval, S3 failure recovery, publication marker and duplicate prevention.');
