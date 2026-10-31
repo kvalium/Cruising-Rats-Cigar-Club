@@ -29,6 +29,8 @@ Consignes demandées par le propriétaire le 23 octobre 2026. Elles s’applique
 
 ## Mettre à jour le site et tous les profils
 
+- Si des photos sont jointes, les classer avec les pièces de la séance et préparer les dérivés via `scripts/prepare-session-photos.py`. Renseigner les descriptions et les légendes depuis les éléments établis, synchroniser les images vers le stockage du Club, puis ajouter les entrées `photos` à la séance actuelle dans D1 sans écraser les photos ni les contributions existantes. Ne pas commiter de photos privées dans le dépôt public. Voir `README.md`, section « Photos des séances » ; exécuter aussi `python3 scripts/test-session-photos.py`.
+
 - Ajouter ou réutiliser les identifiants stables des participants. Les membres explicitement enregistrés sans séance peuvent figurer dans `members` ; les participants aux séances sont aussi intégrés automatiquement au registre.
 - Régénérer les pages de séance, les comptes rendus, le registre des membres et les profils de tous les membres impliqués. Créer les profils manquants et recalculer les statistiques depuis les contributions archivées, sans écraser leur historique.
 - Ne pas ajouter d’entrée au menu principal pour ces archives. Conserver les liens membre → profil et les liens entre registre, séance, fiches et PDF.

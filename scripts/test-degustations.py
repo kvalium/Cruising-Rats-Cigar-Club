@@ -25,6 +25,8 @@ class Links(HTMLParser):
             self.links.append(attrs['href'])
 
 for p in (archives.ROOT / 'fiches-degustation').glob('*.html'):
+    if p.name in ('bureau-correspondances.html', 'bureaux-commissions.html'):
+        continue  # Independent office pages are not generated tasting archives.
     text = p.read_text()
     nav = text.split('<nav class="site-nav"')[1].split('</nav>')[0]
     assert '(PDF, nouvel onglet)' not in text, 'Document button labels must stay concise'
@@ -48,7 +50,9 @@ for name in ('seance-2026-08-12-un-classique-sous-observation.html', 'fiche-loui
     text = (archives.ROOT / 'fiches-degustation' / name).read_text()
     assert '<a href="membre-louis.html">Louis</a>' in text, 'Member name must link to registry'
 registry = (archives.ROOT / 'fiches-degustation/membre-louis.html').read_text()
-assert '70/100' in registry and '6,7/10' in registry
+member_payload = json.loads(registry.split('id="member-data">')[1].split('</script>')[0])
+first_row = next(row for row in member_payload['rows'] if row['id'] == 'louis-fiche-1')
+assert first_row['committee_score'] == 70 and first_row['cigar_score'] == 6.7
 assert 'fiche-louis-fiche-2.html' in registry
 assert 'contexte commun uniquement' not in registry
 directory = (archives.ROOT / 'fiches-degustation/registre-membres.html').read_text()
@@ -97,6 +101,7 @@ with tempfile.TemporaryDirectory() as tmp:
     (root / 'data').mkdir()
     (root / 'js').mkdir()
     shutil.copy2(archives.ROOT / 'js/member-stats.js', root / 'js/member-stats.js')
+    shutil.copy2(archives.ROOT / 'js/member-observatory.js', root / 'js/member-observatory.js')
     (root / 'data/report.html').write_text('<section><h2>Test report</h2></section>')
     (root / 'sheet.pdf').write_bytes(b'%PDF-1.4')
     (root / 'minutes.pdf').write_bytes(b'%PDF-1.4')
@@ -162,6 +167,6 @@ assert 'sous-cape' in (archives.ROOT / 'fiches-degustation/fiche-louis-fiche-3.h
 
 for member_id in ('m-crevette','remi'):
     page = (archives.ROOT / f'fiches-degustation/membre-{member_id}.html').read_text()
-    assert 'Première dégustation à venir' in page
+    assert 'Aucune fiche de dégustation n’est encore archivée pour ce membre' in page
     assert 'Moyenne du Comité' not in page and 'data-member-filters' not in page
     assert not any(m['id']==member_id for s in data['sessions'] for m in s['participants'])

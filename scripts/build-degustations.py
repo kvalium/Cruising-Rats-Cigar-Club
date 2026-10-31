@@ -8,6 +8,7 @@ import os
 from datetime import date
 from html import escape as esc
 from pathlib import Path
+from urllib.parse import urlsplit
 from xml.etree import ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +28,7 @@ def validate(data):
     for s in data['sessions']:
         assert re.fullmatch(r'[a-z0-9-]+', s['id']) and s['id'] not in sessions, 'Invalid/duplicate session id'
         sessions.add(s['id'])
+        validate_photos(s.get('photos', []))
         date.fromisoformat(s['date'])
         assert all(re.fullmatch(r'[a-z0-9-]+', m['id']) for m in s['participants']), 'Invalid member id'
         members = {m['id']: m for m in s['participants']}
@@ -65,6 +67,39 @@ def validate(data):
             assert f.get('aromas') is None or all(isinstance(a,str) and a for a in f['aromas']), 'Invalid aromas'
             if s.get('minutes_pdf'):
                 assert f.get('minutes_contribution'), 'Explain individual use (or non-use) of shared minutes'
+
+def validate_photos(photos):
+    assert isinstance(photos, list), 'Photos must be a list'
+    seen = set()
+    for photo in photos:
+        assert isinstance(photo, dict), 'Invalid photo'
+        for field in ('src', 'thumbnail'):
+            path = photo.get(field)
+            assert isinstance(path, str), 'Missing photo asset'
+            url = urlsplit(path)
+            if url.scheme:
+                assert url.scheme == 'https' and url.netloc and not url.username and not url.password, 'Invalid photo URL'
+            else:
+                assert not url.netloc and path.startswith('images/seances/') and '..' not in Path(path).parts, 'Invalid photo path'
+                assert (ROOT / path).is_file(), 'Missing photo asset'
+            assert url.path.lower().endswith(('.webp', '.jpg', '.jpeg', '.png')), 'Invalid photo format'
+        assert photo['src'] not in seen, 'Duplicate photo'
+        seen.add(photo['src'])
+        assert isinstance(photo.get('alt'), str) and photo['alt'].strip(), 'Photo description required'
+        assert isinstance(photo.get('caption', ''), str), 'Invalid photo caption'
+        for key in ('width', 'height'):
+            assert type(photo.get(key)) is int and 0 < photo[key] <= 20000, 'Invalid photo dimensions'
+
+def session_photos(s):
+    photos = s.get('photos', [])
+    if not photos:
+        return ''
+    href = lambda path: path if path.startswith('https://') else '../' + path
+    items = []
+    for p in photos:
+        caption = p.get('caption', '')
+        items.append(f'<figure><a href="{esc(href(p["src"]))}" data-session-photo><img src="{esc(href(p["thumbnail"]))}" alt="{esc(p["alt"])}" width="{p["width"]}" height="{p["height"]}" loading="lazy" decoding="async"></a>' + (f'<figcaption>{esc(caption)}</figcaption>' if caption else '') + '</figure>')
+    return '<section class="card session-photos"><h2>Photos de la séance</h2><div class="session-photo-grid">' + ''.join(items) + '</div></section><script src="../js/session-photos.js" defer></script>'
 
 def score(f):
     return sum(c['score'] for c in f['criteria'])
@@ -238,7 +273,7 @@ def build(data):
         if s.get('minutes_pdf'):
             body += '<section class="card"><h2>Minutes de la séance</h2><p>Document commun aux participants. Les propos ne sont attribués à un membre que lorsque leur auteur est explicitement identifié.</p><div class="documents">' + pdf_links(s['minutes_pdf'], 'les minutes') + '</div></section>'
         body += '<section class="session-records"><h2>Fiches et comptes rendus</h2>' + session_sheets(s) + '</section>'
-        body += session_verdict(s) + cigar_description(s) + RULES
+        body += session_verdict(s) + cigar_description(s) + session_photos(s) + RULES
         body += '<p class="archive-footer"><a href="index.html">← Toutes les séances</a></p>'
         (out / session_url(s)).write_text(shell(s['title'], session_url(s), body))
         for f in s['sheets']:

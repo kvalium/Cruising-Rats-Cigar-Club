@@ -45,6 +45,7 @@ def verify_assets(data):
         return
     paths = {s3_url(s['minutes_pdf']) for s in data['sessions'] if s.get('minutes_pdf')}
     paths |= {s3_url(f['pdf']) for s in data['sessions'] for f in s['sheets']}
+    paths |= {s3_url(p[k]) for s in data['sessions'] for p in s.get('photos', []) for k in ('src', 'thumbnail')}
     paths |= {s3_url(p.relative_to(ROOT).as_posix()) for p in (ROOT / 'images').rglob('*') if p.is_file()}
     if os.environ.get('CRCC_REQUIRE_S3') == '1':
         def check(path):
@@ -63,6 +64,9 @@ def prepare_data(fetched):
         data = {'members': fetched['members'], 'sessions': fetched['sessions']}
         reports = fetched['reports']
         for session in data['sessions']:
+            for photo in session.get('photos', []):
+                for key in ('src', 'thumbnail'):
+                    photo[key] = s3_url(photo[key])
             for sheet in session['sheets']:
                 report_path = Path(sheet['report'])
                 if report_path.is_absolute() or '..' in report_path.parts or not str(report_path).startswith('data/comptes-rendus/'):

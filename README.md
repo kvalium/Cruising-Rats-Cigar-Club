@@ -1,5 +1,39 @@
 # Cruising Rats Cigar Club
 
+## Photos des séances
+
+Chaque séance peut contenir un tableau facultatif `photos`, conservé dans son
+payload D1 et ses versions antérieures. Une séance sans photo reste inchangée.
+La galerie affiche les miniatures, les légendes facultatives et une visionneuse
+(clic, flèches du clavier, Échap). Sans JavaScript, les liens ouvrent les images.
+
+Pour une soumission, préparer les images avec Pillow :
+
+```sh
+python3 scripts/prepare-session-photos.py <id-seance> /chemin/photo1.jpg /chemin/photo2.jpg
+```
+
+Le script crée des WebP (640 px pour les miniatures, 1920 px pour les vues
+agrandies, sans agrandissement des originaux), corrige l’orientation et supprime
+les métadonnées EXIF/GPS. Il affiche le tableau JSON à ajouter au champ `photos`
+de la séance : `src`, `thumbnail`, `width`, `height`, `alt`, `caption`.
+Renseigner une description `alt` fidèle et, si utile, une légende ; les dimensions
+sont celles de la miniature. L’ordre du tableau est celui de la galerie.
+
+Partir de la **séance actuelle dans D1**, préserver toutes ses contributions et
+photos existantes, puis ajouter les nouvelles entrées sans doublon. Classer les
+originaux transmis dans le dossier Library de cette séance. Les images de séances
+sont ignorées par Git : ne pas commiter les photographies privées dans le dépôt
+public. Synchroniser les dérivés avec `scripts/sync-assets.sh`, vérifier leur
+accessibilité et publier la séance par le circuit D1 existant ; son payload JSON
+inclut déjà ces champs sans migration SQL ni changement du Worker.
+
+Le build convertit les chemins en URL du stockage et vérifie aussi les photos
+référencées uniquement depuis D1, même si elles ne figurent pas dans le dépôt.
+Un échec de vérification bloque la publication. Vérifier le déploiement Pages
+avant de confirmer la mise en ligne. Contrôle complémentaire :
+`python3 scripts/test-session-photos.py`.
+
 > Nouvelle plateforme en préparation : [architecture, import D1, publication et bascule du domaine](CLOUDFLARE.md).
 > Les pages GitHub Pages restent la version publique tant que `cruising-rats-cigar-club.fr` n'a pas été basculé.
 
