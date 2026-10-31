@@ -47,7 +47,7 @@ async function snapshot(db) {
   };
 }
 
-async function publish(db, session, reports) {
+export async function publish(db, session, reports, additionalQueries = []) {
   validate(session, reports);
   const existing = await db.prepare('SELECT payload FROM sessions WHERE id = ?').bind(session.id).first();
   const queries = [];
@@ -93,7 +93,7 @@ async function publish(db, session, reports) {
     queries.push(db.prepare('INSERT INTO documents VALUES (?,?,?,?,?)')
       .bind(`${sheet.id}:pdf`, session.id, sheet.id, 'fiche', s3Key(sheet.pdf)));
   }
-  await db.batch(queries);
+  await db.batch([...queries, ...additionalQueries]);
 }
 
 async function upsertMember(db, member) {

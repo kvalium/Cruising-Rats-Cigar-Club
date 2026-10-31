@@ -69,7 +69,9 @@ def facts_for(person, sessions):
     attendance=[s for s in sessions if any(p['id']==person['id'] for p in s['participants'])]
     refs=set(str(f.get('reference_exact') or f.get('cigar') or '').strip().casefold() for _,f in sheets)
     refs.discard('')
-    cuts=set(str(f.get('technique') or '').strip().casefold() for _,f in sheets)
+    cuts=set(str((f.get('technique') or {}).get('cut') or '').strip().casefold()
+             if isinstance(f.get('technique'), dict) else str(f.get('technique') or '').strip().casefold()
+             for _,f in sheets)
     cuts.discard('')
     validashes=[(float(f['ash_max_cm']),s,f) for s,f in sheets if isinstance(f.get('ash_max_cm'),(int,float)) and f['ash_max_cm']>0]
     validminutes=[(float(f['duration_minutes']),s,f) for s,f in sheets if isinstance(f.get('duration_minutes'),(int,float)) and f['duration_minutes']>0]
@@ -173,7 +175,7 @@ def build_members(archive, data):
             for f in s['sheets']:
                 if f['member_id'] != member_id:
                     continue
-                row = {key:f.get(key) for key in ('id','number','first','brand','cigar','module','origin','reference_exact','aromas','duration_minutes','ash_max_cm','technique','pairing','pairings','cigar_score','criteria','rubric_label','price','strength_score','richness_score','minutes_contribution')}
+                row = {key:f.get(key) for key in ('id','number','first','brand','cigar','module','origin','reference_exact','aromas','duration_minutes','ash_max_cm','technique','pairing','pairings','cigar_score','criteria','rubric_label','price','strength_score','richness_score','minutes_contribution','length_mm','ring_gauge','humidity','temperature','storage','stop_reason')}
                 # Unknown schemas are isolated per fiche, never assumed comparable.
                 row.update(date=s['date'], session_id=s['id'], session_title=s['title'], session_url=archive.session_url(s), participant_count=len(s['participants']), committee_score=archive.score(f), rubric_id=f.get('rubric_id') or 'Barème non identifié — '+f['id'], url=archive.sheet_url(f), full_title=archive.title(s,f), minutes_pdf=s.get('minutes_pdf'))
                 rows.append(row)

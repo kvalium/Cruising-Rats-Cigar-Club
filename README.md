@@ -1,5 +1,8 @@
 # Cruising Rats Cigar Club
 
+Le dépôt de séances et la validation depuis le Bureau du Comité sont décrits dans
+[le guide des soumissions de dégustations](docs/soumissions-degustations.md).
+
 ## Photos des séances
 
 Chaque séance peut contenir un tableau facultatif `photos`, conservé dans son

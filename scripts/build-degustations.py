@@ -248,7 +248,7 @@ def sheet_list(s, filter_rows=False):
     rows = []
     for f in s['sheets']:
         m = member(s, f)
-        attrs = f' data-entry data-member="{esc(f["member_id"])}" data-brand="{esc(f["brand"])}"' if filter_rows else ''
+        attrs = f' data-entry data-member="{esc(f["member_id"])}" data-brand="{esc(f.get("brand") or "")}"' if filter_rows else ''
         rows.append(f'<li{attrs}><span class="archive-contributor">{member_with_badge(m)}<span class="archive-separator" aria-hidden="true">·</span><a class="archive-sheet-link" href="{sheet_url(f)}" aria-label="{esc(f["title"])} — fiche de {esc(m["name"])}">{esc(f["title"])}</a></span><span class="archive-sheet-score"><span>Comité</span> <strong>{score(f)}/100</strong></span></li>')
     return '<ul class="archive-contributions">' + ''.join(rows) + '</ul>'
 
@@ -258,9 +258,10 @@ def build(data):
     out.mkdir(exist_ok=True)
     sessions = sorted(data['sessions'], key=lambda s: (s['date'], s['id']), reverse=True)
     people = {m['id']: m['name'] for s in sessions for m in s['participants']}
-    brands = sorted({f['brand'] for s in sessions for f in s['sheets']})
+    brands = sorted({f['brand'] for s in sessions for f in s['sheets'] if f.get('brand')})
     options = lambda values: ''.join(f'<option value="{esc(k)}">{esc(v)}</option>' for k,v in values)
     body = '<div class="archive-intro"><p class="lead">Espace membres du Cruising Rats Cigar Club</p><p>Grades, distinctions, dossiers personnels, séances et records du Club.</p></div><section class="card accent"><h2>Registre des membres et des records</h2><p>Consultez les fiches individuelles, la hiérarchie des cinq grades, les distinctions et le palmarès officiel calculé sur les archives.</p><p><a class="download" href="registre-membres.html">ACCÉDER AUX GRADES, DISTINCTIONS ET RECORDS →</a></p></section><section class="card accent"><p class="smallcaps">ADMINISTRATION · SERVICES DU CLUB</p><h2>Bureaux et Commissions</h2><p>Retrouvez les services du Comité : correspondances, convocations, examens et dossiers administratifs. Chaque bureau dispose de son accréditation propre.</p><p><a class="download" href="bureaux-commissions.html">CONSULTER LA LISTE DES BUREAUX ET COMMISSIONS →</a></p></section><h2>Dernières dégustations</h2>'
+    body += '<section class="card accent"><p class="smallcaps">GUICHET DES DÉGUSTATIONS</p><h2>Soumettre une dégustation</h2><p>Déclarez les participants, joignez leurs fiches, les minutes et jusqu’à dix photos. Le Comité examinera le dossier avant publication.</p><p><a class="download" href="soumettre-degustation.html">DÉPOSER UNE DÉGUSTATION →</a></p></section>'
     body += f'''<form class="archive-filters" data-archive-filters hidden><label>Membre<select name="member"><option value="">Tous les membres</option>{options(sorted(people.items(), key=lambda p:p[1]))}</select></label><label>Marque<select name="brand"><option value="">Toutes les marques</option>{options((b,b) for b in brands)}</select></label></form><p class="archive-meta" data-result-count aria-live="polite">{len(sessions)} séance{"s" if len(sessions)>1 else ""} archivée{"s" if len(sessions)>1 else ""}</p><p data-empty hidden>Aucune dégustation ne correspond à ces critères.</p>'''
     for s in sessions:
         n, count = len(s['participants']), len(s['sheets'])
@@ -275,7 +276,10 @@ def build(data):
         body += '<section class="session-records"><h2>Fiches et comptes rendus</h2>' + session_sheets(s) + '</section>'
         body += session_verdict(s) + cigar_description(s) + session_photos(s) + RULES
         body += '<p class="archive-footer"><a href="index.html">← Toutes les séances</a></p>'
-        (out / session_url(s)).write_text(shell(s['title'], session_url(s), body))
+        html = shell(s['title'], session_url(s), body)
+        if s.get('publication_marker'):
+            html = html.replace('</head>', '<meta name="crcc-publication" content="' + esc(s['publication_marker']) + '"></head>', 1)
+        (out / session_url(s)).write_text(html)
         for f in s['sheets']:
             m = member(s,f)
             body = f'<p class="breadcrumbs"><a href="index.html">Dégustations</a> / <a href="{session_url(s)}">{esc(s["title"])}</a> / {member_link(m)} — Fiche {f["number"]}</p>'

@@ -29,6 +29,8 @@ Consignes demandées par le propriétaire le 23 octobre 2026. Elles s’applique
 
 ## Mettre à jour le site et tous les profils
 
+- Pour les dépôts reçus via le formulaire membres, consulter les pièces et la version courante du dossier depuis le Bureau du Comité. Le circuit et la configuration sont décrits dans `docs/soumissions-degustations.md`. Ne pas déclarer une séance publiée tant que le contrôle de sa page et de son marqueur de déploiement n’est pas réussi. Exécuter aussi `node scripts/test-tasting-submissions.mjs` lorsque ce circuit est modifié.
+
 - Si des photos sont jointes, les classer avec les pièces de la séance et préparer les dérivés via `scripts/prepare-session-photos.py`. Renseigner les descriptions et les légendes depuis les éléments établis, synchroniser les images vers le stockage du Club, puis ajouter les entrées `photos` à la séance actuelle dans D1 sans écraser les photos ni les contributions existantes. Ne pas commiter de photos privées dans le dépôt public. Voir `README.md`, section « Photos des séances » ; exécuter aussi `python3 scripts/test-session-photos.py`.
 
 - Ajouter ou réutiliser les identifiants stables des participants. Les membres explicitement enregistrés sans séance peuvent figurer dans `members` ; les participants aux séances sont aussi intégrés automatiquement au registre.

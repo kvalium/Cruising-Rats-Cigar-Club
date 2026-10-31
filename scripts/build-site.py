@@ -281,6 +281,26 @@ def main():
             if '/documents/' in path:
                 return 'fiches-degustation-docs/documents/' + path.split('/documents/', 1)[1]
             return 'fiches-degustation-docs/documents/' + path.removeprefix('documents/')
+        def ensure_private_document(path):
+            target = DIST / private_doc_path(path)
+            if not target.resolve().is_relative_to(protected_docs.resolve()) or '..' in Path(path).parts:
+                raise ValueError('Unsafe document path')
+            if target.is_file() and not os.environ.get('CRCC_DATA_URL'):
+                return
+            if not S3:
+                if not target.is_file():
+                    raise RuntimeError('Missing submitted document: ' + path)
+                return
+            source = s3_url('documents/' + private_doc_path(path).split('/documents/', 1)[1])
+            origin = S3_ORIGIN + source[len(S3):] if source.startswith(S3 + '/') else source
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with urlopen(Request(origin), timeout=30) as response:
+                pdf = response.read(15 * 1024 * 1024 + 1)
+            if len(pdf) > 15 * 1024 * 1024 or not pdf.startswith(b'%PDF-'):
+                raise RuntimeError('Invalid submitted PDF: ' + path)
+            target.write_bytes(pdf)
+        for document in ([session['minutes_pdf']] if session.get('minutes_pdf') else []) + [f['pdf'] for f in session['sheets']]:
+            ensure_private_document(document)
         if session.get('minutes_pdf'):
             session['minutes_pdf'] = private_doc_path(session['minutes_pdf'])
         for sheet in session['sheets']:
@@ -291,7 +311,7 @@ def main():
     env = {**os.environ, 'CRCC_SITE_URL': SITE + '/'}
     subprocess.run([sys.executable, 'scripts/build-degustations.py'], cwd=DIST, env=env, check=True)
     # Private institutional directory and correspondence office, linked from the generated members' landing page.
-    for office_page in ('bureaux-commissions.html', 'bureau-correspondances.html'):
+    for office_page in ('bureaux-commissions.html', 'bureau-correspondances.html', 'soumettre-degustation.html', 'validation-degustations.html'):
         shutil.copy2(ROOT / 'fiches-degustation' / office_page,
                      DIST / 'fiches-degustation' / office_page)
     sitemap = DIST / 'sitemap.xml'

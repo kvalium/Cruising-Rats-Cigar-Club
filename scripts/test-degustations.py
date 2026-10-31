@@ -25,7 +25,7 @@ class Links(HTMLParser):
             self.links.append(attrs['href'])
 
 for p in (archives.ROOT / 'fiches-degustation').glob('*.html'):
-    if p.name in ('bureau-correspondances.html', 'bureaux-commissions.html'):
+    if p.name in ('bureau-correspondances.html', 'bureaux-commissions.html', 'soumettre-degustation.html', 'validation-degustations.html'):
         continue  # Independent office pages are not generated tasting archives.
     text = p.read_text()
     nav = text.split('<nav class="site-nav"')[1].split('</nav>')[0]
