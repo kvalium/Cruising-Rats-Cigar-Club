@@ -15,8 +15,11 @@ local. Fermer l’accréditation vide cette mémoire.
 ## Saisie et pièces
 
 Le formulaire conserve uniquement la date, les heures de début et de fin, le
-contexte, les invités présents et les notes complémentaires. Le titre provisoire
-est généré depuis la date et peut être précisé après l’analyse. Chaque membre déclare sa présence avec
+contexte, les invités présents et les notes complémentaires. Aucun titre n’est
+demandé aux membres : un libellé provisoire est généré depuis la date. Le titre
+définitif est préparé à partir des pièces dans le format des séances archivées
+(référence du cigare et sous-titre éditorial), puis peut être modifié par le Comité
+avant publication. Chaque membre déclare sa présence avec
 ou sans fiche ; au moins une fiche est nécessaire pour publier une séance.
 Seuls les profils existants sont sélectionnables ; le serveur refuse également
 un identifiant absent du registre. Aucun nouveau membre ne peut être créé dans
