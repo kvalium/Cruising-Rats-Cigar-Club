@@ -135,7 +135,7 @@ def distinctions_directory_html():
     return '<section class="card distinction-directory"><h2>Répertoire des distinctions</h2><p class="archive-meta">Décorations et reconnaissances officielles</p>'+''.join(sections)+'</section>'
 
 def record_html(people,sessions,archive):
-    metrics=[('Cendre la plus longue','ashes','cm'),('Dégustation la plus longue','minutes','minutes'),
+    metrics=[('Cendre la plus longue','ashes','mm'),('Dégustation la plus longue','minutes','minutes'),
              ('Plus grand nombre de fiches','sheets','fiches'),('Plus grande variété de références','refs','références')]
     facts={key:facts_for(person,sessions) for key,person in people.items() if not person.get('classified_profile')}
     rows=[]
@@ -150,7 +150,19 @@ def record_html(people,sessions,archive):
         best=max(value for value,_ in candidates)
         holders=[(mid,people[mid]) for value,mid in candidates if value==best]
         rendered=' / '.join('<a href="'+archive.member_url(p)+'">'+esc(p['name'])+'</a>' for _,p in holders)
-        rows.append('<tr><th>'+esc(label)+'</th><td><strong>'+esc(str(int(best) if float(best).is_integer() else best))+' '+unit+'</strong> — '+rendered+'</td></tr>')
+        proofs=[]
+        if key=='ashes':
+            for mid,_ in holders:
+                for value,session,sheet in sorted(facts[mid]['ashes'],key=lambda item:item[1]['date'],reverse=True):
+                    if value!=best:
+                        continue
+                    src=(sheet.get('ash_evidence') or {}).get('photo_src')
+                    if src and any(photo['src']==src for photo in session.get('photos',[])) and not any(p[0]==src for p in proofs):
+                        proofs.append((src,people[mid]['name']))
+        proof_links=''.join(' · <a href="'+esc(src if src.startswith('https://') else '../'+src)+'" target="_blank" rel="noopener">Voir la photo'+(' de '+esc(name) if len(proofs)>1 else '')+'</a>' for src,name in proofs)
+        displayed=best*10 if key=='ashes' else best
+        amount=format(displayed,'.12g').replace('.',',')
+        rows.append('<tr><th>'+esc(label)+'</th><td><strong>'+esc(amount)+' '+unit+'</strong> — '+rendered+proof_links+'</td></tr>')
     return '<section class="card"><h2>Registre des records homologables</h2><p class="archive-meta">Calculé uniquement à partir des informations archivées ; les mesures absentes ne sont pas estimées.</p><div class="table-scroll"><table><tbody>'+''.join(rows)+'</tbody></table></div></section>'
 
 def hierarchy_html():

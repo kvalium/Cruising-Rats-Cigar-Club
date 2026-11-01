@@ -1,4 +1,5 @@
 import {api,API,esc,field,sessionFields,memberFields,readForm,split,attachmentsHtml} from './tasting-common.js';
+import {historyHtml} from './tasting-history.js';
 const $=id=>document.getElementById(id);let secret='',catalog=null,current=null,poll=null;
 const message=(value,error=false)=>{$('review-message').textContent=value;$('review-message').dataset.error=error;};
 const call=(path,method='GET',body)=>api('/admin'+path,method,body,secret);
@@ -48,7 +49,7 @@ async function openDossier(id) {
   $('approve').disabled=row.status!=='pending';$('publication-actions').hidden=!['processing','publishing','publish_failed','published'].includes(row.status);
   $('publication-result').textContent=row.status==='published'?'Déploiement vérifié.':'';
   $('published-link').hidden=row.status!=='published';$('published-link').href='/fiches-degustation/seance-'+row.session_id;
-  $('review-events').innerHTML=row.events.map(e=>`<li><strong>${esc(e.event)}</strong> · ${esc(e.created_at)}<br>${esc(e.details)}</li>`).join('');
+  $('review-events').innerHTML=historyHtml(row.events,catalog.members);
   $('decision-feedback').value=row.feedback||'';
   $('review-form').querySelectorAll('.review-member').forEach(section=>{const update=()=>{const inputs=[...section.querySelectorAll('input[type=number]')];section.querySelector('[data-total]').textContent=inputs.some(n=>n.value==='')?'—':inputs.reduce((a,n)=>a+Number(n.value),0);};section.addEventListener('input',update);update();});
   if(['publishing','publish_failed'].includes(row.status))poll=setInterval(()=>checkPublication().catch(e=>message(e.message,true)),15000);

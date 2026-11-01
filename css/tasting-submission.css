@@ -16,4 +16,16 @@
 .tasting-queue{display:grid;gap:14px}.tasting-queue article{padding:20px;border:1px solid var(--line);background:#fffefa}.tasting-queue h3{font-size:22px}.tasting-badge{font:700 11px Arial,sans-serif;letter-spacing:.7px;background:#eee8dd;padding:6px 9px;display:inline-block}
 .tasting-criteria{border-top:1px solid var(--line);margin-top:18px;padding-top:18px}.tasting-criteria .tasting-grid{grid-template-columns:120px 1fr}.tasting-total{font:bold 18px Georgia,serif}
 .tasting-original{white-space:pre-wrap;max-height:350px;overflow:auto;background:#efede7;padding:15px;font:13px/1.5 monospace}.tasting-feedback{background:#eee8dd;padding:18px;white-space:pre-line;margin:15px 0}
+.history-caption{margin:0 0 24px;color:var(--muted);font:13px/1.6 Arial,sans-serif}
+.tasting-history{list-style:none;margin:0;padding:0 0 0 22px;border-left:2px solid var(--line)}
+.history-item{position:relative;padding:0 0 26px;min-width:0}.history-item:last-child{padding-bottom:0}
+.history-item:before{content:"";position:absolute;left:-29px;top:5px;width:10px;height:10px;border:2px solid var(--white);border-radius:50%;background:#8b8175;box-shadow:0 0 0 1px var(--line)}
+.history-item[data-tone=success]:before{background:#4d6a51}.history-item[data-tone=warning]:before{background:#a16732}.history-item[data-tone=review]:before{background:var(--red)}
+.history-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px 20px;flex-wrap:wrap}
+.tasting-shell .history-heading h3{margin:0;font:700 16px/1.5 Arial,sans-serif}.history-heading time{color:var(--muted);font:12px/1.6 Arial,sans-serif}
+.history-summary{margin:6px 0 0;font:14px/1.65 Arial,sans-serif;overflow-wrap:anywhere}
+.history-facts{display:flex;flex-wrap:wrap;gap:10px 24px;margin:12px 0 0;padding:12px 15px;background:#f5f1e9;font:13px/1.55 Arial,sans-serif}
+.history-facts div{min-width:0}.history-facts dt{color:var(--muted)}.history-facts dd{margin:2px 0 0;font-weight:700;overflow-wrap:anywhere}
+.history-technical{margin-top:12px;font:12px/1.6 Arial,sans-serif}.history-technical summary{width:fit-content;cursor:pointer;color:var(--muted)}
+.history-technical pre{max-height:240px;overflow:auto;margin:10px 0 0;padding:14px;background:#efede7;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.6 monospace}
 @media(max-width:640px){.tasting-grid{grid-template-columns:1fr}.tasting-shell .card{padding:19px}.tasting-criteria .tasting-grid{grid-template-columns:1fr}.tasting-heading{flex-wrap:wrap}.tasting-actions>*{flex:1;text-align:center}}

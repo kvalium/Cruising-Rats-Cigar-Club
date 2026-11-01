@@ -26,6 +26,16 @@ un identifiant absent du registre. Aucun nouveau membre ne peut être créé dan
 ce circuit. Le Comité confirme les grades historiques avant publication.
 Aucune promotion n’est calculée à l’approbation.
 
+Les longueurs de cendre restent stockées en centimètres dans `ash_max_cm` ;
+le registre des records les affiche en millimètres. Une mesure retenue peut
+référencer sa preuve dans `ash_evidence.photo_src`, avec `confirmed_on` et la
+provenance de la confirmation. Le lien affiché doit désigner une photographie
+présente dans la même séance. Les mesures absentes restent non renseignées.
+
+L’historique du Comité présente les événements du plus récent au plus ancien,
+avec des libellés français et des dates en heure de Paris. Les détails techniques
+restent accessibles dans des blocs repliés ; les événements originaux sont conservés.
+
 Les données individuelles ne sont plus ressaisies par le déposant : elles sont
 extraites par l’analyse ChatGPT des fiches, des minutes et des photos. Elles comprennent référence, marque, origine, module, coupe,
 tirage, durée, prix, note personnelle /10, arômes, accompagnements distincts,
@@ -122,6 +132,8 @@ python3 scripts/test-degustations.py
 node scripts/test-member-stats.js
 python3 scripts/test-session-photos.py
 node scripts/test-tasting-submissions.mjs
+node scripts/test-tasting-history.mjs
+python3 scripts/test-member-records.py
 python3 scripts/build-site.py
 npx wrangler pages functions build functions --outdir .openai/functions-build
 ```
