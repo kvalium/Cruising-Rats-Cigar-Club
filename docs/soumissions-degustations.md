@@ -1,6 +1,6 @@
 # Dépôt et validation des dégustations
 
-Le lien **Soumettre une dégustation** figure sur l’accueil des membres. Le
+Le lien **Soumettre une dégustation** figure sur la page **Dégustations** de l’espace membres. Le
 formulaire `/fiches-degustation/soumettre-degustation` utilise la protection de
 l’espace membres. Le dossier est associé au navigateur du déposant par un jeton
 aléatoire conservé dans un cookie HttpOnly, Secure et SameSite=Strict ; seul son

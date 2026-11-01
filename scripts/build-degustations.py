@@ -14,6 +14,9 @@ from xml.etree import ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 BASE = os.environ.get('CRCC_SITE_URL', 'https://cruising-rats-cigar-club.fr/').rstrip('/') + '/'
 MONTHS = ['', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
+layout_spec = importlib.util.spec_from_file_location('member_layout', Path(__file__).with_name('member-layout.py'))
+layout = importlib.util.module_from_spec(layout_spec)
+layout_spec.loader.exec_module(layout)
 
 def long_date(value):
     d = date.fromisoformat(value)
@@ -187,17 +190,16 @@ def tasting_facts(f):
                     '</dd></div>' for label,value in facts) + '</dl></section>')
 
 def shell(title_text, path, body, script=False):
-    nav = re.search(r'<nav class="site-nav".*?</nav>', (ROOT / 'index.html').read_text(), re.S).group()
-    nav = re.sub(r' aria-current="page"', '', nav)
-    nav = nav.replace('href="', 'href="../')
-    return f'''<!doctype html>
+    nav = layout.navigation(path)
+    html = f'''<!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{esc(title_text)} — CRCC</title><meta name="description" content="{esc(title_text)} : archives, documents sources et appréciation du Comité du Cruising Rats Cigar Club.">
 <link rel="canonical" href="{BASE}fiches-degustation/{esc(path)}"><link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/archives.css">
 <link rel="icon" href="https://assets.cruising-rats-cigar-club.fr/images/crcc-logo-header-155.webp" type="image/webp">
-</head><body><div class="site-shell"><header class="site-header"><img class="logo" src="https://assets.cruising-rats-cigar-club.fr/images/crcc-logo-header-155.webp" alt="Logo du Cruising Rats Cigar Club" width="155" height="155"><div class="kicker">CRUISING RATS CIGAR CLUB</div><h1 class="site-title">{esc(title_text)}</h1><div class="reference">SERVICE DES ARCHIVES ORGANOLEPTIQUES</div></header>
+</head><body><div class="site-shell">{layout.header(title_text)}
 {nav}<div class="banner">LES RATS DÉGUSTENT • LE COMITÉ EXAMINE • LES ARCHIVES CONSERVENT</div><main>{body}</main>
-<footer>CRUISING RATS CIGAR CLUB<br>COMITÉ EXÉCUTIF • SERVICE DE DÉGUSTATION ET D’ARCHIVAGE<br>On pipe rien, mais on a des fiches.<br><a href="index.html">Dégustations</a> · <a href="registre-membres.html">Registre des membres</a></footer></div>{'<script src="../js/archives.js" defer></script>' if script else ''}</body></html>'''
+<footer>CRUISING RATS CIGAR CLUB<br>COMITÉ EXÉCUTIF • SERVICE DE DÉGUSTATION ET D’ARCHIVAGE<br>On pipe rien, mais on a des fiches.<br><a href="index.html">Accueil membres</a> · <a href="degustations.html">Dégustations</a> · <a href="registre-membres.html">Registre des membres</a></footer></div>{'<script src="../js/archives.js" defer></script>' if script else ''}</body></html>'''
+    return layout.normalize(html,path)
 
 RULES = '''<details class="card"><summary>Comprendre la note du Comité et le rôle des minutes</summary>
 <p>La note du Comité sur 100 évalue la précision, la cohérence et la qualité des observations du membre, à partir des pièces disponibles. La note du cigare sur 10 exprime le jugement personnel du dégustateur.</p>
@@ -260,29 +262,29 @@ def build(data):
     people = {m['id']: m['name'] for s in sessions for m in s['participants']}
     brands = sorted({f['brand'] for s in sessions for f in s['sheets'] if f.get('brand')})
     options = lambda values: ''.join(f'<option value="{esc(k)}">{esc(v)}</option>' for k,v in values)
-    body = '<div class="archive-intro"><p class="lead">Espace membres du Cruising Rats Cigar Club</p><p>Grades, distinctions, dossiers personnels, séances et records du Club.</p></div><section class="card accent"><h2>Registre des membres et des records</h2><p>Consultez les fiches individuelles, la hiérarchie des cinq grades, les distinctions et le palmarès officiel calculé sur les archives.</p><p><a class="download" href="registre-membres.html">ACCÉDER AUX GRADES, DISTINCTIONS ET RECORDS →</a></p></section><section class="card accent"><p class="smallcaps">ADMINISTRATION · SERVICES DU CLUB</p><h2>Bureaux et Commissions</h2><p>Retrouvez les services du Comité : correspondances, convocations, examens et dossiers administratifs. Chaque bureau dispose de son accréditation propre.</p><p><a class="download" href="bureaux-commissions.html">CONSULTER LA LISTE DES BUREAUX ET COMMISSIONS →</a></p></section><h2>Dernières dégustations</h2>'
+    body = '<p class="breadcrumbs"><a href="index.html">Espace membres</a> / Dégustations</p><div class="archive-intro"><p class="lead">Les séances du Club, leurs fiches et les observations du Comité.</p><p>Retrouvez les dégustations archivées, les comptes rendus individuels et les pièces de chaque séance.</p></div>'
     body += '<section class="card accent"><p class="smallcaps">GUICHET DES DÉGUSTATIONS</p><h2>Soumettre une dégustation</h2><p>Déclarez les participants, joignez leurs fiches, les minutes et jusqu’à dix photos. Le Comité examinera le dossier avant publication.</p><p><a class="download" href="soumettre-degustation.html">DÉPOSER UNE DÉGUSTATION →</a></p></section>'
     body += f'''<form class="archive-filters" data-archive-filters hidden><label>Membre<select name="member"><option value="">Tous les membres</option>{options(sorted(people.items(), key=lambda p:p[1]))}</select></label><label>Marque<select name="brand"><option value="">Toutes les marques</option>{options((b,b) for b in brands)}</select></label></form><p class="archive-meta" data-result-count aria-live="polite">{len(sessions)} séance{"s" if len(sessions)>1 else ""} archivée{"s" if len(sessions)>1 else ""}</p><p data-empty hidden>Aucune dégustation ne correspond à ces critères.</p>'''
     for s in sessions:
         n, count = len(s['participants']), len(s['sheets'])
         body += f'<article class="archive-card" data-session><time class="news-date" datetime="{s["date"]}">{long_date(s["date"])}</time><h2><a href="{session_url(s)}">{esc(s["title"])}</a></h2><p class="archive-meta">{n} participant{"s" if n>1 else ""} · {count} fiche{"s" if count>1 else ""}{" · Minutes disponibles" if s.get("minutes_pdf") else ""}</p>{sheet_list(s, True)}</article>'
     body += '<p><a href="registre-membres.html">Consulter le registre des membres →</a></p>' + RULES
-    (out / 'index.html').write_text(shell('Dégustations', 'index.html', body, True))
+    (out / 'degustations.html').write_text(shell('Dégustations', 'degustations.html', body, True))
     for s in sessions:
-        crumbs = '<p class="breadcrumbs"><a href="index.html">Dégustations</a> / Séance</p>'
+        crumbs = '<p class="breadcrumbs"><a href="degustations.html">Dégustations</a> / Séance</p>'
         body = crumbs + session_intro(s)
         if s.get('minutes_pdf'):
             body += '<section class="card"><h2>Minutes de la séance</h2><p>Document commun aux participants. Les propos ne sont attribués à un membre que lorsque leur auteur est explicitement identifié.</p><div class="documents">' + pdf_links(s['minutes_pdf'], 'les minutes') + '</div></section>'
         body += '<section class="session-records"><h2>Fiches et comptes rendus</h2>' + session_sheets(s) + '</section>'
         body += session_verdict(s) + cigar_description(s) + session_photos(s) + RULES
-        body += '<p class="archive-footer"><a href="index.html">← Toutes les séances</a></p>'
+        body += '<p class="archive-footer"><a href="degustations.html">← Toutes les séances</a></p>'
         html = shell(s['title'], session_url(s), body)
         if s.get('publication_marker'):
             html = html.replace('</head>', '<meta name="crcc-publication" content="' + esc(s['publication_marker']) + '"></head>', 1)
         (out / session_url(s)).write_text(html)
         for f in s['sheets']:
             m = member(s,f)
-            body = f'<p class="breadcrumbs"><a href="index.html">Dégustations</a> / <a href="{session_url(s)}">{esc(s["title"])}</a> / {member_link(m)} — Fiche {f["number"]}</p>'
+            body = f'<p class="breadcrumbs"><a href="degustations.html">Dégustations</a> / <a href="{session_url(s)}">{esc(s["title"])}</a> / {member_link(m)} — Fiche {f["number"]}</p>'
             body += f'<p><span class="badge">{esc(m["grade"])}</span>{"<span class=badge>Première fiche</span>" if f.get("first") else ""}</p><p class="archive-meta">Grade au moment de la dégustation · Dégustation du <time datetime="{s["date"]}">{long_date(s["date"])}</time><br>Publié le {long_date(f["published"])} · Dernière révision : {long_date(f["revised"])}</p>'
             body += tasting_facts(f)
             body += f'<section class="card"><h2>Identification du dossier</h2><p><strong>Membre :</strong> {member_link(m)}<br><strong>Cigare déclaré :</strong> {esc(f["cigar"])}<br><strong>Durée :</strong> {esc(f["duration"])}<br><strong>Accompagnement :</strong> {esc(f["pairing"])}<br><strong>Prix :</strong> {esc(f["price"])}</p><div class="documents">{pdf_links(f["pdf"], "la fiche")}</div>'
@@ -306,17 +308,29 @@ def build(data):
                 body += '<ul>' + ''.join(f'<li><a href="{sheet_url(of)}">{esc(title(os,of))}</a></li>' for os,of in others) + '</ul>'
             else:
                 body += '<p>Il s’agit de la première fiche archivée de ce membre. Le dossier attend la suite.</p>'
-            body += f'<p><a href="{member_url(m)}">Registre et statistiques de {esc(m["name"])} →</a></p><p><a href="{session_url(s)}">← Revenir à la séance</a> · <a href="index.html">Toutes les séances</a></p></section>'
+            body += f'<p><a href="{member_url(m)}">Registre et statistiques de {esc(m["name"])} →</a></p><p><a href="{session_url(s)}">← Revenir à la séance</a> · <a href="degustations.html">Toutes les séances</a></p></section>'
             (out / sheet_url(f)).write_text(shell(title(s,f), sheet_url(f), body))
     spec = importlib.util.spec_from_file_location('member_pages', Path(__file__).with_name('member-pages.py'))
     registry = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(registry)
     member_pages = registry.build_members(SimpleNamespace(ROOT=ROOT, member_url=member_url, session_url=session_url, sheet_url=sheet_url, score=score, title=title, long_date=long_date, shell=shell), data)
+    count_sheets=sum(len(s['sheets']) for s in sessions)
+    count_people=len(registry.people_for(data))
+    home='<section class="member-welcome"><p class="smallcaps">LES ARCHIVES SONT OUVERTES</p><h2>Bienvenue dans l’espace membres.</h2><p class="lead">Les dégustations, les dossiers des membres et les services du Comité, réunis au même endroit. La navigation vous mènera au bon bureau ; la diligence du service n’est pas garantie.</p></section>'
+    home+='<dl class="member-overview"><div><dt>Séances archivées</dt><dd>'+str(len(sessions))+'</dd></div><div><dt>Fiches de dégustation</dt><dd>'+str(count_sheets)+'</dd></div><div><dt>Profils au registre</dt><dd>'+str(count_people)+'</dd></div></dl><div class="member-home-grid">'
+    if sessions:
+        latest=sessions[0]
+        home+='<section class="member-latest"><p class="smallcaps">DERNIÈRE DÉGUSTATION</p><time class="news-date" datetime="'+latest['date']+'">'+long_date(latest['date'])+'</time><h2><a href="'+session_url(latest)+'">'+esc(latest['title'])+'</a></h2><p class="archive-meta">'+', '.join(esc(m['name']) for m in latest['participants'])+' · '+str(len(latest['sheets']))+' fiche'+('s' if len(latest['sheets'])>1 else '')+'</p>'+session_verdict(latest,True)+'<p><a class="member-latest-link" href="'+session_url(latest)+'">Ouvrir le dossier de séance →</a></p></section>'
+    else:
+        home+='<section class="member-latest"><h2>Les archives attendent leur première séance.</h2><p>Les dégustations et leurs pièces seront réunies dans la rubrique dédiée.</p></section>'
+    home+='<aside class="member-note"><h2>Le mot du Comité</h2><p>Les cigares passent. Les fiches restent.</p><p>Chaque dégustation conserve ses observations, ses documents et les appréciations de chacun. Les bonnes archives savent distinguer une impression d’une certitude.</p></aside></div><p class="member-home-footer"><a href="degustations.html">Consulter toutes les dégustations →</a></p>'
+    (out/'index.html').write_text(shell('Espace membres','index.html',home))
+    layout.normalize_directory(out)
     # Keep generated pages discoverable and remove only prior archive sitemap entries.
     sitemap = ROOT / 'sitemap.xml'
     text = sitemap.read_text()
     text = re.sub(r'\s*<url><loc>[^<]*/fiches-degustation/[^<]*</loc>.*?</url>', '', text, flags=re.S)
-    urls = ['index.html'] + [session_url(s) for s in sessions] + [sheet_url(f) for s in sessions for f in s['sheets']] + member_pages
+    urls = ['index.html','degustations.html'] + [session_url(s) for s in sessions] + [sheet_url(f) for s in sessions for f in s['sheets']] + member_pages
     entries = ''.join(f'  <url><loc>{BASE}fiches-degustation/{p}</loc></url>\n' for p in urls)
     sitemap.write_text(text.replace('</urlset>', entries + '</urlset>'))
     ET.parse(sitemap)

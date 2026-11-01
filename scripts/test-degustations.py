@@ -4,6 +4,7 @@ import importlib.util
 import json
 import tempfile
 import shutil
+import re
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlsplit, unquote
@@ -28,7 +29,7 @@ for p in (archives.ROOT / 'fiches-degustation').glob('*.html'):
     if p.name in ('bureau-correspondances.html', 'bureaux-commissions.html', 'soumettre-degustation.html', 'validation-degustations.html'):
         continue  # Independent office pages are not generated tasting archives.
     text = p.read_text()
-    nav = text.split('<nav class="site-nav"')[1].split('</nav>')[0]
+    nav = re.search(r'<nav class="site-nav[^\"]*"[^>]*>(.*?)</nav>',text,re.S).group(1)
     assert '(PDF, nouvel onglet)' not in text, 'Document button labels must stay concise'
     assert ' download' not in text and 'Télécharger la fiche' not in text and 'Télécharger les minutes' not in text, 'No separate download links'
     assert 'Fiches de dégustation' not in nav, 'Archive accidentally added to main menu'
@@ -130,7 +131,7 @@ with tempfile.TemporaryDirectory() as tmp:
     directory = (root / 'fiches-degustation/registre-membres.html').read_text()
     assert directory.index('>Alpha</a>') < directory.index('>Louis</a>'), 'Directory must be alphabetical'
     assert 'membre-test-member.html' in directory, 'New participants must automatically enter the directory'
-    index = (root / 'fiches-degustation/index.html').read_text()
+    index = (root / 'fiches-degustation/degustations.html').read_text()
     assert index.index('2026-08-12') < index.index('2026-01-01'), 'Incorrect descending order'
     assert '2 participants' in index and 'Minutes disponibles' in index
     session_html = (root / ('fiches-degustation/' + archives.session_url(s))).read_text()

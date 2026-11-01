@@ -64,6 +64,13 @@ for page in pages:
             errors.append(f'Broken local link: {rel} -> {href}')
     if rel.startswith('fiches-degustation/') and 'noindex,nofollow' not in html:
         errors.append('Private archive missing noindex: ' + rel)
+    if rel.startswith('fiches-degustation/'):
+        nav=re.search(r'<nav class="site-nav member-nav"[^>]*>(.*?)</nav>',html,re.S)
+        expected=['index.html','degustations.html','registre-membres.html','bureaux-commissions.html']
+        if not nav or re.findall(r'href="([^"]+)"',nav.group(1))!=expected:
+            errors.append('Missing shared members navigation: '+rel)
+        if not re.search(r'<a class="member-logo" href="../index.html"',html):
+            errors.append('Missing member logo link to main site: '+rel)
     if not rel.startswith('fiches-degustation/') and any(('/fiches-degustation/' in ref or ref.startswith('fiches-degustation/')) and not (ref.endswith('/fiches-degustation/') or ref == 'fiches-degustation/') for ref in p.references):
         errors.append('Public link to private archive: ' + rel)
 
@@ -77,6 +84,9 @@ if not correspondence.is_file():
     errors.append('Missing private Bureau des correspondances')
 if not members_home.is_file() or 'href="bureaux-commissions.html"' not in members_home.read_text(encoding='utf-8'):
     errors.append('Missing Bureaux et Commissions link on members home')
+tastings=root/'fiches-degustation'/'degustations.html'
+if not tastings.is_file() or 'href="soumettre-degustation.html"' not in tastings.read_text():
+    errors.append('Missing tasting list or submission entry')
 if directory.is_file():
     directory_html = directory.read_text(encoding='utf-8')
     for expected_link in ('href="bureau-correspondances.html"', 'href="/examen?comite=1"'):

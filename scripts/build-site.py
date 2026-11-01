@@ -314,6 +314,11 @@ def main():
     for office_page in ('bureaux-commissions.html', 'bureau-correspondances.html', 'soumettre-degustation.html', 'validation-degustations.html'):
         shutil.copy2(ROOT / 'fiches-degustation' / office_page,
                      DIST / 'fiches-degustation' / office_page)
+    import importlib.util
+    layout_spec=importlib.util.spec_from_file_location('member_layout',ROOT/'scripts/member-layout.py')
+    member_layout=importlib.util.module_from_spec(layout_spec)
+    layout_spec.loader.exec_module(member_layout)
+    member_layout.normalize_directory(DIST/'fiches-degustation')
     sitemap = DIST / 'sitemap.xml'
     sitemap.write_text(re.sub(r'\s*<url><loc>[^<]*/fiches-degustation/[^<]*</loc>.*?</url>', '', sitemap.read_text(), flags=re.S))
     for page in (DIST / 'fiches-degustation').glob('*.html'):

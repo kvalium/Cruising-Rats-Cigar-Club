@@ -106,6 +106,14 @@ Le service compétent n’a pas encore été identifié.
 
 La section `fiches-degustation/` est accessible depuis le guide et le pied de page de l’accueil, sans entrée au menu principal. Pages statiques, consultables sans JavaScript ; les filtres membre/marque ajoutent une aide facultative.
 
+`fiches-degustation/index.html` est l’accueil dédié à l’espace membres ; la liste
+des séances et le bloc de soumission sont dans `fiches-degustation/degustations.html`.
+Toutes les pages de cet espace partagent l’en-tête de `scripts/member-layout.py` :
+logo lié au site principal, puis menu Accueil, Dégustations, Membres et Bureaux & Commissions.
+Le générateur normalise également les bureaux et formulaires indépendants, avec
+la rubrique active et une navigation utilisable sans JavaScript. Vérifier avec
+`python3 scripts/test-member-navigation.py` après régénération.
+
 Source : `data/degustations.json` et fragments HTML de comptes rendus dans `data/comptes-rendus/`. Régénérer avec `python3 scripts/build-degustations.py`, puis vérifier avec `python3 scripts/test-degustations.py`. Les pages générées sont versionnées pour GitHub Pages ; aucune dépendance ni compilation côté hébergeur.
 
 Chaque séance possède un identifiant stable, une date de dégustation, un contexte, des participants (avec leur grade historique), les cigares et une liste de fiches. `minutes_pdf` vaut `null` ou le chemin relatif d’un unique PDF commun, placé par exemple dans `documents/seances/<id>/minutes.pdf`. Il ne faut pas dupliquer les minutes par membre.

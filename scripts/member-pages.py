@@ -231,12 +231,12 @@ def build_members(archive, data):
         <p>Les graphiques utilisent uniquement les fiches et minutes archivées. Une donnée absente reste non renseignée et n'est jamais interprétée comme zéro.</p>
         <p>Les arômes sont attribués aux membres seulement lorsqu'ils apparaissent dans leurs fiches. Les incidents collectifs des minutes ne leur sont pas imputés.</p>
         <p>Les évaluations du Comité décrivent la qualité documentaire des dossiers, indépendamment des notes personnelles. Les comparaisons entre membres sont réservées aux pages de séances.</p></details>'''
-        body+='<p class="archive-footer"><a href="registre-membres.html">← Registre des membres</a> · <a href="index.html">Toutes les séances de dégustation</a></p>'
+        body+='<p class="archive-footer"><a href="registre-membres.html">← Registre des membres</a> · <a href="degustations.html">Toutes les séances de dégustation</a></p>'
         # Escape the script terminator even when future member input contains HTML.
         payload=json.dumps({'rows':rows},ensure_ascii=False).replace('<','\\u003c').replace('>','\\u003e').replace('&','\\u0026')
         body+=f'<script type="application/json" id="member-data">{payload}</script><script src="https://cdn.jsdelivr.net/npm/chart.js@4.6.1/dist/chart.umd.min.js" defer></script><script src="../js/member-observatory.js?v=20261028" defer></script>'
         (root/'fiches-degustation'/page).write_text(archive.shell(f'{person["name"]} — Registre du membre',page,body).replace('</head>', '<link rel="stylesheet" href="../css/members.css?v=20261028-2"><link rel="stylesheet" href="../css/member-observatory.css?v=20261028"></head>'))
-    directory = '<p class="breadcrumbs"><a href="index.html">Dégustations</a> / Registre des membres</p><p class="lead">Les membres, leurs contributions et les pièces qui les accompagnent. Chaque nom ouvre un dossier personnel ; le Comité n’égare personne volontairement.</p><p>Retrouvez les profils enregistrés, leurs fiches et leurs statistiques de dégustation. Les membres sont classés par ordre alphabétique.</p>'
+    directory = '<p class="breadcrumbs"><a href="index.html">Espace membres</a> / Registre des membres</p><p class="lead">Les membres, leurs contributions et les pièces qui les accompagnent. Chaque nom ouvre un dossier personnel ; le Comité n’égare personne volontairement.</p><p>Retrouvez les profils enregistrés, leurs fiches et leurs statistiques de dégustation. Les membres sont classés par ordre alphabétique.</p>'
     directory += f'<p class="archive-meta">{len(people)} profil' + ('s enregistrés' if len(people)>1 else ' enregistré') + '.</p><ul class="member-directory">'
     for person in sorted(people.values(), key=lambda m:(m['name'].casefold(),m['id'])):
         attended = [s for s in sessions if any(m['id']==person['id'] for m in s['participants'])]
@@ -252,6 +252,6 @@ def build_members(archive, data):
         directory += f'<li class="card member-directory-card">{special_badge(person, compact=True) or grade_badge(person, compact=True)}<div class="directory-details"><div class="directory-heading"><h2><a href="{archive.member_url(person)}">{esc(person["name"])}</a></h2><span class="badge">{esc(person.get("grade") or "Grade non renseigné")}</span></div><p class="archive-meta">{len(attended)} séance' + ('s' if len(attended)>1 else '') + f' · {len(sheets)} fiche' + ('s' if len(sheets)>1 else '') + f'<br>{first}</p><a class="directory-profile" href="{archive.member_url(person)}" aria-label="Consulter le profil de {esc(person["name"])}">Profil et statistiques →</a></div></li>'
     directory += '</ul>'+hierarchy_html()+record_html(people,sessions,archive)
     directory += distinctions_directory_html()
-    directory += '<p class="archive-meta">Les grades affichés correspondent aux dernières informations documentées. Les statistiques portent sur les contributions archivées.</p><p class="archive-footer"><a href="index.html">← Toutes les séances de dégustation</a></p>'
+    directory += '<p class="archive-meta">Les grades affichés correspondent aux dernières informations documentées. Les statistiques portent sur les contributions archivées.</p><p class="archive-footer"><a href="degustations.html">← Toutes les séances de dégustation</a></p>'
     (root/'fiches-degustation/registre-membres.html').write_text(archive.shell('Registre des membres','registre-membres.html',directory).replace('</head>', '<link rel="stylesheet" href="../css/members.css?v=20261028-2"></head>'))
     return pages + ['registre-membres.html']
