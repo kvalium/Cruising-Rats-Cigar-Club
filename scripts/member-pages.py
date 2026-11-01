@@ -92,7 +92,7 @@ def facts_for(person, sessions):
 
 def awards_for(person,facts):
     manual=set(person.get('distinctions') or [])
-    allowed={d[0] for d in DISTINCTIONS if d[3]=='committee'}
+    allowed={d[0] for d in DISTINCTIONS if d[3] in ('committee','record')}
     return facts['auto'] | (manual & allowed)
 
 def grade_progress(person,facts):

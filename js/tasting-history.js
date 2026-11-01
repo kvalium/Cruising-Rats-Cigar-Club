@@ -14,6 +14,7 @@ const EVENTS={
   'publication.editorial.updated':['Présentation mise à jour','review'],
   'publication.title.updated':['Titre de la dégustation modifié','review'],
   'record.ash.confirmed':['Record de cendre enregistré','success'],
+  'distinction.awarded':['Distinction attribuée','success'],
 };
 const STATES={valide:'VALIDÉ','valide-avec-reserves':'VALIDÉ AVEC RÉSERVES','a-regulariser':'À RÉGULARISER'};
 const dateFormat=new Intl.DateTimeFormat('fr-FR',{dateStyle:'long',timeStyle:'short',timeZone:'Europe/Paris'});
@@ -33,6 +34,8 @@ function detailsFor(event,members) {
   for(const [id,score] of Object.entries(data.proposed_committee_scores||{}))if(typeof score==='number')facts.push([`Note proposée · ${name(id)}`,`${score}/100`]);
   if(typeof data.photo_count_added==='number')facts.push(['Photographies ajoutées',String(data.photo_count_added)]);
   if(typeof data.length_mm==='number')facts.push(['Cendre retenue',`${data.length_mm} mm`]);
+  if(data.distinction)facts.push(['Distinction',String(data.distinction)]);
+  if(data.member_name)facts.push(['Membre',String(data.member_name)]);
   const record=data.record_proposal;
   if(typeof record?.estimated_length_cm==='number')facts.push(['Candidature au record',`${record.estimated_length_cm.toLocaleString('fr-FR')} cm · mesure à confirmer`]);
   if(data.title)facts.push(['Titre de séance',String(data.title)]);
@@ -40,6 +43,7 @@ function detailsFor(event,members) {
   if(event.event==='analysis_prepared')summary='Le compte rendu et les propositions de notes sont prêts pour l’examen du Comité.';
   if(event.event==='evidence.photo.added')summary='Une photographie complémentaire a été jointe au dossier. Sa miniature est conservée avec elle.';
   if(event.event==='record.ash.confirmed')summary='La mesure est retenue pour le registre des records, avec sa photographie justificative.';
+  if(event.event==='distinction.awarded')summary='Une distinction a été attribuée au membre sur décision du Comité.';
   if(!summary)summary='Les informations du dossier ont été mises à jour.';
   return {summary,facts,technical:JSON.stringify({event:event.event,...data},null,2)};
 }

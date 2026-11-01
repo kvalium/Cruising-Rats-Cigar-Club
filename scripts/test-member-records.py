@@ -21,4 +21,10 @@ sheet['ash_max_cm']=None
 html=members.record_html(people,[session],archive)
 assert '<th>Cendre la plus longue</th><td>Non homologué' in html
 assert 'Voir la photo' not in html
+facts=members.facts_for(people['julien'],[session])
+assert 'cendre-longue' not in members.awards_for(people['julien'],facts)
+awarded={**people['julien'],'distinctions':['cendre-longue','unknown-award']}
+assert members.awards_for(awarded,facts)=={'cendre-longue'}
+assert 'Ordre de la Cendre Longue' in members.medal_html(awarded,facts)
+assert 'unknown-award' not in members.medal_html(awarded,facts)
 print('Member records checks passed: cm/mm conversion, winning proof, missing measures and unrelated links.')
