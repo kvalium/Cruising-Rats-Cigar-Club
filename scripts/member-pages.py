@@ -9,6 +9,14 @@ def grade_badge(person, compact=False):
     if grade.casefold().strip() == 'rat de passage':
         size = 96 if compact else 144
         return f'<img class="grade-portrait" src="../images/badges/rat-de-passage-{size}.webp" srcset="../images/badges/rat-de-passage-{size*2}.webp 2x" decoding="async" alt="Badge Rat de Passage : jeune rat avec une tétine" width="{size}" height="{size}">'
+    if grade.casefold().strip() in ('rat homologué','rat homologue'):
+        # Grade emblem until the portrait artwork is published in the official assets.
+        size = 96 if compact else 144
+        return (f'<span class="grade-portrait grade-homologue-emblem" role="img" '
+                f'aria-label="Badge Rat Homologué" title="Rat Homologué" '
+                f'style="--grade-seal-size:{size}px">'
+                '<span class="grade-homologue-insignia">CRCC</span>'
+                '<strong>RH</strong><small>RAT HOMOLOGUÉ</small></span>')
     return ''
 
 def special_badge(person, compact=False):
