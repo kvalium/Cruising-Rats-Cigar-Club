@@ -891,7 +891,9 @@
   "members": [
     {
       "id": "louis",
-      "name": "Louis"
+      "name": "Louis",
+      "grade": "Rat Homologué",
+      "grade_updated_at": "2026-11-03"
     },
     {
       "id": "julien",
