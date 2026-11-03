@@ -38,3 +38,14 @@
 .photo-controls span{flex:1;text-align:center}
 .photo-controls button{cursor:pointer;padding:8px 12px;background:#28241d;color:inherit;border:1px solid #887047;border-radius:3px;font:inherit}
 .photo-controls button:disabled{opacity:.4;cursor:default}
+
+
+/* Grade officiel Rat Homologué — emblème typographique de secours en attendant le portrait validé. */
+.grade-homologue-emblem{box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:var(--grade-seal-size,144px);height:var(--grade-seal-size,144px);aspect-ratio:1;border-radius:50%;border:5px double #743c36;background:radial-gradient(circle,#fbf3e5 0%,#e7d4b9 100%);color:#743c36;text-align:center;box-shadow:inset 0 0 0 3px #efe6d6}
+.grade-homologue-emblem .grade-homologue-insignia{font:700 10px/1 Arial,sans-serif;letter-spacing:.18em}
+.grade-homologue-emblem strong{font:700 48px/.95 Georgia,serif;letter-spacing:-.06em}
+.grade-homologue-emblem small{font:700 9px/1.2 Arial,sans-serif;letter-spacing:.03em;max-width:85%}
+.member-directory-card .grade-homologue-emblem{border-width:4px;gap:2px}
+.member-directory-card .grade-homologue-emblem strong{font-size:30px}
+.member-directory-card .grade-homologue-emblem small{font-size:7px}
+@media(max-width:700px){.member-identity .grade-homologue-emblem{border-width:4px;gap:2px}.member-identity .grade-homologue-emblem strong{font-size:31px}.member-identity .grade-homologue-emblem small{font-size:7px}.member-directory-card .grade-homologue-emblem strong{font-size:25px}}
