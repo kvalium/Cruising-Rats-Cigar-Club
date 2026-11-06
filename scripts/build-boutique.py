@@ -14,7 +14,7 @@ GROUPS = [('hommes', 'Hommes', 'Louis prend la pose. Le dossier reste ouvert.'),
 
 def image(product, prefix='', side='left', lazy=True):
     model = product['model']
-    label = ('Vue portée par ' + model + ' en version réaliste' if model in ('Pipa', 'Louis')
+    label = ('Vue portée par ' + model if model in ('Pipa', 'Louis')
              else 'Vue portée sur un mannequin junior de catalogue' if model == 'junior'
              else 'Seconde vue du vêtement seul') if side == 'right' else 'Vêtement seul'
     return (f'<div class="garment-crop garment-{side}"><img '
@@ -50,7 +50,7 @@ def product_page(p, products, template):
     page = re.sub(r'<h1 class="site-title">.*?</h1>', '<div class="site-title">La Boutique du Comité</div>', page)
     # Template links live at the public root; the product pages live one level below.
     page = re.sub(r'(href|src)="(?![a-z]+:|/|#)([^"]+)"', r'\1="../\2"', page)
-    gallery_caption = 'Porté par ' + p['model'] + ' · version réaliste' if p['model'] in ('Pipa','Louis') else ('Vue portée · junior' if p['model']=='junior' else 'Seconde vue · pièce seule')
+    gallery_caption = 'Porté par ' + p['model'] if p['model'] in ('Pipa','Louis') else ('Vue portée · junior' if p['model']=='junior' else 'Seconde vue · pièce seule')
     back = ''
     if p.get('back_image'):
         back = ('<section class="garment-back-view" aria-labelledby="back-title"><h2 id="back-title">Le dos du Club</h2>'
@@ -76,7 +76,7 @@ def product_page(p, products, template):
             f'<dt>Coloris présenté</dt><dd>{escape(p["colour"])}</dd>'
             f'<dt>Matière envisagée</dt><dd>{escape(p["fabric"])}</dd>'
             f'<dt>Coupe</dt><dd>{escape(p["cut"])}</dd></dl>'
-            '<p class="boutique-note">Collection fictive. Visuels de création générés, sans article proposé à la vente.</p></aside></section>'
+            '</aside></section>'
             '<section class="boutique-related" aria-labelledby="related-title"><h2 id="related-title">Dans le même vestiaire</h2>'
             '<div class="boutique-products">' + ''.join(card(other,'../') for other in peers) + '</div></section>'
             f'<p><a class="boutique-back" href="../boutique.html#{p["category"]}">← Retour au rayon {group.lower()}</a></p></main>')
@@ -111,11 +111,11 @@ def main():
             'Cigarolo, Pipa et les hamsters du HRPC se partagent le vestiaire.</p>'
             '<nav class="boutique-rays" aria-label="Rayons de la boutique">'
             '<a href="#hommes">HOMMES</a><a href="#femmes">FEMMES</a><a href="#enfants">ENFANTS</a></nav>'
-            '<p class="boutique-note">Une collection fictive à explorer : chaque article a sa propre fiche et ses visuels. '
-            'Pipa et Louis prennent la pose en version réaliste. Aucun article n’est proposé à la vente.</p></div>'
+            '<p class="boutique-note">Chaque article a sa propre fiche et ses visuels. '
+            'Pipa et Louis prennent la pose.</p></div>'
             '<figure><a href="boutique-articles/'+hero['slug']+'.html">'
             '<img src="boutique-media/'+hero['slug']+'.webp" width="1536" height="1024" '
-            'alt="Sweat bordeaux Opération hamster, seul et porté par Pipa en version réaliste" fetchpriority="high" decoding="async">'
+            'alt="Sweat bordeaux Opération hamster, seul et porté par Pipa" fetchpriority="high" decoding="async">'
             '</a><figcaption>Opération hamster · Pipa, chargée de l’infiltration et de la présentation.</figcaption></figure></section>'
             '<div class="boutique-filter" aria-label="Filtrer la collection">'
             '<button type="button" data-filter="all" aria-pressed="true">Tout le vestiaire</button>'
