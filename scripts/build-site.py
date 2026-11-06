@@ -289,6 +289,7 @@ def main():
         shutil.copy2(path, DIST / path.name)
     for name in ('sitemap.xml', 'robots.txt', '_headers', 'llms.txt'):
         shutil.copy2(ROOT / name, DIST / name)
+    subprocess.run([sys.executable, str(ROOT / 'scripts/build-boutique.py'), str(DIST)], cwd=ROOT, check=True)
     # Rebuild tasting archives behind the shared-password Cloudflare middleware.
     prepare_data(snapshot())
     protected_docs = DIST / 'fiches-degustation-docs'
