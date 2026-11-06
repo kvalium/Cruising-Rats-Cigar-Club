@@ -256,11 +256,31 @@ def install_instagram_link():
         html = html.replace('</head>', style + '</head>', 1)
         page.write_text(html, encoding='utf-8')
 
+def install_boutique_navigation():
+    """Expose the public catalogue without changing the dedicated members menu."""
+    from html import escape
+    for page in DIST.rglob('*.html'):
+        if page.relative_to(DIST).parts[0] in ('fiches-degustation', 'fiches-degustation-docs'):
+            continue
+        html = page.read_text(encoding='utf-8')
+        match = re.search(r'<nav class="site-nav"[^>]*>(.*?)</nav>', html, re.S)
+        if not match or 'boutique.html' in match.group(1):
+            continue
+        href = os.path.relpath(DIST / 'boutique.html', page.parent).replace(os.sep, '/')
+        link = '<a href="' + escape(href, quote=True) + '">BOUTIQUE</a>'
+        menu = match.group(0)
+        contact = re.search(r'<a href="[^"]*contact\.html"', menu)
+        if contact:
+            menu = menu[:contact.start()] + link + menu[contact.start():]
+        else:
+            menu = menu.replace('</nav>', link + '</nav>', 1)
+        page.write_text(html[:match.start()] + menu + html[match.end():], encoding='utf-8')
+
 def main():
     if DIST.exists():
         shutil.rmtree(DIST)
     DIST.mkdir()
-    for directory in ('css', 'js', 'jeu', 'scripts', 'data', 'news-thumbs', 'actualites'):
+    for directory in ('css', 'js', 'jeu', 'scripts', 'data', 'news-thumbs', 'actualites', 'boutique-media'):
         shutil.copytree(ROOT / directory, DIST / directory)
     if not S3:
         for directory in ('images', 'documents'):
@@ -328,6 +348,7 @@ def main():
     enrich_news_pages()
     install_album_control()
     install_instagram_link()
+    install_boutique_navigation()
     shutil.rmtree(DIST / 'scripts')
     shutil.rmtree(DIST / 'data')
     subprocess.run([sys.executable, str(ROOT / 'scripts/check-site.py'), str(DIST)], cwd=ROOT, check=True)
